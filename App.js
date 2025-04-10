@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
 export default function LoadingPage() {
@@ -24,12 +24,19 @@ export default function LoadingPage() {
             width: 200,
             height: 200,
             borderRadius: 20,
-            marginTop: -200,
+            marginTop: -150,
           }}
+        />
+        <ActivityIndicator
+          style={{
+            marginTop: 30,
+          }}
+          size="large"
+          color="#121212"
         />
         <View
           style={{
-            marginTop: 100,
+            marginTop: 50,
             width: 250,
             height: 40,
             backgroundColor: '#ccc',
@@ -74,7 +81,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f6fc',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
