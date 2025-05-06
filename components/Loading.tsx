@@ -5,7 +5,6 @@ export function Loading() {
     const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simula un tiempo de carga de 3 segundos
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 3000);
@@ -28,15 +27,15 @@ export function Loading() {
         />
         <ActivityIndicator
           style={{
-            marginTop: 20, // Reducir el margen superior
+            marginTop: 20, 
           }}
           size="large"
           color="#121212"
         />
         <View
           style={{
-            marginTop: 40, // Reducir el margen superior
-            marginBottom: 10, // Aumentar el margen inferior
+            marginTop: 40, 
+            marginBottom: 10, 
             width: 250,
             height: 40,
             backgroundColor: '#ccc',

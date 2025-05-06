@@ -5,14 +5,12 @@ import { router } from 'expo-router';
 export default function Login() {
     return (
         <View style={styles.container}>
-            {/* Logo */}
             <Image
-                source={require('../assets/logo.png')} 
+                source={require('../../assets/logo.png')} 
                 style={styles.logo}
             />
             <Text style={styles.appName}>MiGym</Text>
 
-            {/* Campos de entrada */}
             <Text style={styles.label}>CORREO ELECTRÓNICO</Text>
             <TextInput
                 style={styles.input}
@@ -33,12 +31,11 @@ export default function Login() {
                 <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
             </TouchableOpacity>
 
-            {/* Enlace para recuperar contraseña */}
+
             <TouchableOpacity>
                 <Text style={styles.forgotPassword}>¿Olvidaste la contraseña?</Text>
             </TouchableOpacity>
 
-            {/* Registro */}
             <Text style={styles.registerText}>
                 ¿No estás registrado todavía?{' '}
                 <TouchableOpacity onPress={() => router.push('/register')}>
@@ -47,7 +44,6 @@ export default function Login() {
             </Text>
             
 
-            {/* Botones de inicio de sesión con Google y Facebook */}
             <TouchableOpacity style={styles.socialButton}>
                 <MaterialIcons name="google" size={24} color="#DB4437" />
                 <Text style={styles.socialButtonText}>Iniciar sesión con Google</Text>
@@ -67,13 +63,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5F5F5',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 50,
-        paddingBottom: 190,
+        paddingTop: 5,
+        paddingBottom: 100,
     },
     logo: {
         width: 200,
         height: 200,
-        marginBottom: 10,
+        marginBottom: 5,
         borderRadius: 20,
     },
     appName: {
@@ -106,7 +102,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
-        marginTop: 10,
+        marginTop: 5,
     },
     loginButtonText: {
         color: '#FFF',
@@ -116,12 +112,12 @@ const styles = StyleSheet.create({
     forgotPassword: {
         color: '#1E90FF',
         fontSize: 14,
-        marginTop: 10,
+        marginTop: 5,
     },
     registerText: {
         fontSize: 14,
         color: '#333',
-        marginTop: 20,
+        marginTop: 10,
     },
     registerLink: {
         color: '#1E90FF',

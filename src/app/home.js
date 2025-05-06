@@ -1,17 +1,15 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import Navigation from "../components/Navigation";
+import Navigation from "../../components/Navigation";
 
 export default function Home() {
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.greeting}>Hola, <Text style={styles.name}>Mirtho!</Text></Text>
                 <Text style={styles.subGreeting}>¿Listo para entrenar?</Text>
             </View>
 
-            {/* Search Bar */}
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
@@ -21,7 +19,6 @@ export default function Home() {
                 <MaterialIcons name="search" size={24} color="#999" style={styles.searchIcon} />
             </View>
 
-            {/* Carousel */}
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -44,7 +41,6 @@ export default function Home() {
                     <Text style={styles.cardTitle}>PESAS</Text>
                     <Text style={styles.cardLink}>Ver más</Text>
                 </View>
-                {/* Agrega más tarjetas si es necesario */}
             </ScrollView>
         </View> 
     );

@@ -1,23 +1,27 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Picker } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function Register() {
+    const router = useRouter();
     return (
         <View style={styles.container}>
-            {/* Logo */}
             <Image
-                source={require ('../assets/logo.png')}
+                source={require ('../../assets/logo.png')}
                 style={styles.logo}
             />
             <Text style={styles.title}>Crea una nueva cuenta</Text>
 
-            {/* Enlace para iniciar sesión */}
             <Text style={styles.loginText}>
                 ¿Ya estás registrado?{' '}
-                <Text style={styles.loginLink}>Iniciar Sesión</Text>
+                <Text
+                    style={styles.loginLink}
+                    onPress={() => router.push('/login')}
+                >
+                    Iniciar Sesión
+                </Text>
             </Text>
 
-            {/* Campos de entrada */}
             <Text style={styles.label}>NOMBRE Y APELLIDO</Text>
             <TextInput
                 style={styles.input}
@@ -58,7 +62,6 @@ export default function Register() {
                 <Picker.Item label="Gimnasio B" value="gimnasio_b" />
             </Picker>
 
-            {/* Botón de registro */}
             <TouchableOpacity style={styles.registerButton}>
                 <Text style={styles.registerButtonText}>Registrarse</Text>
             </TouchableOpacity>
@@ -72,26 +75,26 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5F5F5',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 20, // 
+        paddingHorizontal: 15,
+        paddingTop: 15,
+        paddingBottom: 5,
     },
     logo: {
-        width: 100,
-        height: 100,
-        marginBottom: 20,
+        width: 80,
+        height: 80,
+        marginBottom: 15,
         borderRadius: 10,
     },
     title: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 30,
+        marginBottom: 20,
     },
     loginText: {
-        fontSize: 14,
+        fontSize: 12,
         color: '#333',
-        marginBottom: 30,
+        marginBottom: 20,
         textAlign: 'center',
     },
     loginLink: {
@@ -100,20 +103,20 @@ const styles = StyleSheet.create({
     },
     label: {
         alignSelf: 'flex-start',
-        fontSize: 14,
+        fontSize: 12,
         color: '#333',
         marginBottom: 5,
-        marginTop: 15,
+        marginTop: 10,
     },
     input: {
         width: '100%',
-        height: 40,
+        height: 35,
         borderWidth: 1,
         borderColor: '#CCC',
         borderRadius: 5,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         backgroundColor: '#FFF',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     datePicker: {
         flexDirection: 'row',
@@ -121,33 +124,33 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#CCC',
         borderRadius: 5,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         backgroundColor: '#FFF',
-        marginBottom: 15,
+        marginBottom: 10,
         width: '100%',
     },
     picker: {
         width: '100%',
-        height: 40,
+        height: 35,
         borderWidth: 1,
         borderColor: '#CCC',
         borderRadius: 5,
         backgroundColor: '#FFF',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     registerButton: {
         width: '100%',
-        height: 45,
+        height: 40,
         backgroundColor: '#00AEEF',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
-        marginTop: 30,
-        marginBottom: 50,
+        marginTop: 20,
+        marginBottom: 5,
     },
     registerButtonText: {
         color: '#FFF',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
     },
 });
