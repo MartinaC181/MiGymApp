@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { Loading } from '../components/Loading';
 import { useRouter } from 'expo-router';
 
-
 export default function Index() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -16,5 +15,5 @@ export default function Index() {
     return () => clearTimeout(timer); 
   }, []);
 
-  return isLoading ? <Loading /> : navigate('/home');
+  return isLoading ? <Loading /> : null;
 }

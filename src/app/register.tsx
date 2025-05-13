@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Picker } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -7,7 +7,7 @@ export default function Register() {
     return (
         <View style={styles.container}>
             <Image
-                source={require ('../../assets/logo.png')}
+                source={require('../assets/logo.png')}
                 style={styles.logo}
             />
             <Text style={styles.title}>Crea una nueva cuenta</Text>
@@ -56,11 +56,13 @@ export default function Register() {
             </View>
 
             <Text style={styles.label}>GIMNASIO</Text>
-            <Picker style={styles.picker}>
-                <Picker.Item label="Seleccionar" value="" />
-                <Picker.Item label="Gimnasio A" value="gimnasio_a" />
-                <Picker.Item label="Gimnasio B" value="gimnasio_b" />
-            </Picker>
+            <View style={styles.pickerContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Seleccionar gimnasio"
+                    placeholderTextColor="#999"
+                />
+            </View>
 
             <TouchableOpacity style={styles.registerButton}>
                 <Text style={styles.registerButtonText}>Registrarse</Text>
@@ -68,7 +70,6 @@ export default function Register() {
         </View>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -129,13 +130,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         width: '100%',
     },
-    picker: {
+    pickerContainer: {
         width: '100%',
-        height: 35,
-        borderWidth: 1,
-        borderColor: '#CCC',
-        borderRadius: 5,
-        backgroundColor: '#FFF',
         marginBottom: 10,
     },
     registerButton: {

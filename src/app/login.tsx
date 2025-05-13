@@ -1,12 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 export default function Login() {
     return (
         <View style={styles.container}>
             <Image
-                source={require('../../assets/logo.png')} 
+                source={require('../assets/logo.png')} 
                 style={styles.logo}
             />
             <Text style={styles.appName}>MiGym</Text>
@@ -31,7 +31,6 @@ export default function Login() {
                 <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
             </TouchableOpacity>
 
-
             <TouchableOpacity>
                 <Text style={styles.forgotPassword}>¿Olvidaste la contraseña?</Text>
             </TouchableOpacity>
@@ -42,15 +41,14 @@ export default function Login() {
                     <Text style={styles.registerLink}>Regístrate</Text>
                 </TouchableOpacity>
             </Text>
-            
 
             <TouchableOpacity style={styles.socialButton}>
-                <MaterialIcons name="google" size={24} color="#DB4437" />
+                <MaterialCommunityIcons name="google" size={24} color="#DB4437" />
                 <Text style={styles.socialButtonText}>Iniciar sesión con Google</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.socialButton}>
-                <MaterialIcons name="facebook" size={24} color="#4267B2" />
+                <MaterialCommunityIcons name="facebook" size={24} color="#4267B2" />
                 <Text style={styles.socialButtonText}>Iniciar sesión con Facebook</Text>
             </TouchableOpacity>
         </View>

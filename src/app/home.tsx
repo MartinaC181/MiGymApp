@@ -27,7 +27,7 @@ export default function Home() {
             >
                 <View style={styles.card}>
                     <Image
-                        source={{ uri: "https://via.placeholder.com/150" }} // Reemplaza con tu imagen
+                        source={{ uri: "https://via.placeholder.com/150" }}
                         style={styles.cardImage}
                     />
                     <Text style={styles.cardTitle}>FUNCIONAL HIT</Text>
@@ -35,7 +35,7 @@ export default function Home() {
                 </View>
                 <View style={styles.card}>
                     <Image
-                        source={{ uri: "https://via.placeholder.com/150" }} // Reemplaza con tu imagen
+                        source={{ uri: "https://via.placeholder.com/150" }}
                         style={styles.cardImage}
                     />
                     <Text style={styles.cardTitle}>PESAS</Text>
