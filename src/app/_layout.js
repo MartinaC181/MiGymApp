@@ -1,6 +1,6 @@
 import { Slot } from "expo-router";
 import { View } from "react-native";
-import Navigation from "../../components/Navigation";
+import Navigation from "../components/Navigation";
 
 export default function Layout() {
 return (

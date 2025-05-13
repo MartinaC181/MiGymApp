@@ -1,6 +1,6 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import Navigation from "../../components/Navigation";
+import Navigation from "../components/Navigation";
 
 export default function Home() {
     return (
