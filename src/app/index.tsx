@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Loading } from '../components/Loading';
+import SplashLoader from '../components/SplashLoader';
+import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function Index() {
@@ -10,10 +11,21 @@ export default function Index() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       router.push('/login');
-    }, 2000); 
+    }, 3000); // Tiempo suficiente para ver la animación
 
     return () => clearTimeout(timer); 
   }, []);
 
-  return isLoading ? <Loading /> : null;
+  return isLoading ? (
+    <View style={styles.container}>
+      <SplashLoader size={150} message="Iniciando..." />
+    </View>
+  ) : null;
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  }
+});

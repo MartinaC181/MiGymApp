@@ -7,7 +7,7 @@ export default function Register() {
     return (
         <View style={styles.container}>
             <Image
-                source={require('../assets/logo.png')}
+                source={require('../assets/icon.png')}
                 style={styles.logo}
             />
             <Text style={styles.title}>Crea una nueva cuenta</Text>
