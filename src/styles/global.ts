@@ -3,6 +3,16 @@ import { StyleSheet } from "react-native";
 import theme from "../constants/theme";
 
 const globalStyles = StyleSheet.create({
+    safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.surface, // fondo gris claro
+  },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.lg,
+    justifyContent: "center",
+  },
    logoContainer: {
     alignItems: "center",
     marginBottom: theme.spacing.lg,
@@ -39,6 +49,14 @@ const globalStyles = StyleSheet.create({
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.sm,
   },
+   primaryButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: theme.spacing.md,
+  },
   buttonText: {
     color: theme.colors.background,
     fontSize: theme.typography.fontSize.medium,
@@ -56,7 +74,7 @@ const globalStyles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginTop: theme.spacing.lg,
   },
-  registerLink: {
+  textLink: {
     color: theme.colors.primary,
     fontWeight: "bold",
   },
@@ -80,6 +98,88 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
   },
+   title: {
+    fontSize: theme.typography.fontSize.title,
+    fontFamily: theme.typography.fontFamily.regular,
+    color: theme.colors.textPrimary,
+    textAlign: "center",
+    marginBottom: theme.spacing.lg,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)", // fondo gris semitransparente
+    justifyContent: "center",
+    alignItems: "center",
+    padding: theme.spacing.lg,
+  },
+  modalContainer: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    width: "100%",
+    maxWidth: 320,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: theme.typography.fontSize.title,
+    fontFamily: theme.typography.fontFamily.regular,
+    fontWeight: "bold",
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.textSecondary,
+  },
+  modalText: {
+    fontSize: theme.typography.fontSize.small,
+    fontFamily: theme.typography.fontFamily.regular,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+    marginBottom: theme.spacing.md,
+  },
+  pickerContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  borderWidth: 1,
+  borderColor: theme.colors.primary,
+  borderRadius: theme.borderRadius.md,
+  backgroundColor: theme.colors.background,
+  paddingHorizontal: theme.spacing.md,
+  paddingVertical: theme.spacing.sm,
+  marginBottom: theme.spacing.md,
+},
+
+pickerText: {
+  fontSize: theme.typography.fontSize.medium,
+  fontFamily: theme.typography.fontFamily.medium,
+  color: theme.colors.surface,
+  flex: 1,
+},
+  errorText: {
+    color: theme.colors.error,
+    fontSize: theme.typography.fontSize.small,
+    marginTop: theme.spacing.sm,
+    textAlign: "center",
+  },
+  successContainer: {
+  backgroundColor: theme.colors.background,
+  borderRadius: theme.borderRadius.lg,
+  padding: theme.spacing.lg,
+  alignItems: "center",
+  width: "100%",
+  maxWidth: 320,
+},
+successTitle: {
+  fontSize: theme.typography.fontSize.title,
+  fontFamily: theme.typography.fontFamily.regular,
+  color: theme.colors.textPrimary,
+  textAlign: "center",
+  marginTop: theme.spacing.sm,
+},
+successLink: {
+  color: theme.colors.primary,
+  fontSize: theme.typography.fontSize.small,
+  textDecorationLine: "underline",
+  marginTop: theme.spacing.md,
+},
 });
 
 export default globalStyles;
