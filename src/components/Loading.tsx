@@ -17,7 +17,7 @@ export function Loading() {
     return (
       <View style={styles.container}>
         <Image
-          source={require('../assets/logo.png')}
+          source={require('../assets/icon.png')}
           style={{
             width: 200,
             height: 200,
