@@ -1,4 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import globalStyles from '../styles/global';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
