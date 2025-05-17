@@ -1,13 +1,13 @@
 // src/theme.ts
 
 const colors = {
-  primary: '#00BFFF',
-  background: '#FFFFFF',
-  textPrimary: '#111111',
-  textSecondary: '#3E3E3E',
-  surface: '#F2F2F2',
-  success: '#88DA62',
-  error: '#FF5A5F',
+  primary: '#00BFFF', // Azul
+  background: '#FFFFFF', // Blanco
+  textPrimary: '#111111', // Negro
+  textSecondary: '#3E3E3E', // Gris
+  surface: '#F2F2F2', // Gris claro
+  success: '#88DA62', // Verde
+  error: '#FF5A5F', // Rojo
 };
 
 const spacing = {
