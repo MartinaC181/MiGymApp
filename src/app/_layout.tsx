@@ -1,7 +1,33 @@
+import React, { useEffect } from "react";
 import { Slot } from "expo-router";
 import { View, StyleSheet } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+import { useFonts } from "expo-font";
+import {
+    Roboto_400Regular,
+    Roboto_500Medium,
+    Roboto_700Bold,
+} from "@expo-google-fonts/roboto";
+
+import theme from "../constants/theme"; // ruta a tu archivo theme.ts
+
+SplashScreen.preventAutoHideAsync();
 
 export default function Layout() {
+    const [fontsLoaded] = useFonts({
+        [theme.typography.fontFamily.regular]: Roboto_400Regular,
+        [theme.typography.fontFamily.medium]: Roboto_500Medium,
+        [theme.typography.fontFamily.bold]: Roboto_700Bold,
+    });
+
+    useEffect(() => {
+        if (fontsLoaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded]);
+
+    if (!fontsLoaded) return null;
+
     return (
         <View style={styles.container}>
             <Slot />
@@ -12,8 +38,26 @@ export default function Layout() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white'
-    }
+        backgroundColor: theme.colors.background,
+    },
 });
+
+
+
+
+// export default function Layout() {
+//     return (
+//         <View style={styles.container}>
+//             <Slot />
+//         </View>
+//     );
+// }
+//
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         backgroundColor: 'white'
+//     }
+// });
