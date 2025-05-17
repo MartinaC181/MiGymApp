@@ -1,19 +1,19 @@
-
 import { StyleSheet } from "react-native";
 import theme from "../constants/theme";
 
 const globalStyles = StyleSheet.create({
-    safeArea: {
+  safeArea: {
     flex: 1,
     backgroundColor: theme.colors.surface, // fondo gris claro
   },
   container: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.lg,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: theme.colors.background, // Fondo desde theme
+    padding: theme.spacing.lg,
   },
-   logoContainer: {
+  logoContainer: {
     alignItems: "center",
     marginBottom: theme.spacing.lg,
   },
@@ -49,7 +49,7 @@ const globalStyles = StyleSheet.create({
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.sm,
   },
-   primaryButton: {
+  primaryButton: {
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.md,
@@ -98,16 +98,21 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
   },
-   title: {
+  title: {
     fontSize: theme.typography.fontSize.title,
-    fontFamily: theme.typography.fontFamily.regular,
+    fontFamily: theme.typography.fontFamily.bold,
     color: theme.colors.textPrimary,
     textAlign: "center",
     marginBottom: theme.spacing.lg,
   },
+  description: {
+    fontSize: theme.typography.fontSize.medium,
+    fontFamily: theme.typography.fontFamily.regular,
+    color: theme.colors.textSecondary,
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)", // fondo gris semitransparente
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
     padding: theme.spacing.lg,
@@ -135,24 +140,23 @@ const globalStyles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   pickerContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  borderWidth: 1,
-  borderColor: theme.colors.primary,
-  borderRadius: theme.borderRadius.md,
-  backgroundColor: theme.colors.background,
-  paddingHorizontal: theme.spacing.md,
-  paddingVertical: theme.spacing.sm,
-  marginBottom: theme.spacing.md,
-},
-
-pickerText: {
-  fontSize: theme.typography.fontSize.medium,
-  fontFamily: theme.typography.fontFamily.medium,
-  color: theme.colors.surface,
-  flex: 1,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+  },
+  pickerText: {
+    fontSize: theme.typography.fontSize.medium,
+    fontFamily: theme.typography.fontFamily.medium,
+    color: theme.colors.surface,
+    flex: 1,
+  },
   errorText: {
     color: theme.colors.error,
     fontSize: theme.typography.fontSize.small,
@@ -160,26 +164,39 @@ pickerText: {
     textAlign: "center",
   },
   successContainer: {
-  backgroundColor: theme.colors.background,
-  borderRadius: theme.borderRadius.lg,
-  padding: theme.spacing.lg,
-  alignItems: "center",
-  width: "100%",
-  maxWidth: 320,
-},
-successTitle: {
-  fontSize: theme.typography.fontSize.title,
-  fontFamily: theme.typography.fontFamily.regular,
-  color: theme.colors.textPrimary,
-  textAlign: "center",
-  marginTop: theme.spacing.sm,
-},
-successLink: {
-  color: theme.colors.primary,
-  fontSize: theme.typography.fontSize.small,
-  textDecorationLine: "underline",
-  marginTop: theme.spacing.md,
-},
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    alignItems: "center",
+    width: "100%",
+    maxWidth: 320,
+  },
+  successTitle: {
+    fontSize: theme.typography.fontSize.title,
+    fontFamily: theme.typography.fontFamily.regular,
+    color: theme.colors.textPrimary,
+    textAlign: "center",
+    marginTop: theme.spacing.sm,
+  },
+  successLink: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.fontSize.small,
+    textDecorationLine: "underline",
+    marginTop: theme.spacing.md,
+  },
+  loaderContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  progressCircle: {
+    position: 'absolute',
+  },
+  message: {
+    marginTop: 20,
+    fontSize: theme.typography.fontSize.medium, 
+    color: theme.colors.primary,
+    fontFamily: theme.typography.fontFamily.regular, 
+  },
 });
 
 export default globalStyles;
