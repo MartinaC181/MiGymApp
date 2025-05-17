@@ -101,9 +101,7 @@ const globalStyles = StyleSheet.create({
   title: {
     fontSize: theme.typography.fontSize.title,
     fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    textAlign: "center",
-    marginBottom: theme.spacing.lg,
+    color: theme.colors.background,
   },
   description: {
     fontSize: theme.typography.fontSize.medium,
@@ -193,10 +191,18 @@ const globalStyles = StyleSheet.create({
   },
   message: {
     marginTop: 20,
-    fontSize: theme.typography.fontSize.medium, 
+    fontSize: theme.typography.fontSize.medium,
     color: theme.colors.primary,
-    fontFamily: theme.typography.fontFamily.regular, 
+    fontFamily: theme.typography.fontFamily.regular,
   },
+  header: {
+    width: "100%",
+    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 20,
+    paddingBottom: 16,
+  }
 });
 
 export default globalStyles;
