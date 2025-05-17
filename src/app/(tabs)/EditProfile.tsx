@@ -2,28 +2,43 @@ import React, {useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
+import {router} from "expo-router";
 
 const EditProfile = ({navigation}: any) => {
 
-        const [name, setName] = useState('');
-        const [email, setEmail] = useState('');
-        const [weight, setWeight] = useState('');
-        const [idealWeight, setIdealWeight] = useState('');
-        const [height, setHeight] = useState('');
+        const [name, setName] = useState('Mirtho Legrand');
+        const [email, setEmail] = useState('elMailDeMirtho@UTN.edu.ar');
+        const [weight, setWeight] = useState('75');
+        const [idealWeight, setIdealWeight] = useState('65');
+        const [height, setHeight] = useState('1.72');
 
-        const handleSave = () => {
-            const updateData = {
+        // const handleSave = () => {
+    //     const updateData = {
+    //         name,
+    //         email,
+    //         weight,
+    //         idealWeight,
+    //         height
+    //     };
+    //     console.log("Datos guardados:", updateData);
+    // };
+
+    const handleSave = () => {
+        router.push({
+            pathname: '/Profile',
+            params: {
                 name,
                 email,
                 weight,
                 idealWeight,
-                height
-            };
-            console.log("Datos guardados:", updateData);
-        };
+                height,
+            },
+        });
+    };
 
 
-        return (
+
+    return (
             <View style={globalStyles.safeArea}>
                 <View style={{padding: theme.spacing.lg}}>
                     <Text style={globalStyles.label}>Nombre</Text>
