@@ -1,4 +1,3 @@
-// src/theme.ts
 
 const colors = {
   primary: '#00BFFF',

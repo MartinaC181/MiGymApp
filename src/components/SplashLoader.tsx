@@ -5,7 +5,6 @@ import { View, Animated, Text, Image } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import globalStyles from '../styles/global';
 import theme from '../constants/theme';
-import Color from 'color';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const darkerPrimary = '#007ACC';
