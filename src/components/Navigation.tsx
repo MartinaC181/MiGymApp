@@ -5,7 +5,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 export default function Navigation() {
     return (            
         <View style={styles.container}> 
-            <Link asChild href="/">
+            <Link asChild href="/home">
                 <Pressable style={styles.iconContainer}>
                     <MaterialCommunityIcons name="home" size={32} color="white" />
                     <Text style={styles.iconText}>Inicio</Text>

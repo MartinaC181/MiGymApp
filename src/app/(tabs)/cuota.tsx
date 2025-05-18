@@ -1,11 +1,31 @@
 import { View, Text } from 'react-native';
-import globalStyles from '../../styles/global';
+import { StyleSheet } from 'react-native';
 
 export default function Cuota() {
+    const cuota = getCuotaInfo();
+    const router = useRouter();
+
     return (
-        <View style={globalStyles.container}>
-            <Text style={globalStyles.title}>Cuota</Text>
-            <Text style={globalStyles.description}>Aquí puedes ver y gestionar tu cuota.</Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>Cuota</Text>
+            <Text style={styles.description}>Aquí puedes ver y gestionar tu cuota.</Text>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
+    description: {
+        fontSize: 16,
+        color: '#666',
+    },
+});
