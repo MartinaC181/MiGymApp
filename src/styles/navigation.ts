@@ -30,9 +30,9 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
-    // **desplaza hacia arriba:**
-    marginTop: -45,             // prueba con -12; ajusta valor al diseño exacto
-    // borderWidth: 1, borderColor: 'red',  // ya no hace falta
+ 
+    marginTop: -45,   
+    elevation: 5,
   },
   iconContainerPressed: {
     opacity: 0.6,
