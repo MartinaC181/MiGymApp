@@ -17,31 +17,36 @@ export default StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-end',     // alinéa al fondo para luego "tirar" hacia arriba
     backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.sm + 8, // un poco más de espacio interno
+    paddingVertical: theme.spacing.sm + 10, // un poco más de espacio interno
     borderTopLeftRadius: theme.borderRadius.lg,
     borderTopRightRadius: theme.borderRadius.lg,
-    overflow: 'visible',
   },
   iconContainer: {
-    width: 70,
-    height: 70,
+    width: 65,
+    height: 65,
     borderRadius: theme.borderRadius.pill,
     backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 20,
+    zIndex: 100,
  
-    marginTop: -45,   
-    elevation: 5,
+    marginTop: -60,   
+    elevation: 9,
+    marginBottom: 4,
   },
   iconContainerPressed: {
-    opacity: 0.6,
+     backgroundColor: theme.colors.surface,
   },
   iconText: {
-    fontSize: theme.typography.fontSize.small,
+    fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textPrimary,
+    color: theme.colors.textSecondary,
     marginTop: 4,
+  },
+  navItemWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 10,
   },
 });
 

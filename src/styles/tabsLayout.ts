@@ -5,8 +5,7 @@ import theme from '../constants/theme';
 export default StyleSheet.create({
   container: {
     flex: 1,                        
-    backgroundColor: theme.colors.background,
-    overflow: 'visible',
+    backgroundColor: theme.colors.surface,
     zIndex: 0,
   },
   content: {

@@ -32,7 +32,7 @@ const typography = {
   },
   fontSize: {
     small: 12,
-    medium: 16,
+    medium: 14,
     large: 20,
     title: 24,
     display: 32,
