@@ -72,7 +72,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
 
         {/* Ícono en el centro */}
         <Image
-          source={require('../assets/splash-icon.png')}
+          source={require('../../assets/splash-icon.png')}
           style={{ width: 150, height: 150, position: 'absolute' }}
         />
       </View>

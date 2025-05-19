@@ -4,11 +4,11 @@ import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
 
-import pesoImg from '../../assets/profile/bascula.png';
-import alturaImg from '../../assets/profile/altura.png';
-import idealImg from '../../assets/profile/pesoIdeal.png';
-import imcImg from '../../assets/profile/imc.png';
-import perfilMirtho from '../../assets/profile/perfilMirtho.png';
+import pesoImg from '../../../assets/profile/bascula.png';
+import alturaImg from '../../../assets/profile/altura.png';
+import idealImg from '../../../assets/profile/pesoIdeal.png';
+import imcImg from '../../../assets/profile/imc.png';
+import perfilMirtho from '../../../assets/profile/perfilMirtho.png';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
