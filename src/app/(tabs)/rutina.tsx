@@ -24,6 +24,8 @@ const grupos = [
   },
 ];
 
+
+
 export default function Rutina() {
   return (
     <View style={globalStyles.container}>
@@ -35,12 +37,11 @@ export default function Rutina() {
               <Image source={grupo.icon} style={styles.icon} />
             </View>
             <Text style={styles.cardText}>{grupo.nombre}</Text>
-            <TouchableOpacity>
-              <Text style={styles.editText}>Editar</Text>
-              <router.push({
+            <TouchableOpacity onPress={() => {router.push({
                 pathname: '/GrupoDetalle',  
-                params: { grupo },
-              });
+                params: { grupo: grupo.nombre },
+              });}}>
+              <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
           </View>
         ))}
