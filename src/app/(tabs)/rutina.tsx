@@ -8,19 +8,19 @@ import { router } from 'expo-router';
 const grupos = [
   {
     nombre: 'Piernas',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
   {
     nombre: 'Brazos',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
   {
     nombre: 'Pecho',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
   {
     nombre: 'Espalda',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
 ];
 
@@ -35,12 +35,11 @@ export default function Rutina() {
               <Image source={grupo.icon} style={styles.icon} />
             </View>
             <Text style={styles.cardText}>{grupo.nombre}</Text>
-            <TouchableOpacity>
-              <Text style={styles.editText}>Editar</Text>
-              <router.push({
+            <TouchableOpacity onPress={() => {router.push({
                 pathname: '/GrupoDetalle',  
-                params: { grupo },
-              });
+                params: { grupo: grupo.nombre }
+              })}}>
+              <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
           </View>
         ))}
