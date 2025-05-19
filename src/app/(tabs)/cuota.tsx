@@ -1,31 +1,27 @@
-import { View, Text } from 'react-native';
-import { StyleSheet } from 'react-native';
+// app/(tabs)/cuota.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import theme from '../../constants/theme';
 
 export default function Cuota() {
-    const cuota = getCuotaInfo();
-    const router = useRouter();
-
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Cuota</Text>
-            <Text style={styles.description}>Aquí puedes ver y gestionar tu cuota.</Text>
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Tu plan de cuotas</Text>
+      {/* Aquí va el contenido de la pantalla Cuota */}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-    },
-    description: {
-        fontSize: 16,
-        color: '#666',
-    },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: theme.colors.background,
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: theme.typography.fontFamily.bold,
+    color: theme.colors.primary,
+    marginBottom: 16,
+  },
 });

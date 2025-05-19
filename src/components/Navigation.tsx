@@ -1,56 +1,51 @@
-import { Link } from 'expo-router';
-import { View, Pressable, Text, StyleSheet } from 'react-native';
+// src/components/Navigation.tsx
+import React from 'react';
+import { View, Pressable, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '../styles/navigation';
+import theme from '../constants/theme';
 
 export default function Navigation() {
-    return (            
-        <View style={styles.container}> 
-            <Link asChild href="/home">
-                <Pressable style={styles.iconContainer}>
-                    <MaterialCommunityIcons name="home" size={32} color="white" />
-                    <Text style={styles.iconText}>Inicio</Text>
-                </Pressable>
-            </Link>
+  const router = useRouter();
 
-            <Link asChild href="/rutina">
-                <Pressable style={styles.iconContainer}>
-                    <MaterialCommunityIcons name="weight-lifter" size={32} color="white" />
-                    <Text style={styles.iconText}>Rutina</Text>
-                </Pressable>
-            </Link>
+  // Función auxiliar para crear cada botón
+  const NavButton = ({
+    iconName,
+    label,
+    route,
+  }: {
+    iconName: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+    label: string;
+    route: string;
+  }) => (
+    <Pressable
+      style={({ pressed }) => [
+        styles.iconContainer,
+        pressed && styles.iconContainerPressed,
+      ]}
+      onPress={() => router.push(route)}
+    >
+      <MaterialCommunityIcons
+        name={iconName}
+        size={32}
+        color={theme.colors.primary}
+      />
+      <Text style={styles.iconText}>{label}</Text>
+    </Pressable>
+  );
 
-            <Link asChild href="/cuota">
-                <Pressable style={styles.iconContainer}>
-                    <MaterialCommunityIcons name="wallet" size={32} color="white" />
-                    <Text style={styles.iconText}>Cuota</Text>
-                </Pressable>
-            </Link>
-
-            <Link asChild href="/perfil">
-                <Pressable style={styles.iconContainer}>
-                    <MaterialCommunityIcons name="account" size={32} color="white" />
-                    <Text style={styles.iconText}>Perfil</Text>
-                </Pressable>
-            </Link>
-        </View>
-    );  
+  return (
+    <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+      <View style={styles.container}>
+        <NavButton iconName="home"        label="Inicio" route="/home"   />
+        <NavButton iconName="weight-lifter" label="Rutina" route="/rutina" />
+        <NavButton iconName="wallet"      label="Cuota"  route="/cuota"  />
+        <NavButton iconName="account"     label="Perfil" route="/perfil" />
+      </View>
+    </SafeAreaView>
+  );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: '#00AEEF',
-        paddingVertical: 10,
-        
-    },
-    iconContainer: {
-        alignItems: 'center',
-    },
-    iconText: {
-        color: 'white',
-        fontSize: 12,
-        marginTop: 5,
-    },
-});
+

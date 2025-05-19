@@ -1,23 +1,24 @@
 {
   "expo": {
     "name": "MiGymApp",
-    "slug": "MiGymApp",
+    "slug": "migymapp",
     "version": "1.0.0",
+    "scheme": "migymapp",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "icon": "../assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./src/assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
     },
@@ -27,6 +28,7 @@
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "newArchEnabled": true
   }
 }

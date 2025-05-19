@@ -1,45 +1,51 @@
+// app/_layout.tsx
 import React, { useEffect } from "react";
 import { Slot } from "expo-router";
 import { View, StyleSheet } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import {
-    Roboto_400Regular,
-    Roboto_500Medium,
-    Roboto_700Bold,
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
 
 import theme from "../constants/theme"; // ruta a tu archivo theme.ts
 
+// Evita que el splash se oculte automáticamente hasta que carguen las fuentes
 SplashScreen.preventAutoHideAsync();
 
-export default function Layout() {
-    const [fontsLoaded] = useFonts({
-        [theme.typography.fontFamily.regular]: Roboto_400Regular,
-        [theme.typography.fontFamily.medium]: Roboto_500Medium,
-        [theme.typography.fontFamily.bold]: Roboto_700Bold,
-    });
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    [theme.typography.fontFamily.regular]: Roboto_400Regular,
+    [theme.typography.fontFamily.medium]: Roboto_500Medium,
+    [theme.typography.fontFamily.bold]: Roboto_700Bold,
+  });
 
-    useEffect(() => {
-        if (fontsLoaded) {
-            SplashScreen.hideAsync();
-        }
-    }, [fontsLoaded]);
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
-    if (!fontsLoaded) return null;
+  // Mientras no carguen las fuentes, no renderizamos nada
+  if (!fontsLoaded) return null;
 
-    return (
-        <View style={styles.container}>
-            <Slot />
-        </View>
-    );
+  return (
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <Slot />
+      </View>
+    </SafeAreaProvider>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.background,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
 });
 
 

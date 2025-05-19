@@ -25,7 +25,7 @@ const EditProfile = ({navigation}: any) => {
 
     const handleSave = () => {
         router.push({
-            pathname: '/Profile',
+            pathname: '/pefil',
             params: {
                 name,
                 email,
