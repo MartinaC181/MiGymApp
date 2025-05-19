@@ -4,11 +4,11 @@ import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
 
-import pesoImg from '../../assets/profile/bascula.png';
-import alturaImg from '../../assets/profile/altura.png';
-import idealImg from '../../assets/profile/pesoIdeal.png';
-import imcImg from '../../assets/profile/imc.png';
-import perfilMirtho from '../../assets/profile/perfilMirtho.png';
+import pesoImg from '../../../assets/profile/bascula.png';
+import alturaImg from '../../../assets/profile/altura.png';
+import idealImg from '../../../assets/profile/pesoIdeal.png';
+import imcImg from '../../../assets/profile/imc.png';
+import perfilMirtho from '../../../assets/profile/perfilMirtho.png';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
@@ -39,6 +39,11 @@ const Profile = () => {
 
     return (
         <View style={globalStyles.safeArea}>
+
+            <View style={styles.header}>
+                <Text style={styles.title}>Perfil</Text>
+            </View>
+
             <View style={styles.container}>
 
                 {/* Avatar con fondo y botón de edición*/}
@@ -89,6 +94,19 @@ const InfoBox = ({icon, value, label}: {
 );
 
 const styles = StyleSheet.create({
+    header: {
+        width: "100%",
+        backgroundColor: theme.colors.primary,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingTop: 20,
+        paddingBottom: 16,
+    },
+    title: {
+        fontSize: theme.typography.fontSize.title,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.background,
+    },
     container: {
         flex: 1,
         justifyContent: 'flex-start',

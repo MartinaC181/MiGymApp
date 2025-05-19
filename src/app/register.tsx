@@ -16,7 +16,7 @@ export default function Register() {
       <View style={globalStyles.container}>
         <View style={globalStyles.logoContainer}>
           <Image
-            source={require("../assets/icon.png")}
+            source={require("../../assets/icon.png")}
             style={globalStyles.logo}
           />
         </View>
