@@ -39,6 +39,11 @@ const Profile = () => {
 
     return (
         <View style={globalStyles.safeArea}>
+
+            <View style={styles.header}>
+                <Text style={styles.title}>Perfil</Text>
+            </View>
+
             <View style={styles.container}>
 
                 {/* Avatar con fondo y botón de edición*/}
@@ -89,6 +94,19 @@ const InfoBox = ({icon, value, label}: {
 );
 
 const styles = StyleSheet.create({
+    header: {
+        width: "100%",
+        backgroundColor: theme.colors.primary,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingTop: 20,
+        paddingBottom: 16,
+    },
+    title: {
+        fontSize: theme.typography.fontSize.title,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.background,
+    },
     container: {
         flex: 1,
         justifyContent: 'flex-start',
