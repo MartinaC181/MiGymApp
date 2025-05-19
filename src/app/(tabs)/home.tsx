@@ -6,10 +6,6 @@ import globalStyles from "../../styles/global";
 export default function Home() {
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Home</Text>
-            </View>
-
             <View style={globalStyles.container}>
                 <View style={styles.greetingContainer}>
                     <Text style={styles.greeting}>Hola, <Text style={styles.name}>Mirtho!</Text></Text>
@@ -31,7 +27,7 @@ export default function Home() {
                     style={styles.carousel}
                     pagingEnabled
                 >
-                    <View style={styles.card}>
+                    <View style={[globalStyles.card, styles.card]}>
                         <Image
                             source={{ uri: "https://via.placeholder.com/150" }}
                             style={styles.cardImage}
@@ -39,7 +35,7 @@ export default function Home() {
                         <Text style={styles.cardTitle}>FUNCIONAL HIT</Text>
                         <Text style={styles.cardLink}>Ver más</Text>
                     </View>
-                    <View style={styles.card}>
+                    <View style={[globalStyles.card, styles.card]}>
                         <Image
                             source={{ uri: "https://via.placeholder.com/150" }}
                             style={styles.cardImage}
@@ -119,14 +115,6 @@ const styles = StyleSheet.create({
     card: {
         width: 300,
         marginRight: theme.spacing.md,
-        backgroundColor: theme.colors.surface,
-        borderRadius: theme.borderRadius.lg,
-        overflow: "hidden",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
         alignItems: "center",
         justifyContent: "center",
         padding: theme.spacing.md,

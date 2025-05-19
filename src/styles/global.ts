@@ -99,7 +99,7 @@ const globalStyles = StyleSheet.create({
     textAlign: "center",
   },
   title: {
-    fontSize: theme.typography.fontSize.title,
+    fontSize: theme.typography.fontSize.large,
     fontFamily: theme.typography.fontFamily.bold,
     color: theme.colors.textPrimary,
     textAlign: "center",
@@ -196,6 +196,28 @@ const globalStyles = StyleSheet.create({
     fontSize: theme.typography.fontSize.medium, 
     color: theme.colors.primary,
     fontFamily: theme.typography.fontFamily.regular, 
+  },
+  card: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    width: "100%",
+    overflow: "hidden",
+  },
+  section: {
+    marginBottom: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  subtitle: {
+    fontSize: theme.typography.fontSize.medium,
+    fontFamily: theme.typography.fontFamily.medium,
+    color: theme.colors.textSecondary,
   },
 });
 

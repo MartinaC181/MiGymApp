@@ -15,9 +15,9 @@ export default StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'flex-end',     // alinéa al fondo para luego "tirar" hacia arriba
+    alignItems: 'flex-end',   
     backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.sm + 10, // un poco más de espacio interno
+    paddingVertical: theme.spacing.sm + 10, 
     borderTopLeftRadius: theme.borderRadius.lg,
     borderTopRightRadius: theme.borderRadius.lg,
   },
