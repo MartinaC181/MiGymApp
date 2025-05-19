@@ -8,7 +8,7 @@ import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
 
 // Hardcodea el resultado del pago aquí
-const pagoExitoso = true; // Cambia a false para probar el error
+const pagoExitoso = false; // Cambia a false para probar el error
 
 export default function Facturacion() {
     const [procesando, setProcesando] = useState(false);
