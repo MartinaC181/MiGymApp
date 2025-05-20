@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, Image, Switch, TouchableOpacity} from 'react-native';
 
-import modeIcon from '../../assets/settings/modoscuro.png';
-import changeIcon from '../../assets/settings/llave.png';
-import aboutIcon from '../../assets/settings/sobreapp.png';
-import termsIcon from '../../assets/settings/terminos.png';
-import privacyIcon from '../../assets/settings/seguridad.png';
-import shareIcon from '../../assets/settings/compartir.png';
+import modeIcon from '../../../assets/settings/modoscuro.png';
+import changeIcon from '../../../assets/settings/llave.png';
+import aboutIcon from '../../../assets/settings/sobreapp.png';
+import termsIcon from '../../../assets/settings/terminos.png';
+import privacyIcon from '../../../assets/settings/seguridad.png';
+import shareIcon from '../../../assets/settings/compartir.png';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {useRouter} from "expo-router";
 import globalStyles from "../../styles/global";

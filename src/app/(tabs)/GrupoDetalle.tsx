@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 // Datos de ejemplo
 const grupo = {
   nombre: 'Piernas',
-  icon: require('../../assets/icon.png'),
+  icon: require('../../../assets/icon.png'),
 };
 
 const ejercicios = [

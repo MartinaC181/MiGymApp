@@ -10,39 +10,41 @@ import theme from '../constants/theme';
 export default function Navigation() {
   const router = useRouter();
 
-  // Función auxiliar para crear cada botón
-  const NavButton = ({
+  // Función auxiliar para crear cada botón con su texto
+  const NavItem = ({
     iconName,
-    label,
     route,
+    label,
   }: {
     iconName: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-    label: string;
     route: string;
+    label: string;
   }) => (
-    <Pressable
-      style={({ pressed }) => [
-        styles.iconContainer,
-        pressed && styles.iconContainerPressed,
-      ]}
-      onPress={() => router.push(route)}
-    >
-      <MaterialCommunityIcons
-        name={iconName}
-        size={32}
-        color={theme.colors.primary}
-      />
+    <View style={styles.navItemWrapper}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.iconContainer,
+          pressed ? styles.iconContainerPressed : {},
+        ]}
+        onPress={() => router.push(route)}
+      >
+        <MaterialCommunityIcons
+          name={iconName}
+          size={32}
+          color={theme.colors.primary}
+        />
+      </Pressable>
       <Text style={styles.iconText}>{label}</Text>
-    </Pressable>
+    </View>
   );
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <View style={styles.container}>
-        <NavButton iconName="home"        label="Inicio" route="/home"   />
-        <NavButton iconName="weight-lifter" label="Rutina" route="/rutina" />
-        <NavButton iconName="wallet"      label="Cuota"  route="/cuota"  />
-        <NavButton iconName="account"     label="Perfil" route="/perfil" />
+        <NavItem iconName="home" route="/home" label="Inicio" />
+        <NavItem iconName="weight-lifter" route="/rutina" label="Rutina" />
+        <NavItem iconName="wallet" route="/cuota" label="Cuota" />
+        <NavItem iconName="account" route="/perfil" label="Perfil" />
       </View>
     </SafeAreaView>
   );

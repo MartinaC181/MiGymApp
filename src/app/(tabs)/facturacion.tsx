@@ -3,8 +3,8 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView, Acti
 import { MaterialIcons } from "@expo/vector-icons";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
-import pagoCorrecto from '../../assets/pagocorrecto.png';
-import pagoError from '../../assets/pagoerror.png';
+import pagoCorrecto from '../../../assets/pagocorrecto.png';
+import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
 
 // Hardcodea el resultado del pago aquí

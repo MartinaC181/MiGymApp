@@ -20,7 +20,7 @@ export default function ForgotPassword() {
         {/* Logo */}
         <View style={globalStyles.logoContainer}>
           <Image
-            source={require("../assets/icon.png")}
+            source={require("../../assets/icon.png")}
             style={globalStyles.logo}
           />
         </View>

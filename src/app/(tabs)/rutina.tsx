@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,19 +8,19 @@ import { router } from 'expo-router';
 const grupos = [
   {
     nombre: 'Piernas',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
   {
     nombre: 'Brazos',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
   {
     nombre: 'Pecho',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
   {
     nombre: 'Espalda',
-    icon: require('../../assets/icon.png'),
+    icon: require('../../../assets/icon.png'),
   },
 ];
 
@@ -28,30 +28,55 @@ const grupos = [
 
 export default function Rutina() {
   return (
-    <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Elegí qué vas a entrenar</Text>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {grupos.map((grupo, idx) => (
-          <View key={grupo.nombre} style={styles.card}>
-            <View style={styles.iconContainer}>
-              <Image source={grupo.icon} style={styles.icon} />
+    <SafeAreaView style={styles.safeArea}>
+    <View style={globalStyles.safeArea}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Rutina</Text>
+      </View>
+
+      <View style={globalStyles.container}>
+        <Text style={globalStyles.title}>Elegí qué vas a entrenar</Text>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {grupos.map((grupo, idx) => (
+            <View key={grupo.nombre} style={styles.card}>
+              <View style={styles.iconContainer}>
+                <Image source={grupo.icon} style={styles.icon} />
+              </View>
+              <Text style={styles.cardText}>{grupo.nombre}</Text>
+              <TouchableOpacity onPress={() => {router.push({
+                  pathname: '/GrupoDetalle',  
+                  params: { grupo: grupo.nombre }
+                })}}>
+                <Text style={styles.editText}>Editar</Text>
+              </TouchableOpacity>
             </View>
-            <Text style={styles.cardText}>{grupo.nombre}</Text>
-            <TouchableOpacity onPress={() => {router.push({
-                pathname: '/GrupoDetalle',  
-                params: { grupo: grupo.nombre },
-              });}}>
-              <Text style={styles.editText}>Editar</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-        <MaterialIcons name="keyboard-double-arrow-down" size={32} color={theme.colors.primary} style={styles.arrow} />
-      </ScrollView>
+          ))}
+          <MaterialIcons name="keyboard-double-arrow-down" size={32} color={theme.colors.primary} style={styles.arrow} />
+        </ScrollView>
+      </View>
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  header: {
+    width: "100%",
+    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: theme.typography.fontSize.title,
+    fontFamily: theme.typography.fontFamily.bold,
+    color: theme.colors.background,
+  },
   scrollContent: {
     width: '100%',
     alignItems: 'center',
