@@ -49,7 +49,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={theme.colors.surface} // Color desde theme
+            stroke={theme.colors.surface} 
             strokeWidth={strokeWidth}
             fill="none"
           />
@@ -61,7 +61,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={darkerPrimary} // Color desde theme
+            stroke={darkerPrimary} 
             strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}

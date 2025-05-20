@@ -4,7 +4,7 @@ const colors = {
   background: '#FFFFFF',
   textPrimary: '#111111',
   textSecondary: '#3E3E3E',
-  surface: '#F2F2F2',
+  surface: '#F7F7F7', //como puedo hacer para que sea un poquito mas claro
   success: '#88DA62',
   error: '#FF5A5F',
 };

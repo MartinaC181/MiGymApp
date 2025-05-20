@@ -1,141 +1,130 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { 
+    View, 
+    Text, 
+    TextInput, 
+    ScrollView, 
+    Image, 
+    TouchableOpacity, 
+    KeyboardAvoidingView, 
+    Platform,
+    TouchableWithoutFeedback,
+    Keyboard
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import theme from "../../constants/theme";
+import styles, { CARD_WIDTH } from "../../styles/home";
 import globalStyles from "../../styles/global";
 
 export default function Home() {
+    // Estado para controlar el slide activo
+    const [activeSlide, setActiveSlide] = useState(0);
+    
+    // Datos de ejemplo para las clases
+    const clases = [
+        {
+            id: 1,
+            nombre: "FUNCIONAL HIT",
+            imagen: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+            fechas: ["Lun, Mie, Vie", "8:00 - 9:00"]
+        },
+        {
+            id: 2,
+            nombre: "CROSSFIT",
+            imagen: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+            fechas: ["Mar, Jue", "18:00 - 19:30"]
+        },
+        {
+            id: 3,
+            nombre: "YOGA",
+            imagen: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+            fechas: ["Lun, Mie, Vie", "19:00 - 20:00"]
+        },
+        {
+            id: 4,
+            nombre: "SPINNING",
+            imagen: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+            fechas: ["Mar, Jue, Sab", "10:00 - 11:00"]
+        },
+        {
+            id: 5,
+            nombre: "PILATES",
+            imagen: "https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+            fechas: ["Lun, Mie", "17:00 - 18:00"]
+        },
+    ];
+
+    // Función para manejar el cambio de slide
+    const handleScroll = (event) => {
+        const slideIndex = Math.round(
+            event.nativeEvent.contentOffset.x / (CARD_WIDTH + 20)
+        );
+        if (slideIndex >= 0 && slideIndex < clases.length) {
+            setActiveSlide(slideIndex);
+        }
+    };
+
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={globalStyles.container}>
-                <View style={styles.greetingContainer}>
-                    <Text style={styles.greeting}>Hola, <Text style={styles.name}>Mirtho!</Text></Text>
-                    <Text style={styles.subGreeting}>¿Listo para entrenar?</Text>
-                </View>
-
-                <View style={styles.searchContainer}>
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Buscar clase"
-                        placeholderTextColor="#999"
-                    />
-                    <MaterialIcons name="search" size={24} color="#999" style={styles.searchIcon} />
-                </View>
-
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.carousel}
-                    pagingEnabled
-                >
-                    <View style={[globalStyles.card, styles.card]}>
-                        <Image
-                            source={{ uri: "https://via.placeholder.com/150" }}
-                            style={styles.cardImage}
-                        />
-                        <Text style={styles.cardTitle}>FUNCIONAL HIT</Text>
-                        <Text style={styles.cardLink}>Ver más</Text>
-                    </View>
-                    <View style={[globalStyles.card, styles.card]}>
-                        <Image
-                            source={{ uri: "https://via.placeholder.com/150" }}
-                            style={styles.cardImage}
-                        />
-                        <Text style={styles.cardTitle}>PESAS</Text>
-                        <Text style={styles.cardLink}>Ver más</Text>
-                    </View>
-                </ScrollView>
+        <View style={[globalStyles.container, styles.homeContainer]}>
+            <View style={styles.greetingContainer}>
+                <Text style={styles.greeting}>Hola, <Text style={styles.name}>Mirtho!</Text></Text>
+                <Text style={styles.subGreeting}>¿Listo para entrenar?</Text>
             </View>
-        </SafeAreaView> 
+
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Buscar clase"
+                    placeholderTextColor="#999"
+                />
+                <MaterialIcons name="search" size={24} color="#999" style={styles.searchIcon} />
+            </View>
+
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.carousel}
+                contentContainerStyle={styles.carouselContent}
+                pagingEnabled
+                snapToInterval={CARD_WIDTH + 20}
+                decelerationRate="fast"
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+            >
+                {clases.map((clase) => (
+                    <View key={clase.id} style={styles.cardContainer}>
+                        <View style={styles.card}>
+                            <Image
+                                source={{ uri: clase.imagen }}
+                                style={styles.cardImage}
+                            />
+                            <View style={styles.cardOverlay} />
+                            <View style={styles.cardContent}>
+                                <Text style={styles.cardTitle}>{clase.nombre}</Text>
+                                {clase.fechas.map((fecha, index) => (
+                                    <Text key={index} style={styles.cardDate}>{fecha}</Text>
+                                ))}
+                                <TouchableOpacity style={styles.verMasButton}>
+                                    <Text style={styles.verMasText}>Ver más</Text>
+                                    <MaterialIcons name="keyboard-arrow-down" size={18} color="#FFFFFF" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                ))}
+            </ScrollView>
+
+            <View style={styles.pagination}>
+                {clases.map((_, index) => (
+                    <View
+                        key={index}
+                        style={[
+                            styles.paginationDot,
+                            index === activeSlide && styles.paginationDotActive,
+                        ]}
+                    />
+                ))}
+            </View>
+        </View>
     );
 }
 
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: theme.colors.surface,
-    },
-    header: {
-        width: "100%",
-        backgroundColor: theme.colors.primary,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: 20,
-        paddingBottom: 16,
-    },
-    title: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.background,
-    },
-    greetingContainer: {
-        marginBottom: theme.spacing.lg,
-        paddingHorizontal: theme.spacing.lg,
-    },
-    greeting: {
-        fontSize: theme.typography.fontSize.large,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.primary,
-    },
-    name: {
-        color: theme.colors.primary,
-    },
-    subGreeting: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
-    },
-    searchContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: theme.colors.surface,
-        borderRadius: theme.borderRadius.md,
-        paddingHorizontal: theme.spacing.md,
-        marginBottom: theme.spacing.xl,
-        marginHorizontal: theme.spacing.lg,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    searchInput: {
-        flex: 1,
-        height: 40,
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textPrimary,
-    },
-    searchIcon: {
-        marginLeft: theme.spacing.sm,
-    },
-    carousel: {
-        flexDirection: "row",
-        paddingHorizontal: theme.spacing.lg,
-    },
-    card: {
-        width: 300,
-        marginRight: theme.spacing.md,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: theme.spacing.md,
-    },
-    cardImage: {
-        width: "100%",
-        height: 120,
-        borderRadius: theme.borderRadius.md,
-    },
-    cardTitle: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-        textAlign: "center",
-        marginVertical: theme.spacing.sm,
-        color: theme.colors.textPrimary,
-    },
-    cardLink: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.medium,
-        textAlign: "center",
-        color: theme.colors.primary,
-        marginBottom: theme.spacing.sm,
-    },
-});

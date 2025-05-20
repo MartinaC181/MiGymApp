@@ -12,20 +12,15 @@ import perfilMirtho from '../../../assets/profile/perfilMirtho.png';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-const iconMap: Record<string, any> =
-    {
-        peso: pesoImg,
-        altura:
-        alturaImg,
-        ideal:
-        idealImg,
-        imc:
-        imcImg,
-    }
-;
+
+const iconMap: Record<string, any> = {
+    peso: pesoImg,
+    altura: alturaImg,
+    ideal: idealImg,
+    imc: imcImg,
+};
 
 const Profile = () => {
-
     const router = useRouter();
     const params = useLocalSearchParams();
 
@@ -38,44 +33,35 @@ const Profile = () => {
     const imc = (parseFloat(weight as string) / Math.pow(parseFloat(height as string), 2)).toFixed(2);
 
     return (
-        <View style={globalStyles.safeArea}>
-
-            <View style={styles.header}>
-                <Text style={styles.title}>Perfil</Text>
-            </View>
-
-            <View style={styles.container}>
-
-                {/* Avatar con fondo y botón de edición*/}
-                <View style={styles.avatarWrapper}>
-                    <Image source={perfilMirtho} style={styles.avatar}/>
-                    <TouchableOpacity style={styles.editIcon}
-                                      onPress={() => router.push('EditProfile')}>
-                        <MaterialCommunityIcons name="pencil" size={16} color="white"/>
-                    </TouchableOpacity>
-                </View>
-
-
-                {/* Nombre y correo */}
-                <Text style={styles.name}>{name || 'Sin nombre'}</Text>
-                <Text style={styles.email}>{email || 'Sin correo'}</Text>
-
-                {/* Cuadricula */}
-                <View style={styles.grid}>
-                    <InfoBox icon="peso" label="Peso" value={`${weight || '---'} kg`}/>
-                    <InfoBox icon="altura" label="Altura" value={`${height || '---'} m`}/>
-                    <InfoBox icon="ideal" label="Peso ideal" value={`${idealWeight || '---'} kg`}/>
-                    <InfoBox icon="imc" label="IMC" value={`${imc || '---'}`}/>
-                </View>
-
-                {/* Botón de editar */}
-                <TouchableOpacity style={globalStyles.primaryButton}
+        <View style={globalStyles.container}>
+            {/* Avatar con fondo y botón de edición*/}
+            <View style={styles.avatarWrapper}>
+                <Image source={perfilMirtho} style={styles.avatar}/>
+                <TouchableOpacity style={styles.editIcon}
                                   onPress={() => router.push('EditProfile')}>
-                    <Text style={globalStyles.buttonText}>Editar</Text> </TouchableOpacity>
+                    <MaterialCommunityIcons name="pencil" size={16} color="white"/>
+                </TouchableOpacity>
             </View>
+
+            {/* Nombre y correo */}
+            <Text style={styles.name}>{name || 'Sin nombre'}</Text>
+            <Text style={styles.email}>{email || 'Sin correo'}</Text>
+
+            {/* Cuadricula */}
+            <View style={styles.grid}>
+                <InfoBox icon="peso" label="Peso" value={`${weight || '---'} kg`}/>
+                <InfoBox icon="altura" label="Altura" value={`${height || '---'} m`}/>
+                <InfoBox icon="ideal" label="Peso ideal" value={`${idealWeight || '---'} kg`}/>
+                <InfoBox icon="imc" label="IMC" value={`${imc || '---'}`}/>
+            </View>
+
+            {/* Botón de editar */}
+            <TouchableOpacity style={globalStyles.primaryButton}
+                              onPress={() => router.push('EditProfile')}>
+                <Text style={globalStyles.buttonText}>Editar</Text>
+            </TouchableOpacity>
         </View>
     );
-
 };
 
 const InfoBox = ({icon, value, label}: {
@@ -86,7 +72,6 @@ const InfoBox = ({icon, value, label}: {
     <View style={styles.box}>
         <View style={styles.iconCircle}>
             <Image source={iconMap[icon]} style={styles.iconImage}/>
-
         </View>
         <Text style={styles.boxValue}>{value}</Text>
         <Text style={styles.boxLabel}>{label}</Text>
@@ -94,19 +79,7 @@ const InfoBox = ({icon, value, label}: {
 );
 
 const styles = StyleSheet.create({
-    header: {
-        width: "100%",
-        backgroundColor: theme.colors.primary,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: 20,
-        paddingBottom: 16,
-    },
-    title: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.background,
-    },
+    // Se eliminaron header y title redundantes
     container: {
         flex: 1,
         justifyContent: 'flex-start',
@@ -160,7 +133,6 @@ const styles = StyleSheet.create({
         rowGap: theme.spacing.md,
         columnGap: theme.spacing.md,
         marginBottom: theme.spacing.lg,
-
     },
     box: {
         width: 100,
@@ -172,9 +144,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 2,
-        // margin: theme.spacing.xs,
-        // borderWidth: 1,
-        // borderColor: theme.colors.primary,
     },
     iconCircle: {
         width: 50,
@@ -185,11 +154,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: theme.spacing.xs,
     },
-
     iconImage: {
         width: 30,
         height: 30,
-        // marginBottom: theme.spacing.xs,
         resizeMode: 'contain',
     },
     boxValue: {
