@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-na
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import theme from "../../constants/theme";
+import globalStyles from "../../styles/global";
 
 // Función hardcode para verificar estados de vista
 function getCuotaInfo() {
@@ -32,16 +33,11 @@ export default function Cuota() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.title}>Cuota</Text>
-            </View>
-
             <View style={styles.container}>
                 {/* Si hay cuota pendiente */}
                 {cuota.pendiente ? (
                     <>
-                        <View style={styles.card}>
+                        <View style={globalStyles.card}>
                             <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
                                 <Text style={styles.label}>Pago pendiente </Text>
                                 <MaterialIcons name="error-outline" size={18} color={theme.colors.error} />
@@ -51,15 +47,15 @@ export default function Cuota() {
                                 style={styles.payButton}
                                 onPress={() => router.push("/facturacion")}
                             >
-                                <Text style={styles.payButtonText}>Pagar</Text>
+                                <Text style={globalStyles.buttonText}>Pagar</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.card}>
+                        <View style={globalStyles.card}>
                             <Text style={styles.invoiceTitle}>Factura asociada a</Text>
                             <Text style={styles.invoiceText}><Text style={styles.bold}>Nombre:</Text> {cuota.nombre}</Text>
                             <Text style={styles.invoiceText}><Text style={styles.bold}>DNI:</Text> {cuota.dni}</Text>
                             <TouchableOpacity style={styles.payButton}>
-                                <Text style={styles.payButtonText}>Factura</Text>
+                                <Text style={globalStyles.buttonText}>Factura</Text>
                             </TouchableOpacity>
                         </View>
                     </>
@@ -67,7 +63,7 @@ export default function Cuota() {
                 // Si no hay cuota pendiente
                 (
                     <>
-                        <View style={styles.card}>
+                        <View style={globalStyles.card}>
                             <Text style={styles.label}>Pago pendiente</Text>
                             <Text style={styles.amount}>$0</Text>
                         </View>
@@ -87,36 +83,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: theme.colors.surface,
     },
-    header: {
-        width: "100%",
-        backgroundColor: theme.colors.primary,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: 20,
-        paddingBottom: 16,
-    },
-    title: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.background,
-    },
     container: {
         flex: 1,
         paddingHorizontal: theme.spacing.lg,
         paddingTop: theme.spacing.lg,
-    },
-    card: {
-        backgroundColor: theme.colors.background,
-        borderRadius: theme.borderRadius.lg,
-        padding: theme.spacing.lg,
-        alignItems: "flex-start",
-        marginBottom: theme.spacing.lg,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        width: "100%",
     },
     label: {
         color: theme.colors.textSecondary,

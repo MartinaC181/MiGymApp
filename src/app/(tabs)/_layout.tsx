@@ -1,6 +1,6 @@
 // app/(tabs)/_layout.tsx
-import React from 'react';
-import { View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Keyboard } from 'react-native';
 import { Slot, usePathname } from 'expo-router';
 import styles from '../../styles/tabsLayout';
 import Navigation from '../../components/Navigation';
@@ -8,7 +8,22 @@ import Header from '../../components/Header';
 
 export default function TabsLayout() {
   const pathname = usePathname();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   // Función para obtener el título basado en la ruta actual
   const getHeaderTitle = (path: string) => {
     if (path.includes('/home')) return 'Inicio';
@@ -29,7 +44,7 @@ export default function TabsLayout() {
       <View style={styles.content}>
         <Slot />
       </View>
-      <Navigation />
+      {!keyboardVisible && <Navigation />}
     </View>
   );
 }

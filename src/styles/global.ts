@@ -10,7 +10,7 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.background, // Fondo desde theme
+    backgroundColor: theme.colors.surface, // Fondo desde theme
     padding: theme.spacing.lg,
   },
   logoContainer: {
@@ -18,8 +18,8 @@ const globalStyles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 180,
+    height: 180,
     resizeMode: "contain",
     marginBottom: theme.spacing.xl,
   },
@@ -34,10 +34,11 @@ const globalStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D9D9D9",
     borderRadius: theme.borderRadius.md,
+    height: 50,
     padding: theme.spacing.sm,
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.regular,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.background,
     marginBottom: theme.spacing.sm,
   },
   loginButton: {
@@ -192,9 +193,9 @@ const globalStyles = StyleSheet.create({
     position: 'absolute',
   },
   message: {
-    marginTop: 20,
+    marginTop: 24,
     fontSize: theme.typography.fontSize.medium, 
-    color: theme.colors.primary,
+    color: "#007ACC",
     fontFamily: theme.typography.fontFamily.regular, 
   },
   card: {
