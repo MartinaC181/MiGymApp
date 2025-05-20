@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import { 
     View, 
     Text, 
@@ -18,6 +19,7 @@ import globalStyles from "../../styles/global";
 export default function Home() {
     // Estado para controlar el slide activo
     const [activeSlide, setActiveSlide] = useState(0);
+    const router = useRouter();
     
     // Datos de ejemplo para las clases
     const clases = [
@@ -62,6 +64,16 @@ export default function Home() {
             setActiveSlide(slideIndex);
         }
     };
+    const handleVerMas = (clase) => {
+        router.push({
+            pathname: "/clases",
+            params: { 
+                id: clase.id,
+                nombre: clase.nombre,
+                imagen: clase.imagen
+            }
+        });
+    };
 
     return (
         <View style={[globalStyles.container, styles.homeContainer]}>
@@ -103,7 +115,10 @@ export default function Home() {
                                 {clase.fechas.map((fecha, index) => (
                                     <Text key={index} style={styles.cardDate}>{fecha}</Text>
                                 ))}
-                                <TouchableOpacity style={styles.verMasButton}>
+                                <TouchableOpacity 
+                                    style={styles.verMasButton}
+                                    onPress={() => handleVerMas(clase)}
+                                >
                                     <Text style={styles.verMasText}>Ver más</Text>
                                     <MaterialIcons name="keyboard-arrow-down" size={18} color="#FFFFFF" />
                                 </TouchableOpacity>
