@@ -13,6 +13,13 @@ const globalStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface, // Fondo desde theme
     padding: theme.spacing.lg,
   },
+  containerLoad: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: theme.colors.background, // Fondo desde theme
+    padding: theme.spacing.lg,
+  },
   logoContainer: {
     alignItems: "center",
     marginBottom: theme.spacing.lg,

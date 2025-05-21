@@ -129,13 +129,15 @@ const styles = StyleSheet.create({
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        maxWidth: 280,
         rowGap: theme.spacing.md,
         columnGap: theme.spacing.md,
         marginBottom: theme.spacing.lg,
     },
     box: {
-        width: 100,
+        width: 130,
         height: 120,
         backgroundColor: '#b3dcec',
         borderRadius: theme.borderRadius.md,
@@ -143,7 +145,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.spacing.xs,
         alignItems: 'center',
         justifyContent: 'center',
-        elevation: 2,
+        marginBottom: theme.spacing.md,
+        elevation: 8,
+
     },
     iconCircle: {
         width: 50,

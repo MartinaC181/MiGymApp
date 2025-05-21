@@ -35,11 +35,6 @@ const EditProfile = ({navigation}: any) => {
             },
         });
 
-        router.push({
-            pathname: '/Imc',
-            params: { weight, height },
-        });
-
     };
 
 

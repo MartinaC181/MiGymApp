@@ -6,11 +6,7 @@ import {
     TextInput, 
     ScrollView, 
     Image, 
-    TouchableOpacity, 
-    KeyboardAvoidingView, 
-    Platform,
-    TouchableWithoutFeedback,
-    Keyboard
+    TouchableOpacity,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles, { CARD_WIDTH } from "../../styles/home";
@@ -27,31 +23,26 @@ export default function Home() {
             id: 1,
             nombre: "FUNCIONAL HIT",
             imagen: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-            fechas: ["Lun, Mie, Vie", "8:00 - 9:00"]
         },
         {
             id: 2,
             nombre: "CROSSFIT",
             imagen: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-            fechas: ["Mar, Jue", "18:00 - 19:30"]
         },
         {
             id: 3,
             nombre: "YOGA",
             imagen: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-            fechas: ["Lun, Mie, Vie", "19:00 - 20:00"]
         },
         {
             id: 4,
             nombre: "SPINNING",
             imagen: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-            fechas: ["Mar, Jue, Sab", "10:00 - 11:00"]
         },
         {
             id: 5,
             nombre: "PILATES",
             imagen: "https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-            fechas: ["Lun, Mie", "17:00 - 18:00"]
         },
     ];
 
@@ -94,13 +85,10 @@ export default function Home() {
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                style={styles.carousel}
-                contentContainerStyle={styles.carouselContent}
-                pagingEnabled
-                snapToInterval={CARD_WIDTH + 20}
+                snapToInterval={CARD_WIDTH + 20} // Usa el ancho de pantalla completo
                 decelerationRate="fast"
+                contentContainerStyle={styles.carouselContent}
                 onScroll={handleScroll}
-                scrollEventThrottle={16}
             >
                 {clases.map((clase) => (
                     <View key={clase.id} style={styles.cardContainer}>
@@ -112,9 +100,6 @@ export default function Home() {
                             <View style={styles.cardOverlay} />
                             <View style={styles.cardContent}>
                                 <Text style={styles.cardTitle}>{clase.nombre}</Text>
-                                {clase.fechas.map((fecha, index) => (
-                                    <Text key={index} style={styles.cardDate}>{fecha}</Text>
-                                ))}
                                 <TouchableOpacity 
                                     style={styles.verMasButton}
                                     onPress={() => handleVerMas(clase)}

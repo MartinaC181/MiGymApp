@@ -61,25 +61,28 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.md,
     },
     cardContainer: {
-        width: CARD_WIDTH,
-        marginRight: 20, // Espacio entre cards
+        width: CARD_WIDTH, // Usar el ancho definido para las cards
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 10, // Dar espacio entre las cards
     },
     card: {
-        width: "100%", 
-        height: 320,
+        width: '100%', // Usar todo el ancho disponible del cardContainer
+        height: 370,
         borderRadius: theme.borderRadius.lg,
         overflow: 'hidden',
         position: 'relative',
     },
     cardImage: {
-        width: "100%",
-        height: "100%",
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover', // Añadir esto para asegurar que la imagen se ajuste bien
         position: 'absolute',
         backgroundColor: '#777777', // Color de fondo mientras se carga o si hay error
     },
     cardOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
     },
     cardContent: {
         position: 'absolute',
@@ -87,37 +90,31 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         padding: theme.spacing.md,
     },
     cardTitle: {
-        fontSize: 28,
+        fontSize: 40,
         fontFamily: theme.typography.fontFamily.bold,
         textAlign: "center",
-        color: "#FFFFFF",
+        color: theme.colors.surface,
         marginBottom: theme.spacing.lg,
-    },
-    cardDate: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.medium,
-        textAlign: "center",
-        color: "#FFFFFF",
-        marginBottom: 4,
     },
     verMasButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: theme.spacing.xl,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        paddingVertical: 6,
+        marginTop: theme.spacing.xs,
+        marginBottom: theme.spacing.md,
+        backgroundColor: 'rgba(0, 191, 255, 0.4)',
+        paddingVertical: 4,
         paddingHorizontal: 12,
         borderRadius: theme.borderRadius.md,
     },
     verMasText: {
         fontSize: theme.typography.fontSize.small,
         fontFamily: theme.typography.fontFamily.medium,
-        color: "#FFFFFF",
+        color: theme.colors.background,
         marginRight: 4,
     },
     pagination: {

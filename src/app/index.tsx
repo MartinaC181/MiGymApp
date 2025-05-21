@@ -18,7 +18,7 @@ export default function Index() {
 
   return isLoading ? (
     <View style={styles.container}>
-      <SplashLoader size={150} message="Iniciando..." />
+      <SplashLoader size={150}/>
     </View>
   ) : null;
 }
