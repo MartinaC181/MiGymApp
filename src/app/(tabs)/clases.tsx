@@ -149,7 +149,7 @@ export default function ClaseDetalle() {
                 
                 {/* Botón inscribirse */}
                 <TouchableOpacity 
-                    style={[globalStyles.primaryButton, {marginTop: theme.spacing.lg}]}
+                    style={[globalStyles.Button, {marginTop: theme.spacing.lg}]}
                     onPress={handleInscripcion}
                 >
                     <Text style={globalStyles.buttonText}>Inscribirse</Text>

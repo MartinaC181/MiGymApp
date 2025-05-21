@@ -41,7 +41,7 @@ export default function TabsLayout() {
 
   return (
     <View style={styles.container}>
-      <Header title={getHeaderTitle(pathname)} />
+      <Header title={getHeaderTitle(pathname)} showBack />
       <View style={styles.content}>
         <Slot />
       </View>

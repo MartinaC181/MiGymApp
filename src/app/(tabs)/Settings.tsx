@@ -59,7 +59,7 @@ const Settings = () => {
 
                 <Text style={styles.rowDescription}>Claro u oscuro</Text>
 
-                <TouchableOpacity style={styles.row} onPress={() => router.push('/changePassword')}>
+                <TouchableOpacity style={styles.row} onPress={() => router.push('/reset-password')}>
                     <View style={styles.rowLeft}>
                         <Image source={changeIcon} style={styles.icon}/>
                         <Text style={styles.label}>Cambiar contraseña</Text>
