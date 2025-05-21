@@ -5,10 +5,13 @@ import {
     ScrollView, 
     Image, 
     TouchableOpacity,
-    Alert
+    Alert,
+    Dimensions
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
+import { useLocalSearchParams } from 'expo-router';
 import styles from '../../styles/clases';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
@@ -39,6 +42,9 @@ export default function ClaseDetalle() {
     
     // Estado para los horarios seleccionados
     const [seleccionados, setSeleccionados] = useState({});
+    
+    // Añadir estado para el día seleccionado
+    const [diaSeleccionado, setDiaSeleccionado] = useState(0);
     
     // Toggle selección de horario
     const toggleSeleccion = (dia, hora) => {
@@ -84,34 +90,66 @@ export default function ClaseDetalle() {
             <View style={styles.contentContainer}>
                 <Text style={globalStyles.title}>Días y horarios</Text>
                 
-                <View style={styles.scheduleContainer}>
+                {/* Selector de días como pestañas */}
+                <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.diasTabsScroll}
+                >
                     {claseInfo.horarios.map((item, index) => (
-                        <View key={index} style={styles.dayContainer}>
-                            <Text style={styles.dayName}>{item.dia}</Text>
-                            {item.horas.map((hora, horaIndex) => (
-                                <TouchableOpacity 
-                                    key={horaIndex} 
-                                    style={styles.scheduleRow}
-                                    onPress={() => toggleSeleccion(item.dia, hora)}
-                                >
-                                    <View style={styles.checkbox}>
-                                        <MaterialIcons 
-                                            name={seleccionados[`${item.dia}-${hora}`] ? "check-circle" : "radio-button-unchecked"} 
-                                            size={22} 
-                                            color={seleccionados[`${item.dia}-${hora}`] ? theme.colors.primary : "#888888"} 
-                                        />
-                                    </View>
-                                    <Text style={styles.scheduleText}>{hora}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                        <TouchableOpacity
+                            key={index}
+                            style={[
+                                styles.diaTab,
+                                index === diaSeleccionado && styles.diaTabActive
+                            ]}
+                            onPress={() => setDiaSeleccionado(index)}
+                        >
+                            <Text 
+                                style={[
+                                    styles.diaTabText,
+                                    index === diaSeleccionado && styles.diaTabTextActive
+                                ]}
+                            >
+                                {item.dia}
+                            </Text>
+                        </TouchableOpacity>
                     ))}
+                </ScrollView>
+                
+                {/* Horarios del día seleccionado */}
+                <View style={styles.horariosContainer}>
+                    {claseInfo.horarios[diaSeleccionado].horas.map((hora, horaIndex) => {
+                        const dia = claseInfo.horarios[diaSeleccionado].dia;
+                        const key = `${dia}-${hora}`;
+                        return (
+                            <TouchableOpacity 
+                                key={horaIndex}
+                                style={[
+                                    styles.horarioCard,
+                                    seleccionados[key] && styles.horarioCardSelected
+                                ]}
+                                onPress={() => toggleSeleccion(dia, hora)}
+                            >
+                                <Text style={[
+                                    styles.horarioCardText,
+                                    seleccionados[key] && styles.horarioCardTextSelected
+                                ]}>
+                                    {hora}
+                                </Text>
+                                <MaterialIcons 
+                                    name={seleccionados[key] ? "check-circle" : "add-circle-outline"} 
+                                    size={24} 
+                                    color={seleccionados[key] ? "#FFFFFF" : theme.colors.primary} 
+                                />
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
-            </View>
-            
-            <View style={{paddingHorizontal: theme.spacing.lg, marginVertical: theme.spacing.lg}}>
+                
+                {/* Botón inscribirse */}
                 <TouchableOpacity 
-                    style={globalStyles.primaryButton}
+                    style={[globalStyles.primaryButton, {marginTop: theme.spacing.lg}]}
                     onPress={handleInscripcion}
                 >
                     <Text style={globalStyles.buttonText}>Inscribirse</Text>

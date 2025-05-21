@@ -27,6 +27,7 @@ export default function TabsLayout() {
   // Función para obtener el título basado en la ruta actual
   const getHeaderTitle = (path: string) => {
     if (path.includes('/home')) return 'Inicio';
+    if (path.includes('/clases')) return 'Clases';
     if (path.includes('/rutina')) return 'Rutina';
     if (path.includes('/cuota')) return 'Cuota';
     if (path.includes('/perfil')) return 'Perfil';

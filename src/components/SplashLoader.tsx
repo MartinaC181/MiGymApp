@@ -1,7 +1,7 @@
 // components/SplashLoader.tsx
 
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, Text, Image } from 'react-native';
+import { View, Animated, Image } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import globalStyles from '../styles/global';
 import theme from '../constants/theme';
@@ -17,7 +17,6 @@ interface SplashLoaderProps {
 
 const SplashLoader: React.FC<SplashLoaderProps> = ({ 
   size = 120, 
-  message = 'Cargando...', 
   duration = 3000 
 }) => {
   const progressValue = useRef(new Animated.Value(0)).current;
@@ -41,7 +40,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
   });
 
   return (
-    <View style={globalStyles.container}>
+    <View style={globalStyles.containerLoad}>
       <View style={globalStyles.loaderContainer}>
         {/* Círculo de fondo */}
         <Svg width={size} height={size}>
@@ -76,7 +75,6 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
           style={{ width: 150, height: 150, position: 'absolute' }}
         />
       </View>
-      <Text style={globalStyles.message}>{message}</Text>
     </View>
   );
 };
