@@ -1,26 +1,44 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Image,
-  StyleSheet,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-
-import globalStyles from "../styles/global";
-import theme from "../constants/theme";
+import globalStyles from "../../styles/global";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const USER = "usuario@gmail.com";
+const PASS = "123456";
+
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = () => {
+    if (email !== USER && password !== PASS) {
+      setError("Correo y contraseña incorrectos");
+    } else if (email !== USER) {
+      setError("Correo incorrecto");
+    } else if (password !== PASS) {
+      setError("Contraseña incorrecta");
+    } else {
+      setError("");
+      router.push("/home");
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView style={globalStyles.safeArea}>
+      <View style={globalStyles.container}>
         {/* Logo */}
         <View style={globalStyles.logoContainer}>
           <Image
-            source={require("../../assets/icon.png")}
+            source={require("../../../assets/icon.png")}
             style={globalStyles.logo}
           />
         </View>
@@ -32,6 +50,8 @@ export default function Login() {
           placeholder="correo@ejemplo.com"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
 
         {/* Contraseña */}
@@ -41,20 +61,27 @@ export default function Login() {
           placeholder="********"
           placeholderTextColor="#999"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
+        {/* Mensaje de error */}
+        {error !== "" && <Text style={globalStyles.errorText}>{error}</Text>}
 
         {/* Botón */}
         <TouchableOpacity
-          style={globalStyles.loginButton}
-          onPress={() => router.push("/home")}
+          style={globalStyles.LoginButton}
+          onPress={handleLogin}
+
         >
           <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
 
         {/* ¿Olvidaste tu contraseña? */}
         <TouchableOpacity>
-          <Text style={globalStyles.forgotPassword}
-          onPress={() => router.push("/forgot-password")}>
+          <Text
+            style={globalStyles.forgotPassword}
+            onPress={() => router.push("/forgot-password")}
+          >
             ¿Olvidaste la contraseña?
           </Text>
         </TouchableOpacity>
@@ -87,16 +114,3 @@ export default function Login() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.surface, // fondo gris claro
-  },
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.lg,
-    justifyContent: "center",
-  },
-});

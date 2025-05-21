@@ -8,11 +8,27 @@ import {
   Modal,
 } from "react-native";
 import { useState } from "react";
-import globalStyles from "../styles/global";
+import globalStyles from "../../styles/global";
 import { router } from "expo-router";
+
+function isValidEmail(email: string) {
+  // Simple email regex
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 export default function ForgotPassword() {
   const [visible, setVisible] = useState(false);
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSend = () => {
+    if (!isValidEmail(email)) {
+      setError("Por favor ingresa un correo válido.");
+      return;
+    }
+    setError("");
+    setVisible(true);
+  };
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
@@ -20,7 +36,7 @@ export default function ForgotPassword() {
         {/* Logo */}
         <View style={globalStyles.logoContainer}>
           <Image
-            source={require("../../assets/icon.png")}
+            source={require("../../../assets/icon.png")}
             style={globalStyles.logo}
           />
         </View>
@@ -29,18 +45,25 @@ export default function ForgotPassword() {
         <Text style={globalStyles.title}>¿Olvidaste tu contraseña?</Text>
 
         {/* Correo */}
-        <Text style={globalStyles.label}>CORREO ELECTRÓNICO</Text>
+        <Text style={globalStyles.label}>INGRESA TU CORREO</Text>
+
         <TextInput
           style={globalStyles.input}
           placeholder="prueba@canvaprog.com"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
         />
+        {error ? (
+          <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+        ) : null}
 
         {/* Botón Enviar */}
         <TouchableOpacity
-          style={globalStyles.primaryButton}
-          onPress={() => setVisible(true)}
+          style={globalStyles.Button}
+          onPress={handleSend}
         >
           <Text style={globalStyles.buttonText}>Enviar</Text>
         </TouchableOpacity>
@@ -61,7 +84,7 @@ export default function ForgotPassword() {
               restablecer tu contraseña
             </Text>
             <TouchableOpacity
-              style={globalStyles.loginButton}
+              style={globalStyles.Button}
               onPress={() => {
                 setVisible(false);
                 router.push("/reset-password");

@@ -8,13 +8,14 @@ const globalStyles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.lg,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.surface, // Fondo desde theme
-    padding: theme.spacing.lg,
   },
   logoContainer: {
     alignItems: "center",
+    marginTop: theme.spacing.xl,
     marginBottom: theme.spacing.lg,
   },
   logo: {
@@ -35,27 +36,31 @@ const globalStyles = StyleSheet.create({
     borderColor: "#D9D9D9",
     borderRadius: theme.borderRadius.md,
     height: 50,
+    width: "100%",
     padding: theme.spacing.sm,
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.regular,
     backgroundColor: theme.colors.background,
     marginBottom: theme.spacing.sm,
   },
-  loginButton: {
+  LoginButton: {
     backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
     alignItems: "center",
     justifyContent: "center",
+    width: 150,
+    height: 40,
     marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
   },
-  primaryButton: {
+  Button: {
     backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
     alignItems: "center",
     justifyContent: "center",
+    width: 100,
+    height: 50,
     marginTop: theme.spacing.md,
   },
   buttonText: {
@@ -81,6 +86,7 @@ const globalStyles = StyleSheet.create({
   },
   socialButton: {
     borderWidth: 1,
+    width: "100%",
     borderColor: "#D9D9D9",
     borderRadius: theme.borderRadius.md,
     paddingVertical: theme.spacing.sm,
@@ -145,7 +151,8 @@ const globalStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: theme.colors.primary,
+    borderColor: "#D9D9D9",
+    width: "100%",
     borderRadius: theme.borderRadius.md,
     backgroundColor: theme.colors.background,
     paddingHorizontal: theme.spacing.md,
@@ -155,7 +162,7 @@ const globalStyles = StyleSheet.create({
   pickerText: {
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.surface,
+    color: "#999",
     flex: 1,
   },
   errorText: {
@@ -194,9 +201,9 @@ const globalStyles = StyleSheet.create({
   },
   message: {
     marginTop: 24,
-    fontSize: theme.typography.fontSize.medium, 
+    fontSize: theme.typography.fontSize.medium,
     color: "#007ACC",
-    fontFamily: theme.typography.fontFamily.regular, 
+    fontFamily: theme.typography.fontFamily.regular,
   },
   card: {
     backgroundColor: theme.colors.background,

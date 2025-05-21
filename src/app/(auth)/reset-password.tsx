@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
-import globalStyles from "../styles/global";
+import globalStyles from "../../styles/global";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import theme from "../constants/theme";
+import theme from "../../constants/theme";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -37,7 +37,7 @@ export default function ResetPassword() {
         {/* Logo */}
         <View style={globalStyles.logoContainer}>
           <Image
-            source={require("../../assets/icon.png")}
+            source={require("../../../assets/icon.png")}
             style={globalStyles.logo}
           />
         </View>
@@ -72,7 +72,7 @@ export default function ResetPassword() {
 
         {/* Botón Aceptar */}
         <TouchableOpacity
-          style={globalStyles.primaryButton}
+          style={globalStyles.Button}
           onPress={handleSubmit}
         >
           <Text style={globalStyles.buttonText}>Aceptar</Text>
