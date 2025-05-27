@@ -12,6 +12,7 @@ import {
 } from "@expo-google-fonts/roboto";
 
 import theme from "../constants/theme"; // ruta a tu archivo theme.ts
+import { GluestackUIProvider } from "../components/ui/gluestack-ui-provider";
 
 // Evita que el splash se oculte automáticamente hasta que carguen las fuentes
 SplashScreen.preventAutoHideAsync();
@@ -34,9 +35,12 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        <Slot />
-      </View>
+      {/* Proveedor de Gluestack UI para temas y estilos */}
+      <GluestackUIProvider>
+        <View style={styles.container}>
+          <Slot />
+        </View>
+      </GluestackUIProvider>
     </SafeAreaProvider>
   );
 }
@@ -47,9 +51,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
 });
-
-
-
 
 // export default function Layout() {
 //     return (
