@@ -1,8 +1,9 @@
 // app/_layout.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Slot } from "expo-router";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider } from "../components/ui/ThemeProvider/themeProvider"
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import {
@@ -18,6 +19,8 @@ import { GluestackUIProvider } from "../components/ui/gluestack-ui-provider";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+
+
   const [fontsLoaded] = useFonts({
     [theme.typography.fontFamily.regular]: Roboto_400Regular,
     [theme.typography.fontFamily.medium]: Roboto_500Medium,
@@ -35,12 +38,9 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      {/* Proveedor de Gluestack UI para temas y estilos */}
-      <GluestackUIProvider>
         <View style={styles.container}>
           <Slot />
         </View>
-      </GluestackUIProvider>
     </SafeAreaProvider>
   );
 }

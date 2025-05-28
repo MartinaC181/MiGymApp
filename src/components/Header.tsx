@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import theme from "../constants/theme";
-import { Heading } from "./ui/heading";
 type HeaderProps = {
   title: string;
   showBack?: boolean; // opcional: mostrar o no botón atrás
@@ -25,7 +24,6 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
 
       {/* Título */}
       <Text style={styles.title}>{title}</Text>
-      <Heading size={"sm"}>{title}</Heading>
 
       {/* Botón configuración */}
       <TouchableOpacity
