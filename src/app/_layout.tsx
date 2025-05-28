@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Slot } from "expo-router";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ThemeProvider } from "../components/ui/ThemeProvider/themeProvider"
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import {
@@ -13,7 +12,6 @@ import {
 } from "@expo-google-fonts/roboto";
 
 import theme from "../constants/theme"; // ruta a tu archivo theme.ts
-import { GluestackUIProvider } from "../components/ui/gluestack-ui-provider";
 
 // Evita que el splash se oculte automáticamente hasta que carguen las fuentes
 SplashScreen.preventAutoHideAsync();
