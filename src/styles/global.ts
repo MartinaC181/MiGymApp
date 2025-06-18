@@ -37,6 +37,7 @@ const globalStyles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.medium,
     marginBottom: 4,
     marginTop: theme.spacing.sm,
+    alignItems: "flex-start",
   },
   input: {
     borderWidth: 1,
