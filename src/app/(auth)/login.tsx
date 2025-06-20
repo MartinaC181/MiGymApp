@@ -14,9 +14,6 @@ import theme from "../../constants/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UsuarioAtleta } from "../../data/UsuarioAtleta";
 
-const USER = "mirtho@gmail.com";
-const PASS = "123456";
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,11 +31,11 @@ export default function Login() {
 
     // Simular delay de carga
     setTimeout(() => {
-    if (email !== USER && password !== PASS) {
+    if (email !== UsuarioAtleta.email && password !== UsuarioAtleta.password) {
       setError("Correo y contraseña incorrectos");
-    } else if (email !== USER) {
+    } else if (email !== UsuarioAtleta.email) {
       setError("Correo incorrecto");
-    } else if (password !== PASS) {
+    } else if (password !== UsuarioAtleta.password) {
       setError("Contraseña incorrecta");
     } else {
       setError("");
