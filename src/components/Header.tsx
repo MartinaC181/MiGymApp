@@ -5,13 +5,12 @@ import { router, useNavigation } from "expo-router";
 import theme from "../constants/theme";
 type HeaderProps = {
   title: string;
-  showBack?: boolean; // opcional: mostrar o no botón atrás
+  showBack?: boolean;
 };
 
 const Header = ({ title, showBack = false }: HeaderProps) => {
   return (
     <View style={styles.header}>
-      {/* Botón volver */}
       {showBack && (
         <TouchableOpacity style={styles.leftIcon} onPress={() => router.back()}>
           <MaterialIcons
@@ -22,10 +21,10 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
         </TouchableOpacity>
       )}
 
-      {/* Título */}
+
       <Text style={styles.title}>{title}</Text>
 
-      {/* Botón configuración */}
+  
       <TouchableOpacity
         style={styles.rightIcon}
         onPress={() => router.push("/configuracion")}

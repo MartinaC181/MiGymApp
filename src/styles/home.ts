@@ -2,7 +2,10 @@ import { StyleSheet, Dimensions } from 'react-native';
 import theme from '../constants/theme';
 
 const { width } = Dimensions.get('window');
-export const CARD_WIDTH = width * 0.85; // 85% del ancho de pantalla
+// Rediseño del carrusel para snap perfecto
+export const CARD_WIDTH = width * 0.75; // 75% del ancho para mejor centrado
+export const CARD_SPACING = 20; // Espacio entre cards
+export const SIDE_SPACING = (width - CARD_WIDTH) / 2; // Espaciado lateral para centrado perfecto
 
 const styles = StyleSheet.create({
     homeContainer: {
@@ -11,9 +14,12 @@ const styles = StyleSheet.create({
         padding: 0,
     },
     greetingContainer: {
-        marginTop: theme.spacing.xl,
-        marginBottom: theme.spacing.lg,
+        marginTop: theme.spacing.lg,
+        marginBottom: theme.spacing.md,
         paddingHorizontal: theme.spacing.lg,
+    },
+    rachaContainer: {
+        marginBottom: theme.spacing.md,
     },
     greeting: {
         fontSize: theme.typography.fontSize.large,
@@ -34,7 +40,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderRadius: theme.borderRadius.md,
         paddingHorizontal: theme.spacing.md,
-        marginBottom: theme.spacing.xl,
+        marginBottom: theme.spacing.md,
         marginHorizontal: theme.spacing.lg,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -52,37 +58,53 @@ const styles = StyleSheet.create({
     searchIcon: {
         marginLeft: theme.spacing.sm,
     },
-    carousel: {
-        flexGrow: 0,
-    },
+    // Rediseño completo del carrusel
     carouselContent: {
-        paddingLeft: theme.spacing.lg,
-        paddingRight: theme.spacing.lg, // Añadir padding al final también
-        paddingVertical: theme.spacing.md,
+        paddingLeft: SIDE_SPACING,
+        paddingRight: SIDE_SPACING,
+        paddingTop: 0,
+        paddingBottom: theme.spacing.sm,
     },
     cardContainer: {
-        width: CARD_WIDTH, // Usar el ancho definido para las cards
+        width: CARD_WIDTH,
+        marginRight: CARD_SPACING,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 10, // Dar espacio entre las cards
+    },
+    // Último card sin margen derecho
+    lastCardContainer: {
+        width: CARD_WIDTH,
+        marginRight: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     card: {
-        width: '100%', // Usar todo el ancho disponible del cardContainer
-        height: 370,
+        width: '100%',
+        height: 320,
         borderRadius: theme.borderRadius.lg,
         overflow: 'hidden',
         position: 'relative',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 6,
+        backgroundColor: '#000',
     },
     cardImage: {
         width: '100%',
         height: '100%',
-        resizeMode: 'cover', // Añadir esto para asegurar que la imagen se ajuste bien
-        position: 'absolute',
-        backgroundColor: '#777777', // Color de fondo mientras se carga o si hay error
+        resizeMode: 'cover',
+        backgroundColor: '#777777',
     },
     cardOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        borderRadius: theme.borderRadius.lg,
     },
     cardContent: {
         position: 'absolute',
@@ -95,21 +117,29 @@ const styles = StyleSheet.create({
         padding: theme.spacing.md,
     },
     cardTitle: {
-        fontSize: 40,
+        fontSize: 36,
         fontFamily: theme.typography.fontFamily.bold,
         textAlign: "center",
-        color: theme.colors.surface,
-        marginBottom: theme.spacing.lg,
+        color: theme.colors.background,
+        marginBottom: theme.spacing.md,
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 3,
     },
     verMasButton: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: theme.spacing.xs,
         marginBottom: theme.spacing.md,
-        backgroundColor: 'rgba(0, 191, 255, 0.4)',
-        paddingVertical: 4,
-        paddingHorizontal: 12,
-        borderRadius: theme.borderRadius.md,
+        backgroundColor: 'rgba(0, 191, 255, 0.9)',
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        borderRadius: theme.borderRadius.pill,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
     },
     verMasText: {
         fontSize: theme.typography.fontSize.small,
@@ -120,8 +150,8 @@ const styles = StyleSheet.create({
     pagination: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: theme.spacing.md,
-        marginBottom: 80, // Dar más espacio para la barra de navegación
+        marginTop: theme.spacing.lg,
+        marginBottom: theme.spacing.xl,
     },
     paginationDot: {
         width: 8,
@@ -132,6 +162,9 @@ const styles = StyleSheet.create({
     },
     paginationDotActive: {
         backgroundColor: theme.colors.primary,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
     },
 });
 

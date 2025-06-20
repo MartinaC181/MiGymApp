@@ -1,4 +1,3 @@
-// src/components/Navigation.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Pressable, Text, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -11,7 +10,6 @@ export default function Navigation() {
   const router = useRouter();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  // Añadir listeners para el teclado
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardVisible(true);
@@ -26,7 +24,6 @@ export default function Navigation() {
     };
   }, []);
 
-  // Función auxiliar para crear cada botón con su texto
   const NavItem = ({
     iconName,
     route,
@@ -54,7 +51,6 @@ export default function Navigation() {
     </View>
   );
 
-  // Si el teclado está visible, no mostrar la navegación
   if (keyboardVisible) {
     return null;
   }

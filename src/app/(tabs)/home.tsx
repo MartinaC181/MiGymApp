@@ -9,8 +9,9 @@ import {
     TouchableOpacity,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import styles, { CARD_WIDTH } from "../../styles/home";
+import styles, { CARD_WIDTH, CARD_SPACING } from "../../styles/home";
 import globalStyles from "../../styles/global";
+import Racha from "../../components/Racha";
 
 export default function Home() {
     // Estado para controlar el slide activo
@@ -24,7 +25,7 @@ export default function Home() {
             nombre: "FUNCIONAL HIT",
             imagen: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
         },
-        {
+      {
             id: 2,
             nombre: "CROSSFIT",
             imagen: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -46,15 +47,16 @@ export default function Home() {
         },
     ];
 
-    // Función para manejar el cambio de slide
+    // Función mejorada para manejar el cambio de slide
     const handleScroll = (event) => {
         const slideIndex = Math.round(
-            event.nativeEvent.contentOffset.x / (CARD_WIDTH + 20)
+            event.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_SPACING)
         );
         if (slideIndex >= 0 && slideIndex < clases.length) {
             setActiveSlide(slideIndex);
         }
     };
+    
     const handleVerMas = (clase) => {
         router.push({
             pathname: "/clases",
@@ -73,6 +75,11 @@ export default function Home() {
                 <Text style={styles.subGreeting}>¿Listo para entrenar?</Text>
             </View>
 
+            {/* Racha asistencia */}
+            <View style={styles.rachaContainer}>
+                <Racha />
+            </View>
+
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
@@ -85,13 +92,17 @@ export default function Home() {
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                snapToInterval={CARD_WIDTH + 20} // Usa el ancho de pantalla completo
+                snapToInterval={CARD_WIDTH + CARD_SPACING} // Snap perfecto con el nuevo cálculo
                 decelerationRate="fast"
                 contentContainerStyle={styles.carouselContent}
                 onScroll={handleScroll}
+                scrollEventThrottle={16} // Mejor performance del scroll
             >
-                {clases.map((clase) => (
-                    <View key={clase.id} style={styles.cardContainer}>
+                {clases.map((clase, index) => (
+                    <View 
+                        key={clase.id} 
+                        style={index === clases.length - 1 ? styles.lastCardContainer : styles.cardContainer}
+                    >
                         <View style={styles.card}>
                             <Image
                                 source={{ uri: clase.imagen }}
@@ -105,7 +116,7 @@ export default function Home() {
                                     onPress={() => handleVerMas(clase)}
                                 >
                                     <Text style={styles.verMasText}>Ver más</Text>
-                                    <MaterialIcons name="keyboard-arrow-down" size={18} color="#FFFFFF" />
+                                    <MaterialIcons name="keyboard-arrow-down" size={20} color="#FFFFFF" />
                                 </TouchableOpacity>
                             </View>
                         </View>

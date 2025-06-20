@@ -1,5 +1,3 @@
-// components/SplashLoader.tsx
-
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, Image } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
@@ -22,7 +20,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
   const progressValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Animación del progreso circular
+
     Animated.timing(progressValue, {
       toValue: 1,
       duration: duration,
@@ -42,7 +40,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
   return (
     <View style={globalStyles.containerLoad}>
       <View style={globalStyles.loaderContainer}>
-        {/* Círculo de fondo */}
+
         <Svg width={size} height={size}>
           <Circle
             cx={size / 2}
@@ -54,7 +52,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
           />
         </Svg>
 
-        {/* Círculo de progreso */}
+ 
         <Svg width={size} height={size} style={globalStyles.progressCircle}>
           <AnimatedCircle
             cx={size / 2}
@@ -69,7 +67,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
           />
         </Svg>
 
-        {/* Ícono en el centro */}
+    
         <Image
           source={require('../../assets/splash-icon.png')}
           style={{ width: 150, height: 150, position: 'absolute' }}

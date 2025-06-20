@@ -10,9 +10,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import globalStyles from "../../styles/global";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const USER = "usuario@gmail.com";
-const PASS = "123456";
+import { UsuarioAtleta } from "../../data/UsuarioAtleta";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,11 +18,11 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const handleLogin = () => {
-    if (email !== USER && password !== PASS) {
+    if (email !== UsuarioAtleta.email && password !== UsuarioAtleta.password) {
       setError("Correo y contraseña incorrectos");
-    } else if (email !== USER) {
+    } else if (email !== UsuarioAtleta.email) {
       setError("Correo incorrecto");
-    } else if (password !== PASS) {
+    } else if (password !== UsuarioAtleta.password) {
       setError("Contraseña incorrecta");
     } else {
       setError("");
@@ -97,13 +95,13 @@ export default function Login() {
           </Text>
         </Text>
 
-        {/* Google */}
+        
         <TouchableOpacity style={globalStyles.socialButton}>
           <MaterialCommunityIcons name="google" size={24} color="#DB4437" />
           <Text style={globalStyles.socialText}>Iniciar sesión con Google</Text>
         </TouchableOpacity>
 
-        {/* Facebook */}
+        
         <TouchableOpacity style={globalStyles.socialButton}>
           <MaterialCommunityIcons name="facebook" size={24} color="#4267B2" />
           <Text style={globalStyles.socialText}>
