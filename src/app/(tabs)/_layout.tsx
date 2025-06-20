@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Keyboard } from 'react-native';
 import { Slot, usePathname } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from '../../styles/tabsLayout';
 import Navigation from '../../components/Navigation';
 import Header from '../../components/Header';
@@ -40,13 +41,13 @@ export default function TabsLayout() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header title={getHeaderTitle(pathname)} showBack />
       <View style={styles.content}>
         <Slot />
       </View>
       {!keyboardVisible && <Navigation />}
-    </View>
+    </SafeAreaView>
   );
 }
 

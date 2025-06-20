@@ -16,7 +16,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
         <TouchableOpacity style={styles.leftIcon} onPress={() => router.back()}>
           <MaterialIcons
             name="chevron-left"
-            size={28}
+            size={24}
             color={theme.colors.background}
           />
         </TouchableOpacity>
@@ -32,7 +32,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
       >
         <MaterialCommunityIcons
           name="cog-outline"
-          size={24}
+          size={20}
           color={theme.colors.background}
         />
       </TouchableOpacity>
@@ -45,8 +45,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 20,
+    paddingTop: 50,
     paddingBottom: 16,
+    borderBottomLeftRadius: theme.borderRadius.lg,
+    borderBottomRightRadius: theme.borderRadius.lg,
   },
   title: {
     fontSize: theme.typography.fontSize.title,
@@ -56,12 +58,12 @@ const styles = StyleSheet.create({
   leftIcon: {
     position: "absolute",
     left: 16,
-    top: 20,
+    top: 50,
   },
   rightIcon: {
     position: "absolute",
     right: 16,
-    top: 20,
+    top: 50,
   },
 });
 export default Header;

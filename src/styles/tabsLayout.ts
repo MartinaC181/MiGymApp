@@ -10,6 +10,6 @@ export default StyleSheet.create({
   },
   content: {
     flex: 1,  
-    paddingBottom: 56 + theme.spacing.sm,                   
+    paddingBottom: 56 + theme.spacing.sm,
   },
 });

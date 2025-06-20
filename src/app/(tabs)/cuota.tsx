@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Modal, StatusBar } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import theme from "../../constants/theme";
@@ -30,6 +30,39 @@ function getCuotaInfo() {
 export default function Cuota() {
     const cuota = getCuotaInfo();
     const router = useRouter();
+    const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
+    // Efecto para cambiar el StatusBar cuando el modal esté abierto
+    useEffect(() => {
+        if (showInvoiceModal) {
+            // Hacer la barra de estado transparente cuando el modal esté abierto
+            StatusBar.setBarStyle('light-content');
+            StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.5)');
+            StatusBar.setTranslucent(true);
+        } else {
+            // Restaurar la barra de estado original
+            StatusBar.setBarStyle('light-content');
+            StatusBar.setBackgroundColor(theme.colors.primary);
+            StatusBar.setTranslucent(true);
+        }
+    }, [showInvoiceModal]);
+
+    // Función para manejar el pago con Mercado Pago
+    const handleMercadoPagoPayment = () => {
+        // Aquí iría la lógica de integración con Mercado Pago
+        console.log("Procesando pago con Mercado Pago...");
+        // router.push("/mercadopago-payment");
+    };
+
+    // Función para manejar la vista de la factura
+    const handleViewInvoice = () => {
+        setShowInvoiceModal(true);
+    };
+
+    // Función para cerrar el modal
+    const closeInvoiceModal = () => {
+        setShowInvoiceModal(false);
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -43,19 +76,36 @@ export default function Cuota() {
                                 <MaterialIcons name="error-outline" size={18} color={theme.colors.error} />
                             </View>
                             <Text style={styles.amount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                            
+                            {/* Botones de pago */}
+                            <View style={styles.paymentButtonsContainer}>
                             <TouchableOpacity
                                 style={styles.payButton}
                                 onPress={() => router.push("/facturacion")}
                             >
                                 <Text style={globalStyles.buttonText}>Pagar</Text>
                             </TouchableOpacity>
+                                
+                                <TouchableOpacity
+                                    style={styles.mercadopagoButton}
+                                    onPress={() => handleMercadoPagoPayment()}
+                                >
+                                    <View style={styles.mpLogoContainer}>
+                                        <MaterialIcons name="account-balance-wallet" size={16} color="#009EE3" />
+                                    </View>
+                                    <Text style={styles.mercadopagoText}>MERCADO PAGO</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                         <View style={globalStyles.card}>
                             <Text style={styles.invoiceTitle}>Factura asociada a</Text>
                             <Text style={styles.invoiceText}><Text style={styles.bold}>Nombre:</Text> {cuota.nombre}</Text>
                             <Text style={styles.invoiceText}><Text style={styles.bold}>DNI:</Text> {cuota.dni}</Text>
-                            <TouchableOpacity style={styles.payButton}>
-                                <Text style={globalStyles.buttonText}>Factura</Text>
+                            <TouchableOpacity 
+                                style={styles.invoiceButton}
+                                onPress={() => handleViewInvoice()}
+                            >
+                                <Text style={globalStyles.buttonText}>FACTURA</Text>
                             </TouchableOpacity>
                         </View>
                     </>
@@ -74,6 +124,78 @@ export default function Cuota() {
                     </>
                 )}
             </View>
+            {showInvoiceModal && (
+                <Modal
+                    visible={showInvoiceModal}
+                    animationType="fade"
+                    transparent={true}
+                    onRequestClose={closeInvoiceModal}
+                    statusBarTranslucent={true}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>FACTURA</Text>
+                                <TouchableOpacity
+                                    style={styles.closeIcon}
+                                    onPress={closeInvoiceModal}
+                                >
+                                    <MaterialIcons name="close" size={24} color={theme.colors.textSecondary} />
+                                </TouchableOpacity>
+                            </View>
+                            
+                            <View style={styles.invoiceInfo}>
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>Número de Factura:</Text>
+                                    <Text style={styles.invoiceValue}>#2024-001</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
+                                    <Text style={styles.invoiceValue}>15/01/2024</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
+                                    <Text style={styles.invoiceValue}>15/02/2024</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>Cliente:</Text>
+                                    <Text style={styles.invoiceValue}>{cuota.nombre}</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>DNI:</Text>
+                                    <Text style={styles.invoiceValue}>{cuota.dni}</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>Servicio:</Text>
+                                    <Text style={styles.invoiceValue}>Membresía Gimnasio</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceRow}>
+                                    <Text style={styles.invoiceLabel}>Período:</Text>
+                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
+                                </View>
+                                
+                                <View style={styles.totalRow}>
+                                    <Text style={styles.totalLabel}>TOTAL A PAGAR:</Text>
+                                    <Text style={styles.totalAmount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                                </View>
+                            </View>
+                            
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={closeInvoiceModal}
+                            >
+                                <Text style={styles.closeButtonText}>CERRAR</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+            )}
         </SafeAreaView>
     );
 }
@@ -102,9 +224,13 @@ const styles = StyleSheet.create({
     payButton: {
         backgroundColor: theme.colors.primary,
         borderRadius: theme.borderRadius.md,
-        paddingVertical: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.xl,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
         marginTop: theme.spacing.md,
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 36,
     },
     payButtonText: {
         color: theme.colors.background,
@@ -141,5 +267,133 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.bold,
         marginRight: theme.spacing.sm,
+    },
+    paymentButtonsContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: theme.spacing.sm,
+    },
+    mercadopagoButton: {
+        backgroundColor: "#009EE3", // Color oficial de Mercado Pago
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        marginTop: theme.spacing.md,
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 36,
+        shadowColor: "#009EE3",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    mpLogoContainer: {
+        backgroundColor: theme.colors.background,
+        borderRadius: theme.borderRadius.sm,
+        paddingVertical: 4,
+        paddingHorizontal: 6,
+        marginRight: theme.spacing.sm,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    mercadopagoText: {
+        color: theme.colors.background,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.bold,
+    },
+    invoiceButton: {
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        marginTop: theme.spacing.md,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 36,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        paddingTop: StatusBar.currentHeight || 0,
+    },
+    modalContent: {
+        backgroundColor: theme.colors.background,
+        padding: theme.spacing.lg,
+        borderRadius: theme.borderRadius.lg,
+        width: "80%",
+        maxHeight: "80%",
+        alignItems: "center",
+    },
+    modalHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
+        marginBottom: theme.spacing.md,
+    },
+    modalTitle: {
+        fontFamily: theme.typography.fontFamily.bold,
+        fontSize: theme.typography.fontSize.medium,
+        color: theme.colors.textPrimary,
+    },
+    closeIcon: {
+        padding: theme.spacing.sm,
+    },
+    invoiceInfo: {
+        width: "100%",
+        marginBottom: theme.spacing.md,
+    },
+    invoiceRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: theme.spacing.xs,
+    },
+    invoiceLabel: {
+        fontFamily: theme.typography.fontFamily.medium,
+        fontSize: theme.typography.fontSize.small,
+        color: theme.colors.textSecondary,
+    },
+    invoiceValue: {
+        fontFamily: theme.typography.fontFamily.bold,
+        fontSize: theme.typography.fontSize.medium,
+        color: theme.colors.textPrimary,
+    },
+    totalRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: theme.spacing.md,
+    },
+    totalLabel: {
+        fontFamily: theme.typography.fontFamily.medium,
+        fontSize: theme.typography.fontSize.small,
+        color: theme.colors.textSecondary,
+    },
+    totalAmount: {
+        fontFamily: theme.typography.fontFamily.bold,
+        fontSize: theme.typography.fontSize.medium,
+        color: theme.colors.textPrimary,
+    },
+    closeButton: {
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        marginTop: theme.spacing.md,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 36,
+    },
+    closeButtonText: {
+        color: theme.colors.background,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
     },
 });

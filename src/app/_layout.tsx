@@ -1,7 +1,7 @@
 // app/_layout.tsx
 import React, { useEffect, useState } from "react";
 import { Slot } from "expo-router";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
@@ -17,8 +17,6 @@ import theme from "../constants/theme"; // ruta a tu archivo theme.ts
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-
-
   const [fontsLoaded] = useFonts({
     [theme.typography.fontFamily.regular]: Roboto_400Regular,
     [theme.typography.fontFamily.medium]: Roboto_500Medium,
@@ -36,9 +34,14 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-        <View style={styles.container}>
-          <Slot />
-        </View>
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor={theme.colors.primary} 
+        translucent={true}
+      />
+      <View style={styles.container}>
+        <Slot />
+      </View>
     </SafeAreaProvider>
   );
 }
