@@ -12,6 +12,7 @@ import { router } from "expo-router";
 import globalStyles from "../../styles/global";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import theme from "../../constants/theme";
+import React from "react";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");

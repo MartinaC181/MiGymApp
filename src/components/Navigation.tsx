@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Pressable, Text, Keyboard } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from '../styles/navigation';
@@ -8,6 +8,7 @@ import theme from '../constants/theme';
 
 export default function Navigation() {
   const router = useRouter();
+  const pathname = usePathname();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -27,29 +28,31 @@ export default function Navigation() {
   const NavItem = ({
     iconName,
     route,
-    label,
   }: {
     iconName: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
     route: string;
-    label: string;
-  }) => (
-    <View style={styles.navItemWrapper}>
-      <Pressable
-        style={({ pressed }) => [
-          styles.iconContainer,
-          pressed ? styles.iconContainerPressed : {},
-        ]}
-        onPress={() => router.push(route)}
-      >
-        <MaterialCommunityIcons
-          name={iconName}
-          size={32}
-          color={theme.colors.primary}
-        />
-      </Pressable>
-      <Text style={styles.iconText}>{label}</Text>
-    </View>
-  );
+  }) => {
+    const isActive = pathname === route;
+    
+    return (
+      <View style={styles.navItemWrapper}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.iconContainer,
+            isActive && styles.iconContainerActive,
+            pressed ? styles.iconContainerPressed : {},
+          ]}
+          onPress={() => router.push(route)}
+        >
+          <MaterialCommunityIcons
+            name={iconName}
+            size={36}
+            color={theme.colors.primary}
+          />
+        </Pressable>
+      </View>
+    );
+  };
 
   if (keyboardVisible) {
     return null;
@@ -58,10 +61,10 @@ export default function Navigation() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <View style={styles.container}>
-        <NavItem iconName="home" route="/home" label="Inicio" />
-        <NavItem iconName="weight-lifter" route="/rutina" label="Rutina" />
-        <NavItem iconName="wallet" route="/cuota" label="Cuota" />
-        <NavItem iconName="account" route="/perfil" label="Perfil" />
+        <NavItem iconName="home" route="/home" />
+        <NavItem iconName="weight-lifter" route="/rutina" />
+        <NavItem iconName="wallet" route="/cuota" />
+        <NavItem iconName="account" route="/perfil" />
       </View>
     </SafeAreaView>
   );

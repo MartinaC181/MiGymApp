@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import globalStyles from "../../styles/global";
 import { router } from "expo-router";
+import React from "react";
 
 function isValidEmail(email: string) {
   // Simple email regex

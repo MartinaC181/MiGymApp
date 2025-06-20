@@ -5,30 +5,50 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import globalStyles from "../../styles/global";
+import theme from "../../constants/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UsuarioAtleta } from "../../data/UsuarioAtleta";
+
+const USER = "mirtho@gmail.com";
+const PASS = "123456";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (email !== UsuarioAtleta.email && password !== UsuarioAtleta.password) {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Por favor completa todos los campos");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    // Simular delay de carga
+    setTimeout(() => {
+    if (email !== USER && password !== PASS) {
       setError("Correo y contraseña incorrectos");
-    } else if (email !== UsuarioAtleta.email) {
+    } else if (email !== USER) {
       setError("Correo incorrecto");
-    } else if (password !== UsuarioAtleta.password) {
+    } else if (password !== PASS) {
       setError("Contraseña incorrecta");
     } else {
       setError("");
       router.push("/home");
     }
+      setIsLoading(false);
+    }, 1000);
   };
+
+  const isButtonDisabled = isLoading || !email || !password;
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
@@ -40,6 +60,9 @@ export default function Login() {
             style={globalStyles.logo}
           />
         </View>
+
+        {/* Título invisible para alineación */}
+        <View style={globalStyles.logoSpacer} />
 
         {/* Correo */}
         <Text style={globalStyles.label}>CORREO ELECTRÓNICO</Text>
@@ -67,11 +90,15 @@ export default function Login() {
 
         {/* Botón */}
         <TouchableOpacity
-          style={globalStyles.LoginButton}
+          style={isButtonDisabled ? globalStyles.LoginButtonDisabled : globalStyles.LoginButton}
           onPress={handleLogin}
-
+          disabled={isButtonDisabled}
         >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
           <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
+          )}
         </TouchableOpacity>
 
         {/* ¿Olvidaste tu contraseña? */}

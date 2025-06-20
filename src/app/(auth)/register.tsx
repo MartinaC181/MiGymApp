@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -11,20 +11,59 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function isValidPassword(password: string) {
+  // Al menos 6 caracteres
+  return password.length >= 6;
+}
+
 export default function Register() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = () => {
-    if (!isValidEmail(email)) {
-      setError("Por favor ingresa un correo válido.");
+  const handleSend = async () => {
+    if (!name.trim()) {
+      setError("Por favor ingresa tu nombre completo");
       return;
     }
+    
+    if (!isValidEmail(email)) {
+      setError("Por favor ingresa un correo válido");
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    if (!selectedDate) {
+      setError("Por favor selecciona tu fecha de nacimiento");
+      return;
+    }
+
+    if (!selectedOption) {
+      setError("Por favor selecciona un gimnasio");
+      return;
+    }
+
+    setIsLoading(true);
     setError("");
+
+    // Simular proceso de registro
+    setTimeout(() => {
+      setIsLoading(false);
+      // Aquí iría la lógica real de registro
+      router.push("/login");
+    }, 2000);
   };
+
+  const isButtonDisabled = isLoading || !name.trim() || !email || !password || !selectedDate || !selectedOption;
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
@@ -42,6 +81,8 @@ export default function Register() {
           style={globalStyles.input}
           placeholder="Mirtho Legrand"
           placeholderTextColor="#999"
+          value={name}
+          onChangeText={setName}
         />
 
         <Text style={globalStyles.label}>CORREO ELECTRÓNICO</Text>
@@ -50,6 +91,8 @@ export default function Register() {
           placeholder="correo@ejemplo.com"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
 
         <Text style={globalStyles.label}>CONTRASEÑA</Text>
@@ -58,11 +101,13 @@ export default function Register() {
           placeholder="********"
           placeholderTextColor="#999"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
 
         <Text style={globalStyles.label}>FECHA DE NACIMIENTO</Text>
-        <View style={globalStyles.pickerContainer}>
-          <Text style={globalStyles.pickerText}>
+        <TouchableOpacity style={globalStyles.pickerContainer}>
+          <Text style={selectedDate ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
             {selectedDate
               ? selectedDate.toLocaleDateString("es-ES")
               : "Seleccionar"}
@@ -72,11 +117,11 @@ export default function Register() {
             size={20}
             color={theme.colors.primary}
           />
-        </View>
+        </TouchableOpacity>
 
         <Text style={globalStyles.label}>GIMNASIO</Text>
-        <View style={globalStyles.pickerContainer}>
-          <Text style={globalStyles.pickerText}>
+        <TouchableOpacity style={globalStyles.pickerContainer}>
+          <Text style={selectedOption ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
             {selectedOption ? selectedOption : "Seleccionar"}
           </Text>
           <MaterialIcons
@@ -84,10 +129,24 @@ export default function Register() {
             size={24}
             color={theme.colors.primary}
           />
-        </View>
+        </TouchableOpacity>
+        
         {error ? (
-          <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+          <Text style={globalStyles.errorText}>{error}</Text>
         ) : null}
+        
+        <TouchableOpacity 
+          style={isButtonDisabled ? globalStyles.LoginButtonDisabled : globalStyles.LoginButton} 
+          onPress={handleSend}
+          disabled={isButtonDisabled}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={globalStyles.buttonText}>Registrarse</Text>
+          )}
+        </TouchableOpacity>
+
         <Text style={globalStyles.registerText}>
           ¿Ya estás registrado?{" "}
           <Text
@@ -97,10 +156,6 @@ export default function Register() {
             Iniciar Sesión
           </Text>
         </Text>
-
-        <TouchableOpacity style={globalStyles.LoginButton} onPress={handleSend}>
-          <Text style={globalStyles.buttonText}>Registrarse</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
