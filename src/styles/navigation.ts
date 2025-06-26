@@ -1,4 +1,3 @@
-// src/styles/navigation.ts
 import { StyleSheet } from 'react-native';
 import theme from '../constants/theme';
 
@@ -15,9 +14,9 @@ export default StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'flex-end',   
+    alignItems: 'flex-end',
     backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.md + 8, 
+    paddingVertical: theme.spacing.sm + 4,
     borderTopLeftRadius: theme.borderRadius.lg,
     borderTopRightRadius: theme.borderRadius.lg,
   },
@@ -29,19 +28,19 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 100,
-    marginTop: -68,   
+    marginTop: -46,
     marginBottom: 4,
+    elevation: 15,
   },
   iconContainerActive: {
     backgroundColor: theme.colors.background,
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
     elevation: 15,
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
     transform: [{ scale: 1.08 }],
+    marginTop: -50,
   },
   iconContainerPressed: {
      backgroundColor: theme.colors.surface,

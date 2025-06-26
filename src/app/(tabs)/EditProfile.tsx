@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
 import {router} from "expo-router";
+import styles from '@/src/styles/home';
 
 const EditProfile = ({navigation}: any) => {
 
@@ -78,7 +79,7 @@ const EditProfile = ({navigation}: any) => {
                         placeholder="cm"
                         keyboardType="decimal-pad"/>
 
-                    <TouchableOpacity style={globalStyles.primaryButton} onPress={handleSave}>
+                    <TouchableOpacity style={styles.primaryButton} onPress={handleSave}>
                         <Text style={globalStyles.buttonText}>Guardar cambios</Text>
                     </TouchableOpacity>
                 </View>

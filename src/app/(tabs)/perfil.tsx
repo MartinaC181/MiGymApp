@@ -1,163 +1,179 @@
-import React, { useState } from 'react';
-import {View, Text, TouchableOpacity, Image, ScrollView, Alert, Share, Dimensions, SafeAreaView} from 'react-native';
+import React from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import Ionicons from "@expo/vector-icons/Ionicons";
-
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
-
+import pesoImg from '../../../assets/profile/bascula.png';
+import alturaImg from '../../../assets/profile/altura.png';
+import idealImg from '../../../assets/profile/pesoIdeal.png';
+import imcImg from '../../../assets/profile/imc.png';
 import perfilMirtho from '../../../assets/profile/perfilMirtho.png';
 
-const { width } = Dimensions.get('window');
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-type InfoBoxIcon = 'peso' | 'altura' | 'edad';
 
-interface InfoBoxProps {
-    icon: InfoBoxIcon;
-    value: string;
-    label: string;
-    trend?: string;
-}
-
-const InfoBox = ({icon, value, label, trend}: InfoBoxProps) => {
-    const getIcon = () => {
-        switch (icon) {
-            case 'peso':
-                return <Ionicons name="fitness" size={20} color={theme.colors.primary}/>;
-            case 'altura':
-                return <Ionicons name="body" size={20} color={theme.colors.primary}/>;
-            case 'edad':
-                return <Ionicons name="time" size={20} color={theme.colors.primary}/>;
-            default:
-                return null;
-        }
-    };
-
-    return (
-        <View style={globalStyles.infoBox}>
-            <View style={globalStyles.iconContainer}>
-                {getIcon()}
-            </View>
-            <View style={globalStyles.infoContent}>
-                <Text style={globalStyles.boxValue}>{value}</Text>
-                <Text style={globalStyles.boxLabel}>{label}</Text>
-            </View>
-        </View>
-    );
+const iconMap: Record<string, any> = {
+    peso: pesoImg,
+    altura: alturaImg,
+    ideal: idealImg,
+    imc: imcImg,
 };
 
 const Profile = () => {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const [isDarkMode, setIsDarkMode] = useState(false);
 
-    // ===== DATOS DEL USUARIO =====
-    const name = params.name as string || 'Mirtho García';
-    const email = params.email as string || 'mirtho.garcia@email.com';
-    const weight = params.weight as string || '75';
-    const height = params.height as string || '1.75';
-    const age = params.age as string || '28';
+    const name = params.name || '';
+    const email = params.email || '';
+    const weight = params.weight || '';
+    const idealWeight = params.idealWeight || '';
+    const height = params.height || '';
 
-    // ===== FUNCIONES =====
-    const handleShare = async () => {
-        try {
-            await Share.share({
-                message: `¡Mira mi progreso en MiGymApp! Peso: ${weight}kg, Altura: ${height}m`,
-                title: 'Mi Perfil de Fitness'
-            });
-        } catch (error) {
-            Alert.alert('Error', 'No se pudo compartir el perfil');
-        }
-    };
-
-    const handleEditProfile = () => {
-        router.push('EditProfile');
-    };
-
-    const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
-    };
+    const imc = (parseFloat(weight as string) / Math.pow(parseFloat(height as string), 2)).toFixed(2);
 
     return (
-        <SafeAreaView style={globalStyles.safeArea}>
-            <ScrollView style={globalStyles.profileContainer} showsVerticalScrollIndicator={false}>
-                {/* ===== FOTO DE PERFIL Y INFORMACIÓN ===== */}
-                <View style={globalStyles.profileHeader}>
-                    <View style={globalStyles.avatarWrapper}>
-                        <Image source={perfilMirtho} style={globalStyles.avatar}/>
-                        <TouchableOpacity style={globalStyles.editIcon} onPress={handleEditProfile}>
-                            <MaterialCommunityIcons name="pencil" size={14} color="white"/>
+        <View style={globalStyles.container}>
+            {/* Avatar con fondo y botón de edición*/}
+            <View style={styles.avatarWrapper}>
+                <Image source={perfilMirtho} style={styles.avatar}/>
+                <TouchableOpacity style={styles.editIcon}
+                                  onPress={() => router.push('EditProfile')}>
+                    <MaterialCommunityIcons name="pencil" size={16} color="white"/>
                 </TouchableOpacity>
             </View>
 
-                    <Text style={globalStyles.profileName}>{name}</Text>
-                    <Text style={globalStyles.profileEmail}>{email}</Text>
-                    
-                    <View style={globalStyles.actionButtons}>
-                        <TouchableOpacity style={globalStyles.actionButton} onPress={handleShare}>
-                            <Ionicons name="share-outline" size={18} color={theme.colors.primary}/>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={globalStyles.actionButton} onPress={toggleDarkMode}>
-                            <Ionicons name={isDarkMode ? "sunny" : "moon"} size={18} color={theme.colors.primary}/>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+            {/* Nombre y correo */}
+            <Text style={styles.name}>{name || 'Sin nombre'}</Text>
+            <Text style={styles.email}>{email || 'Sin correo'}</Text>
 
-                {/* ===== INFORMACIÓN PERSONAL ===== */}
-                <View style={globalStyles.infoSection}>
-                    <Text style={globalStyles.sectionTitle}>Información Personal</Text>
-                    <View style={globalStyles.infoList}>
-                        <InfoBox icon="peso" label="Peso Actual" value={`${weight} kg`}/>
-                        <InfoBox icon="altura" label="Altura" value={`${height} m`} />
-                        <InfoBox icon="edad" label="Edad" value={`${age} años`} />
-                    </View>
-                </View>
-
-                {/* ===== LOGROS ===== */}
-                <View style={globalStyles.achievementsSection}>
-                    <Text style={globalStyles.sectionTitle}>Logros Recientes</Text>
-                    <View style={globalStyles.achievementsList}>
-                        <View style={globalStyles.achievementItem}>
-                            <View style={globalStyles.achievementIcon}>
-                                <Ionicons name="trophy" size={20} color="#FFD700"/>
-                            </View>
-                            <View style={globalStyles.achievementContent}>
-                                <Text style={globalStyles.achievementTitle}>Primera semana completa</Text>
-                                <Text style={globalStyles.achievementDesc}>Completaste 7 días de entrenamiento</Text>
-                            </View>
+            {/* Cuadricula */}
+            <View style={styles.grid}>
+                <InfoBox icon="peso" label="Peso" value={`${weight || '---'} kg`}/>
+                <InfoBox icon="altura" label="Altura" value={`${height || '---'} m`}/>
+                <InfoBox icon="ideal" label="Peso ideal" value={`${idealWeight || '---'} kg`}/>
+                <InfoBox icon="imc" label="IMC" value={`${imc || '---'}`}/>
             </View>
 
-                        <View style={globalStyles.achievementItem}>
-                            <View style={globalStyles.achievementIcon}>
-                                <Ionicons name="fitness" size={20} color="#4ECDC4"/>
-                            </View>
-                            <View style={globalStyles.achievementContent}>
-                                <Text style={globalStyles.achievementTitle}>Consistencia</Text>
-                                <Text style={globalStyles.achievementDesc}>6 semanas consecutivas de entrenamiento</Text>
-                            </View>
-                        </View>
-
-                        <View style={globalStyles.achievementItem}>
-                            <View style={globalStyles.achievementIcon}>
-                                <Ionicons name="star" size={20} color="#FF6B6B"/>
-                            </View>
-                            <View style={globalStyles.achievementContent}>
-                                <Text style={globalStyles.achievementTitle}>Cliente VIP</Text>
-                                <Text style={globalStyles.achievementDesc}>Más de 30 días de membresía activa</Text>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-
-                {/* ===== BOTÓN DE EDICIÓN ===== */}
-                <TouchableOpacity style={globalStyles.editProfileButton} onPress={handleEditProfile}>
-                    <MaterialCommunityIcons name="account-edit" size={18} color="white"/>
-                    <Text style={globalStyles.buttonText}>Editar Perfil</Text>
+            {/* Botón de editar */}
+            <TouchableOpacity style={globalStyles.LoginButton}
+                              onPress={() => router.push('EditProfile')}>
+                <Text style={globalStyles.buttonText}>Editar</Text>
             </TouchableOpacity>
-            </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
+
+const InfoBox = ({icon, value, label}: {
+    icon: 'peso' | 'altura' | 'ideal' | 'imc';
+    value: string;
+    label: string;
+}) => (
+    <View style={styles.box}>
+        <View style={styles.iconCircle}>
+            <Image source={iconMap[icon]} style={styles.iconImage}/>
+        </View>
+        <Text style={styles.boxValue}>{value}</Text>
+        <Text style={styles.boxLabel}>{label}</Text>
+    </View>
+);
+
+const styles = StyleSheet.create({
+    // Se eliminaron header y title redundantes
+    container: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        padding: theme.spacing.lg,
+    },
+    avatarWrapper: {
+        position: 'relative',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: theme.spacing.md,
+        width: 110,
+        height: 110,
+        borderRadius: 55,
+        backgroundColor: theme.colors.surface,
+    },
+    avatar: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+    },
+    editIcon: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: theme.colors.primary,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: theme.colors.surface,
+    },
+    name: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginBottom: 4,
+    },
+    email: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        marginBottom: theme.spacing.lg,
+    },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        width: '100%',
+        maxWidth: 280,
+        rowGap: theme.spacing.md,
+        columnGap: theme.spacing.md,
+        marginBottom: theme.spacing.lg,
+    },
+    box: {
+        width: 130,
+        height: 120,
+        backgroundColor: '#b3dcec',
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.xs,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: theme.spacing.md,
+        elevation: 8,
+
+    },
+    iconCircle: {
+        width: 50,
+        height: 50,
+        borderRadius: 20,
+        backgroundColor: theme.colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: theme.spacing.xs,
+    },
+    iconImage: {
+        width: 30,
+        height: 30,
+        resizeMode: 'contain',
+    },
+    boxValue: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginTop: theme.spacing.xs,
+    },
+    boxLabel: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        marginTop: theme.spacing.xs,
+    },
+});
 
 export default Profile;

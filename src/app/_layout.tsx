@@ -11,9 +11,8 @@ import {
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
 
-import theme from "../constants/theme"; // ruta a tu archivo theme.ts
+import theme from "../constants/theme";
 
-// Evita que el splash se oculte automáticamente hasta que carguen las fuentes
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -29,7 +28,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  // Mientras no carguen las fuentes, no renderizamos nada
+
   if (!fontsLoaded) return null;
 
   return (

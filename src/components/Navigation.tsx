@@ -27,9 +27,11 @@ export default function Navigation() {
 
   const NavItem = ({
     iconName,
+    label,
     route,
   }: {
     iconName: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+    label: string;
     route: string;
   }) => {
     const isActive = pathname === route;
@@ -50,6 +52,9 @@ export default function Navigation() {
             color={theme.colors.primary}
           />
         </Pressable>
+        <Text style={styles.iconText}>
+          {label}
+        </Text>
       </View>
     );
   };
@@ -61,10 +66,10 @@ export default function Navigation() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <View style={styles.container}>
-        <NavItem iconName="home" route="/home" />
-        <NavItem iconName="weight-lifter" route="/rutina" />
-        <NavItem iconName="wallet" route="/cuota" />
-        <NavItem iconName="account" route="/perfil" />
+        <NavItem iconName="home" label="Inicio" route="/home" />
+        <NavItem iconName="weight-lifter" label="Rutina" route="/rutina" />
+        <NavItem iconName="wallet" label="Cuota" route="/cuota" />
+        <NavItem iconName="account" label="Perfil" route="/perfil" />
       </View>
     </SafeAreaView>
   );

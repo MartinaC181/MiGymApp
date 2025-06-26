@@ -34,3 +34,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# cursor
+.cursorrules
+.cursorignore
+.cursor*

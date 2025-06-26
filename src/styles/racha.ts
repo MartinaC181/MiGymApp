@@ -47,6 +47,9 @@ export default StyleSheet.create({
   progressDotActive: {
     backgroundColor: theme.colors.primary,
   },
+  progressDotWrapper: {
+    marginHorizontal: 3,
+  },
   desc: {
     marginTop: theme.spacing.sm,
     fontSize: theme.typography.fontSize.small,
