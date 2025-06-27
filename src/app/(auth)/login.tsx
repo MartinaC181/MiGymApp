@@ -12,7 +12,7 @@ import { router } from "expo-router";
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { UsuarioAtleta } from "../../data/UsuarioAtleta";
+import { getUserByCredentials, ClientUser, GymUser } from "../../data/Usuario";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -31,16 +31,21 @@ export default function Login() {
 
     // Simular delay de carga
     setTimeout(() => {
-    if (email !== UsuarioAtleta.email && password !== UsuarioAtleta.password) {
-      setError("Correo y contraseña incorrectos");
-    } else if (email !== UsuarioAtleta.email) {
-      setError("Correo incorrecto");
-    } else if (password !== UsuarioAtleta.password) {
-      setError("Contraseña incorrecta");
-    } else {
-      setError("");
-      router.push("/home");
-    }
+      const user = getUserByCredentials(email, password);
+      
+      if (!user) {
+        setError("Correo o contraseña incorrectos");
+      } else {
+        setError("");
+
+        if (user.role === 'gym') {
+     
+          router.push("/home");
+        } else {
+
+          router.push("/home");
+        }
+      }
       setIsLoading(false);
     }, 1000);
   };
@@ -113,7 +118,7 @@ export default function Login() {
           ¿No estás registrado todavía?{" "}
           <Text
             style={globalStyles.textLink}
-            onPress={() => router.push("/register")}
+            onPress={() => router.push("/user-type-selection")}
           >
             Regístrate
           </Text>

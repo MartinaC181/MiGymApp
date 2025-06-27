@@ -4,7 +4,7 @@ import theme from "../constants/theme";
 const globalStyles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.surface, // fondo gris claro
+    backgroundColor: theme.colors.surface,
   },
   container: {
     flex: 1,
@@ -17,7 +17,7 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.background, // Fondo desde theme
+    backgroundColor: theme.colors.background, 
     padding: theme.spacing.lg,
   },
   logoContainer: {
@@ -29,19 +29,18 @@ const globalStyles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   logo: {
-    width: 170,
-    height: 170,
+    width: 130,
+    height: 130,
     resizeMode: "contain",
     marginBottom: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
+    shadowColor: "#007ACC",
+    shadowOffset: { width: 0, height: 8},
+    shadowOpacity: 0.25,
     shadowRadius: 16,
-    elevation: 8,
-    backgroundColor: theme.colors.background,
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
+    elevation: 16,
+    backgroundColor: "transparent",
+    borderWidth: 0,
   },
   label: {
     fontSize: theme.typography.fontSize.small,
@@ -49,7 +48,9 @@ const globalStyles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.medium,
     marginBottom: 2,
     marginTop: theme.spacing.xs,
-    alignItems: "flex-start",
+    alignSelf: "flex-start",
+    width: "100%",
+    textAlign: "left",
   },
   input: {
     borderWidth: 1,
@@ -152,7 +153,7 @@ const globalStyles = StyleSheet.create({
     textAlign: "center",
   },
   title: {
-    fontSize: theme.typography.fontSize.large,
+    fontSize: theme.typography.fontSize.title,
     fontFamily: theme.typography.fontFamily.bold,
     color: theme.colors.textPrimary,
     textAlign: "center",

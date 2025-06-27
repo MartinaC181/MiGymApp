@@ -1,10 +1,11 @@
-import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { UserRole } from "../../data/Usuario";
 
 function isValidEmail(email: string) {
   // Simple email regex
@@ -18,6 +19,8 @@ function isValidPassword(password: string) {
 
 export default function Register() {
   const router = useRouter();
+  const { userType } = useLocalSearchParams<{ userType?: 'gym' | 'client' }>();
+  
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -25,6 +28,16 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Campos específicos para gimnasio
+  const [businessName, setBusinessName] = useState("");
+  const [address, setAddress] = useState("");
+  
+  useEffect(() => {
+    if (!userType) {
+      router.replace("/user-type-selection");
+    }
+  }, [userType]);
 
   const handleSend = async () => {
     if (!name.trim()) {
@@ -42,14 +55,25 @@ export default function Register() {
       return;
     }
 
-    if (!selectedDate) {
-      setError("Por favor selecciona tu fecha de nacimiento");
-      return;
-    }
-
-    if (!selectedOption) {
-      setError("Por favor selecciona un gimnasio");
-      return;
+   
+    if (userType === 'gym') {
+      if (!businessName.trim()) {
+        setError("Por favor ingresa el nombre del gimnasio");
+        return;
+      }
+      if (!address.trim()) {
+        setError("Por favor ingresa la dirección");
+        return;
+      }
+    } else {
+      if (!selectedDate) {
+        setError("Por favor selecciona tu fecha de nacimiento");
+        return;
+      }
+      if (!selectedOption) {
+        setError("Por favor selecciona un gimnasio");
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -58,32 +82,62 @@ export default function Register() {
     // Simular proceso de registro
     setTimeout(() => {
       setIsLoading(false);
-      // Aquí iría la lógica real de registro
       router.push("/login");
     }, 2000);
   };
 
-  const isButtonDisabled = isLoading || !name.trim() || !email || !password || !selectedDate || !selectedOption;
+  const getButtonDisabledState = () => {
+    const commonFields = !name.trim() || !email || !password || isLoading;
+    
+    if (userType === 'gym') {
+      return commonFields || !businessName.trim() || !address.trim();
+    } else {
+      return commonFields || !selectedDate || !selectedOption;
+    }
+  };
+
+  const isButtonDisabled = getButtonDisabledState();
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
-      <View style={globalStyles.container}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={globalStyles.logoContainer}>
           <Image
             source={require("../../../assets/icon.png")}
             style={globalStyles.logo}
           />
         </View>
-        <Text style={globalStyles.title}>Crea una nueva cuenta</Text>
+        <Text style={globalStyles.title}>
+          {userType === 'gym' ? 'Registrar Gimnasio' : 'Crea una nueva cuenta'}
+        </Text>
 
-        <Text style={globalStyles.label}>NOMBRE Y APELLIDO</Text>
+        <Text style={globalStyles.label}>
+          {userType === 'gym' ? 'NOMBRE DEL RESPONSABLE' : 'NOMBRE Y APELLIDO'}
+        </Text>
         <TextInput
           style={globalStyles.input}
-          placeholder="Mirtho Legrand"
+          placeholder={userType === 'gym' ? "Juan Pérez" : "Mirtho Legrand"}
           placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
         />
+        
+        {userType === 'gym' && (
+          <>
+            <Text style={globalStyles.label}>NOMBRE DEL GIMNASIO</Text>
+            <TextInput
+              style={globalStyles.input}
+              placeholder="FitCenter Plus"
+              placeholderTextColor="#999"
+              value={businessName}
+              onChangeText={setBusinessName}
+            />
+          </>
+        )}
 
         <Text style={globalStyles.label}>CORREO ELECTRÓNICO</Text>
         <TextInput
@@ -105,31 +159,48 @@ export default function Register() {
           onChangeText={setPassword}
         />
 
-        <Text style={globalStyles.label}>FECHA DE NACIMIENTO</Text>
-        <TouchableOpacity style={globalStyles.pickerContainer}>
-          <Text style={selectedDate ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
-            {selectedDate
-              ? selectedDate.toLocaleDateString("es-ES")
-              : "Seleccionar"}
-          </Text>
-          <MaterialCommunityIcons
-            name="calendar-outline"
-            size={20}
-            color={theme.colors.primary}
-          />
-        </TouchableOpacity>
+        {userType === 'gym' ? (
+          <>
+            <Text style={globalStyles.label}>DIRECCIÓN</Text>
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Av. Corrientes 1234, CABA"
+              placeholderTextColor="#999"
+              value={address}
+              onChangeText={setAddress}
+            />
 
-        <Text style={globalStyles.label}>GIMNASIO</Text>
-        <TouchableOpacity style={globalStyles.pickerContainer}>
-          <Text style={selectedOption ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
-            {selectedOption ? selectedOption : "Seleccionar"}
-          </Text>
-          <MaterialIcons
-            name="arrow-drop-down"
-            size={24}
-            color={theme.colors.primary}
-          />
-        </TouchableOpacity>
+
+          </>
+        ) : (
+          <>
+            <Text style={globalStyles.label}>FECHA DE NACIMIENTO</Text>
+            <TouchableOpacity style={globalStyles.pickerContainer}>
+              <Text style={selectedDate ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
+                {selectedDate
+                  ? selectedDate.toLocaleDateString("es-ES")
+                  : "Seleccionar"}
+              </Text>
+              <MaterialCommunityIcons
+                name="calendar-outline"
+                size={20}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+
+            <Text style={globalStyles.label}>GIMNASIO</Text>
+            <TouchableOpacity style={globalStyles.pickerContainer}>
+              <Text style={selectedOption ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
+                {selectedOption ? selectedOption : "Seleccionar"}
+              </Text>
+              <MaterialIcons
+                name="arrow-drop-down"
+                size={24}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+          </>
+        )}
         
         {error ? (
           <Text style={globalStyles.errorText}>{error}</Text>
@@ -156,7 +227,30 @@ export default function Register() {
             Iniciar Sesión
           </Text>
         </Text>
-      </View>
+
+        <Text style={[globalStyles.registerText, { marginTop: theme.spacing.xs }]}>
+          ¿Querés cambiar el tipo de usuario?{" "}
+          <Text
+            style={globalStyles.textLink}
+            onPress={() => router.push("/user-type-selection")}
+          >
+            Volver
+          </Text>
+        </Text>
+      </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+  },
+  scrollContent: {
+    padding: theme.spacing.lg,
+    alignItems: "center",
+    paddingTop: theme.spacing.xl * 1.5, 
+    paddingBottom: theme.spacing.xl,
+  },
+});

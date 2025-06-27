@@ -23,7 +23,7 @@ export default function Home() {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const router = useRouter();
     
-    // Datos de ejemplo para las clases
+
     const clases = [
         {
             id: 1,

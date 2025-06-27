@@ -3,7 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "../styles/racha";
 import theme from "../constants/theme";
-import { UsuarioAtleta as initialUser } from "../data/UsuarioAtleta";
+import { UsuarioAtleta as initialUser } from "../data/Usuario";
 import { calcularRachaSemanal, addAttendanceIfNeeded, countAttendancesThisWeek } from "../utils/racha";
 import { loadClientData, saveClientData } from "../utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
