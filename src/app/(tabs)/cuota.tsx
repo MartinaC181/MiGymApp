@@ -4,10 +4,31 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
-import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
-import { ClientUser } from "../../data/Usuario";
+
+// Función hardcode para verificar estados de vista
+function getCuotaInfo() {
+    // Cambiá este valor para probar ambos estados
+    const pendiente = true;
+
+    if (pendiente) {
+        return {
+            pendiente: true,
+            monto: 10213.89,
+            nombre: "Teo Risso",
+            dni: "40.000.000"
+        };
+    } else {
+        return {
+            pendiente: false,
+            monto: 0,
+            nombre: "Teo Risso",
+            dni: "40.000.000"
+        };
+    }
+}
 
 export default function Cuota() {
+    const cuota = getCuotaInfo();
     const router = useRouter();
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
     const [cuota, setCuota] = useState(null);
@@ -81,10 +102,16 @@ export default function Cuota() {
     }, [showInvoiceModal]);
 
     // Función para manejar el pago con Mercado Pago
-    const handleMercadoPagoPayment = () => {
+    const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
         console.log("Procesando pago con Mercado Pago...");
-        // router.push("/mercadopago-payment");
+        const data = await handleIntegrationMercadoPago(factura.items[0]);
+
+        if (!data) {
+           return console.error("Error al procesar el pago con Mercado Pago");
+        }
+
+        openBrowserAsync(data);
     };
 
     // Función para manejar la vista de la factura
@@ -211,42 +238,42 @@ export default function Cuota() {
                             <View style={styles.invoiceInfo}>
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Número de Factura:</Text>
-                                    <Text style={styles.invoiceValue}>{cuota.numeroFactura || '#2024-001'}</Text>
+                                    <Text style={styles.invoiceValue}>#2024-001</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
-                                    <Text style={styles.invoiceValue}>{formatDate(cuota.fechaEmision)}</Text>
+                                    <Text style={styles.invoiceValue}>15/01/2024</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
-                                    <Text style={styles.invoiceValue}>{formatDate(cuota.fechaVencimiento)}</Text>
+                                    <Text style={styles.invoiceValue}>15/02/2024</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Cliente:</Text>
-                                    <Text style={styles.invoiceValue}>{cuota.nombre}</Text>
+                                    <Text style={styles.invoiceValue}>{factura.cliente}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>DNI:</Text>
-                                    <Text style={styles.invoiceValue}>{cuota.dni}</Text>
+                                    <Text style={styles.invoiceValue}>{factura.dni}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Servicio:</Text>
-                                    <Text style={styles.invoiceValue}>Membresía Gimnasio</Text>
+                                    <Text style={styles.invoiceValue}>{factura.servicio}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Período:</Text>
-                                    <Text style={styles.invoiceValue}>{cuota.periodo || 'N/A'}</Text>
+                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
                                 </View>
                                 
                                 <View style={styles.totalRow}>
                                     <Text style={styles.totalLabel}>TOTAL A PAGAR:</Text>
-                                    <Text style={styles.totalAmount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                                    <Text style={styles.totalAmount}>${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
                                 </View>
                             </View>
                             
