@@ -32,15 +32,9 @@ export default StyleSheet.create({
     zIndex: 100,
     marginTop: -46,
     marginBottom: 4,
-    elevation: 15,
   },
   iconContainerActive: {
     backgroundColor: theme.colors.background,
-    elevation: 15,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
     transform: [{ scale: 1.08 }],
     marginTop: -50,
   },
@@ -57,7 +51,7 @@ export default StyleSheet.create({
   iconText: {
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    color: 'white',
     marginTop: 4,
   },
   navItemWrapper: {

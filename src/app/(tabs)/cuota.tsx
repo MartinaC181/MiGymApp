@@ -4,6 +4,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
+import { handleIntegrationMercadoPago } from "@/src/utils/MPIntegration";
+import { openBrowserAsync } from "expo-web-browser";
 
 // Función hardcode para verificar estados de vista
 function getCuotaInfo() {
@@ -27,8 +29,32 @@ function getCuotaInfo() {
     }
 }
 
+// Objeto con los datos de factura
+const getFacturaData = (cuotaInfo: any) => {
+    return {
+        numeroFactura: "#2024-001",
+        fechaEmision: "15/01/2024",
+        fechaVencimiento: "15/02/2024",
+        cliente: cuotaInfo.nombre,
+        dni: cuotaInfo.dni,
+        servicio: "Membresía Gimnasio",
+        periodo: "Enero 2024",
+        monto: cuotaInfo.monto,
+        items: [
+            {
+                descripcion: "Membresía Mensual",
+                cantidad: 1,
+                precioUnitario: 10213.89,
+                subtotal: 10213.89
+            }
+        ],
+        total: cuotaInfo.monto
+    };
+};
+
 export default function Cuota() {
     const cuota = getCuotaInfo();
+    const factura = getFacturaData(cuota);
     const router = useRouter();
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
@@ -48,10 +74,16 @@ export default function Cuota() {
     }, [showInvoiceModal]);
 
     // Función para manejar el pago con Mercado Pago
-    const handleMercadoPagoPayment = () => {
+    const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
         console.log("Procesando pago con Mercado Pago...");
-        // router.push("/mercadopago-payment");
+        const data = await handleIntegrationMercadoPago(factura.items[0]);
+
+        if (!data) {
+           return console.error("Error al procesar el pago con Mercado Pago");
+        }
+
+        openBrowserAsync(data);
     };
 
     // Función para manejar la vista de la factura
@@ -147,42 +179,42 @@ export default function Cuota() {
                             <View style={styles.invoiceInfo}>
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Número de Factura:</Text>
-                                    <Text style={styles.invoiceValue}>#2024-001</Text>
+                                    <Text style={styles.invoiceValue}>{factura.numeroFactura}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
-                                    <Text style={styles.invoiceValue}>15/01/2024</Text>
+                                    <Text style={styles.invoiceValue}>{factura.fechaEmision}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
-                                    <Text style={styles.invoiceValue}>15/02/2024</Text>
+                                    <Text style={styles.invoiceValue}>{factura.fechaVencimiento}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Cliente:</Text>
-                                    <Text style={styles.invoiceValue}>{cuota.nombre}</Text>
+                                    <Text style={styles.invoiceValue}>{factura.cliente}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>DNI:</Text>
-                                    <Text style={styles.invoiceValue}>{cuota.dni}</Text>
+                                    <Text style={styles.invoiceValue}>{factura.dni}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Servicio:</Text>
-                                    <Text style={styles.invoiceValue}>Membresía Gimnasio</Text>
+                                    <Text style={styles.invoiceValue}>{factura.servicio}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Período:</Text>
-                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
+                                    <Text style={styles.invoiceValue}>{factura.periodo}</Text>
                                 </View>
                                 
                                 <View style={styles.totalRow}>
                                     <Text style={styles.totalLabel}>TOTAL A PAGAR:</Text>
-                                    <Text style={styles.totalAmount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                                    <Text style={styles.totalAmount}>${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
                                 </View>
                             </View>
                             

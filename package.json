@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "color": "^5.0.0",
+    "dotenv": "^17.0.0",
     "expo": "~52.0.46",
     "expo-constants": "~17.0.8",
     "expo-font": "~13.0.4",
@@ -35,6 +36,8 @@
     "expo-router": "~4.0.2",
     "expo-splash-screen": "^0.29.24",
     "expo-status-bar": "~2.0.1",
+    "expo-web-browser": "~14.0.2",
+    "lottie-react-native": "7.1.0",
     "lucide-react": "^0.511.0",
     "nativewind": "^4.1.23",
     "postcss": "^8.5.3",
@@ -45,12 +48,12 @@
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.13",
-    "typecript": "^0.0.1-security",
-    "lottie-react-native": "7.1.0"
+    "typecript": "^0.0.1-security"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.3.12",
+    "react-native-dotenv": "^3.4.11",
     "typescript": "^5.3.3"
   },
   "private": true
