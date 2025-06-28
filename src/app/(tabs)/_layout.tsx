@@ -37,6 +37,7 @@ export default function TabsLayout() {
     if (path.includes('/Settings')) return 'Configuración';
     if (path.includes('/GrupoDetalle')) return 'Editar Rutina';
     if (path.includes('/facturacion')) return 'Facturación';
+    if (path.includes('/temporizador')) return 'Temporizador';
     return 'Mi Gym App';
   };
 
