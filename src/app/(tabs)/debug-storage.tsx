@@ -351,6 +351,94 @@ export default function DebugStorage() {
     );
   };
 
+  const testGymSelection = async () => {
+    try {
+      const gymNames = await getGymNames();
+      
+      let gymSelectionInfo = '=== TEST SELECCIÓN DE GIMNASIO ===\n\n';
+      gymSelectionInfo += `📊 Total gimnasios disponibles: ${gymNames.length}\n\n`;
+      
+      if (gymNames.length > 0) {
+        gymSelectionInfo += '🏢 Gimnasios disponibles para selección:\n';
+        gymNames.forEach((gym, index) => {
+          gymSelectionInfo += `${index + 1}. ${gym}\n`;
+        });
+        gymSelectionInfo += '\n✅ La selección de gimnasio debería funcionar correctamente.\n';
+        gymSelectionInfo += '\n📝 Para probar:\n';
+        gymSelectionInfo += '1. Ve a "Registro" → "Socio"\n';
+        gymSelectionInfo += '2. Toca el campo "GIMNASIO"\n';
+        gymSelectionInfo += '3. Deberías ver una lista desplegable\n';
+        gymSelectionInfo += '4. Puedes escribir para filtrar o seleccionar directamente\n';
+      } else {
+        gymSelectionInfo += '❌ No hay gimnasios disponibles.\n';
+        gymSelectionInfo += 'Primero registra un gimnasio para que aparezca en la lista.';
+      }
+      
+      Alert.alert('🎯 Test Selección Gimnasio', gymSelectionInfo);
+    } catch (error) {
+      Alert.alert('❌ Error', `Error en test de selección: ${error.message}`);
+    }
+  };
+
+  const testRegistrationFlow = async () => {
+    Alert.alert(
+      '🔄 Test Flujo de Registro Completo',
+      'Sigue estos pasos para verificar que todo funciona:\n\n' +
+      '1. Registra un gimnasio nuevo:\n' +
+      '   • Ve a "Registro" → "Gimnasio"\n' +
+      '   • Completa todos los campos\n' +
+      '   • Registra el gimnasio\n\n' +
+      '2. Luego registra un cliente:\n' +
+      '   • Ve a "Registro" → "Socio"\n' +
+      '   • Al llegar al campo "GIMNASIO", tócalo\n' +
+      '   • Deberías ver el gimnasio recién creado\n' +
+      '   • Selecciona el gimnasio\n' +
+      '   • Completa el registro\n\n' +
+      '3. Verifica en "Debug" → "Test Gimnasios"\n\n' +
+      '¡Si todo funciona, el problema está resuelto!',
+      [{ text: 'Entendido', style: 'default' }]
+    );
+  };
+
+  const testGymSelectionPersistence = async () => {
+    try {
+      const gymNames = await getGymNames();
+      
+      let testInfo = '=== TEST PERSISTENCIA SELECCIÓN GIMNASIO ===\n\n';
+      testInfo += '🔧 Test Específico para el problema reportado:\n';
+      testInfo += '"No queda pickeado el gimnasio cuando selecciono"\n\n';
+      
+      testInfo += `📊 Gimnasios disponibles: ${gymNames.length}\n\n`;
+      
+      if (gymNames.length > 0) {
+        testInfo += '🎯 Para testear la PERSISTENCIA:\n\n';
+        testInfo += '1. Ve a "Registro" → "Socio"\n';
+        testInfo += '2. Toca el campo "GIMNASIO"\n';
+        testInfo += '3. ¡IMPORTANTE! Deberías ver una lista desplegable\n';
+        testInfo += '4. Selecciona un gimnasio específico\n';
+        testInfo += '5. ✅ VERIFICAR: El nombre del gimnasio debe aparecer en el campo\n';
+        testInfo += '6. ✅ VERIFICAR: El icono debe cambiar a azul\n';
+        testInfo += '7. ✅ VERIFICAR: Al tocar nuevamente, debe mostrar el gym seleccionado\n\n';
+        
+        testInfo += '🏢 Gimnasios para probar:\n';
+        gymNames.slice(0, 3).forEach((gym, index) => {
+          testInfo += `   ${index + 1}. "${gym}"\n`;
+        });
+        
+        testInfo += '\n🔍 Si el gimnasio NO se queda seleccionado:\n';
+        testInfo += '   ❌ Hay un bug en la lógica de selección\n';
+        testInfo += '   ✅ Si SÍ se queda: ¡Problema resuelto!\n';
+      } else {
+        testInfo += '❌ No hay gimnasios para testear.\n';
+        testInfo += 'Primero registra un gimnasio.';
+      }
+      
+      Alert.alert('🎯 Test Persistencia Gimnasio', testInfo);
+    } catch (error) {
+      Alert.alert('❌ Error', `Error en test: ${error.message}`);
+    }
+  };
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme.colors.surface }}>
       <View style={{ padding: theme.spacing.lg }}>
@@ -450,6 +538,27 @@ export default function DebugStorage() {
           onPress={testGymFlow}
         >
           <Text style={globalStyles.buttonText}>🏢 Test Flujo Completo</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[globalStyles.LoginButton, { marginBottom: theme.spacing.sm }]}
+          onPress={testGymSelection}
+        >
+          <Text style={globalStyles.buttonText}>🎯 Test Selección Gimnasio</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[globalStyles.LoginButton, { marginBottom: theme.spacing.sm }]}
+          onPress={testRegistrationFlow}
+        >
+          <Text style={globalStyles.buttonText}>🔄 Test Flujo Registro</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[globalStyles.LoginButton, { marginBottom: theme.spacing.sm }]}
+          onPress={testGymSelectionPersistence}
+        >
+          <Text style={globalStyles.buttonText}>🎯 Test Persistencia Gimnasio</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 

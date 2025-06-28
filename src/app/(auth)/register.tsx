@@ -34,6 +34,7 @@ export default function Register() {
   const [gymQuery, setGymQuery] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSelectingGym, setIsSelectingGym] = useState(false);
+  const [isEditingGym, setIsEditingGym] = useState(false);
   const [visibleSuccess, setVisibleSuccess] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -186,14 +187,11 @@ export default function Register() {
   const isButtonDisabled = getButtonDisabledState();
 
   const handleGymSelect = (gym: string) => {
-    setIsSelectingGym(true);
     setSelectedOption(gym);
-    setGymQuery(gym);
+    setGymQuery(""); // Limpiar el query de búsqueda al seleccionar
+    setIsEditingGym(false); // Ya no está editando
     setShowGymSuggestions(false);
-    // Reset flag después de un breve delay
-    setTimeout(() => {
-      setIsSelectingGym(false);
-    }, 100);
+    setIsSelectingGym(false);
   };
 
   const filteredGyms = useMemo(() => {
@@ -206,32 +204,40 @@ export default function Register() {
   }, [gymQuery, gymOptions]);
 
   const handleGymTextChange = (text: string) => {
-    setGymQuery(text);
+    // Entrar en modo edición
+    setIsEditingGym(true);
     
-    // Si estamos seleccionando desde las opciones, no mostrar sugerencias
-    if (isSelectingGym) {
-      return;
-    }
-    
-    // Solo resetear la selección si el texto no coincide exactamente
+    // Si había un gimnasio seleccionado y el usuario empieza a escribir, limpiar la selección
     if (selectedOption && text !== selectedOption) {
       setSelectedOption(null);
     }
     
-    // Mostrar sugerencias solo si hay texto y no estamos seleccionando
-    setShowGymSuggestions(text.length > 0);
+    setGymQuery(text);
+    
+    // Mostrar sugerencias cuando hay texto
+    if (text.length > 0) {
+      setShowGymSuggestions(true);
+    } else {
+      setShowGymSuggestions(false);
+    }
   };
 
   const clearGymSearch = () => {
     setGymQuery("");
     setSelectedOption(null);
+    setIsEditingGym(false);
     setShowGymSuggestions(false);
-    setIsSelectingGym(false);
   };
 
   const handleGymFocus = () => {
-    // Solo mostrar sugerencias si no hay una selección válida o si hay texto para buscar
-    if (!selectedOption || gymQuery.length > 0) {
+    // Si hay un gimnasio seleccionado, ponerlo en el campo para que el usuario pueda editarlo
+    if (selectedOption && !isEditingGym) {
+      setGymQuery(selectedOption);
+      setIsEditingGym(true);
+    }
+    
+    // Siempre mostrar sugerencias al hacer focus si no hay texto de búsqueda
+    if (gymQuery.length === 0 || selectedOption) {
       setShowGymSuggestions(true);
     }
   };
@@ -239,12 +245,30 @@ export default function Register() {
   const handleGymBlur = () => {
     // Delay para permitir que el onPress de las sugerencias funcione
     setTimeout(() => {
-      setShowGymSuggestions(false);
-    }, 150);
+      // Solo cerrar si el usuario estaba editando (es decir, si abrió el menú escribiendo)
+      if (isEditingGym) {
+        // Si no hay texto ni selección, salir del modo edición
+        if (!gymQuery && !selectedOption) {
+          setIsEditingGym(false);
+        }
+        setShowGymSuggestions(false);
+      }
+    }, 200);
   };
 
   const handleDropdownPress = () => {
-    setShowGymSuggestions(!showGymSuggestions);
+    if (showGymSuggestions) {
+      setShowGymSuggestions(false);
+    } else {
+      // Mostrar todas las opciones
+      if (selectedOption && !isEditingGym) {
+        setGymQuery(selectedOption);
+        setIsEditingGym(true);
+      } else {
+        setGymQuery("");
+      }
+      setShowGymSuggestions(true);
+    }
   };
 
   const handleDateSelect = (date: Date) => {
@@ -341,8 +365,6 @@ export default function Register() {
               value={address}
               onChangeText={setAddress}
             />
-
-
           </>
         ) : (
           <>
@@ -370,55 +392,81 @@ export default function Register() {
                   ? globalStyles.autocompleteInputContainerFocused 
                   : globalStyles.autocompleteInputContainer
               ]}>
-                                 <View style={globalStyles.autocompleteInputWrapper}>
-                   <MaterialIcons 
-                     name="fitness-center" 
-                     size={20} 
-                     color={selectedOption ? theme.colors.primary : showGymSuggestions ? theme.colors.primary : "#999"} 
-                   />
-                                     <TextInput
-                     style={globalStyles.autocompleteInput}
-                     placeholder="Seleccionar gimnasio"
-                     placeholderTextColor="#999"
-                     value={gymQuery}
-                     onChangeText={handleGymTextChange}
-                     onFocus={handleGymFocus}
-                     onBlur={handleGymBlur}
-                   />
-                                     {gymQuery.length > 0 ? (
-                     <TouchableOpacity onPress={clearGymSearch} style={globalStyles.autocompleteIcon}>
-                       <MaterialIcons name="clear" size={20} color="#999" />
-                     </TouchableOpacity>
-                   ) : (
-                     <TouchableOpacity onPress={handleDropdownPress} style={globalStyles.autocompleteIcon}>
-                       <MaterialCommunityIcons 
-                         name={showGymSuggestions ? "chevron-up" : "chevron-down"} 
-                         size={20} 
-                         color="#999" 
-                       />
-                     </TouchableOpacity>
-                   )}
+                <View style={globalStyles.autocompleteInputWrapper}>
+                  <MaterialIcons 
+                    name="fitness-center" 
+                    size={20} 
+                    color={selectedOption && !isEditingGym ? theme.colors.primary : "#999"} 
+                  />
+                  <TextInput
+                    style={[
+                      globalStyles.autocompleteInput,
+                      selectedOption && !isEditingGym && { color: theme.colors.textPrimary }
+                    ]}
+                    placeholder="Seleccionar gimnasio"
+                    placeholderTextColor="#999"
+                    value={isEditingGym ? gymQuery : (selectedOption || gymQuery)}
+                    onChangeText={handleGymTextChange}
+                    onFocus={handleGymFocus}
+                    onBlur={handleGymBlur}
+                  />
+                  {(gymQuery.length > 0 || isEditingGym) ? (
+                    <TouchableOpacity onPress={clearGymSearch} style={globalStyles.autocompleteIcon}>
+                      <MaterialIcons name="clear" size={20} color="#999" />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={handleDropdownPress} style={globalStyles.autocompleteIcon}>
+                      <MaterialCommunityIcons 
+                        name={showGymSuggestions ? "chevron-up" : "chevron-down"} 
+                        size={20} 
+                        color="#999" 
+                      />
+                    </TouchableOpacity>
+                  )}
                 </View>
-                                 {showGymSuggestions && filteredGyms.length > 0 && (
-                   <View style={globalStyles.suggestionsContainer}>
-                     <ScrollView 
-                       nestedScrollEnabled={true}
-                       showsVerticalScrollIndicator={false}
-                       style={{ maxHeight: 200 }}
-                     >
-                       {filteredGyms.map((gym, index) => (
-                         <TouchableOpacity
-                           key={gym}
-                           style={index === filteredGyms.length - 1 ? globalStyles.suggestionItemLast : globalStyles.suggestionItem}
-                           onPress={() => handleGymSelect(gym)}
-                         >
-                           <MaterialIcons name="fitness-center" size={18} color={theme.colors.primary} />
-                           <Text style={globalStyles.suggestionText}>{gym}</Text>
-                         </TouchableOpacity>
-                       ))}
-                     </ScrollView>
-                   </View>
-                 )}
+                {showGymSuggestions && filteredGyms.length > 0 && (
+                  <View style={globalStyles.suggestionsContainer}>
+                    <ScrollView 
+                      nestedScrollEnabled={true}
+                      showsVerticalScrollIndicator={false}
+                      style={{ maxHeight: 200 }}
+                    >
+                      {filteredGyms.map((gym, index) => (
+                        <TouchableOpacity
+                          key={gym}
+                          style={[
+                            index === filteredGyms.length - 1 ? globalStyles.suggestionItemLast : globalStyles.suggestionItem,
+                            selectedOption === gym && { backgroundColor: theme.colors.surface }
+                          ]}
+                          onPress={() => handleGymSelect(gym)}
+                        >
+                          <MaterialIcons 
+                            name="fitness-center" 
+                            size={18} 
+                            color={selectedOption === gym ? theme.colors.primary : theme.colors.textSecondary} 
+                          />
+                          <Text style={[
+                            globalStyles.suggestionText,
+                            selectedOption === gym && { 
+                              color: theme.colors.primary, 
+                              fontFamily: theme.typography.fontFamily.bold 
+                            }
+                          ]}>
+                            {gym}
+                          </Text>
+                          {selectedOption === gym && (
+                            <MaterialIcons 
+                              name="check" 
+                              size={18} 
+                              color={theme.colors.primary} 
+                              style={{ marginLeft: 'auto' }}
+                            />
+                          )}
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
               </View>
             </View>
           </>

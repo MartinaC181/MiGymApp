@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';

@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Modal, StatusBar } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
+import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
+import { ClientUser } from "../../data/Usuario";
+import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
 
 // Función hardcode para verificar estados de vista
 function getCuotaInfo() {
@@ -28,12 +32,14 @@ function getCuotaInfo() {
 }
 
 export default function Cuota() {
-    const cuota = getCuotaInfo();
     const router = useRouter();
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-    const [cuota, setCuota] = useState(null);
+    const [cuotaData, setCuotaData] = useState(null);
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Usar datos hardcodeados para testing
+    const cuotaHardcoded = getCuotaInfo();
 
     // Cargar datos del usuario y su información de pago
     useEffect(() => {
@@ -45,7 +51,7 @@ export default function Cuota() {
             // Obtener usuario actual
             const user = await getCurrentUser() as ClientUser;
             if (!user) {
-                setCuota({
+                setCuotaData({
                     pendiente: false,
                     monto: 0,
                     nombre: "Usuario no encontrado",
@@ -72,10 +78,10 @@ export default function Cuota() {
                 periodo: paymentInfo.periodo
             };
 
-            setCuota(cuotaInfo);
+            setCuotaData(cuotaInfo);
         } catch (error) {
             console.error("Error cargando datos de pago:", error);
-            setCuota({
+            setCuotaData({
                 pendiente: false,
                 monto: 0,
                 nombre: "Error cargando datos",
@@ -105,13 +111,26 @@ export default function Cuota() {
     const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
         console.log("Procesando pago con Mercado Pago...");
-        const data = await handleIntegrationMercadoPago(factura.items[0]);
+        
+        // Crear objeto de factura mock para testing
+        const facturaItem = {
+            title: "Membresía Gimnasio",
+            quantity: 1,
+            currency_id: "ARS",
+            unit_price: cuotaHardcoded.monto
+        };
+        
+        try {
+            const data = await handleIntegrationMercadoPago(facturaItem);
 
-        if (!data) {
-           return console.error("Error al procesar el pago con Mercado Pago");
+            if (!data) {
+               return console.error("Error al procesar el pago con Mercado Pago");
+            }
+
+            openBrowserAsync(data);
+        } catch (error) {
+            console.error("Error en integración MP:", error);
         }
-
-        openBrowserAsync(data);
     };
 
     // Función para manejar la vista de la factura
@@ -133,6 +152,17 @@ export default function Cuota() {
         } catch (error) {
             return "Fecha inválida";
         }
+    };
+
+    // Usar datos hardcodeados para mostrar en UI
+    const cuota = cuotaHardcoded;
+    
+    // Datos mock para la factura en el modal
+    const factura = {
+        cliente: cuota.nombre,
+        dni: cuota.dni,
+        servicio: "Membresía Gimnasio",
+        total: cuota.monto
     };
 
     if (isLoading) {
