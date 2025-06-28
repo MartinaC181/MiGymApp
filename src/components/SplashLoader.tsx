@@ -28,7 +28,7 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
     }).start();
   }, [duration]);
 
-  const strokeWidth = size * 0.08;
+  const strokeWidth = size * 0.07;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
