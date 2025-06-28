@@ -118,38 +118,41 @@ export default function Home() {
                 <Racha />
             </View>
 
-            <View style={styles.searchContainer}>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar clase"
-                    placeholderTextColor="#999"
-                    value={searchText}
-                    onChangeText={handleTextChange}
-                />
-                {searchText.length > 0 ? (
-                    <TouchableOpacity onPress={clearSearch} style={styles.searchIcon}>
-                        <MaterialIcons name="close" size={24} color="#999" />
-                    </TouchableOpacity>
-                ) : (
-                <MaterialIcons name="search" size={24} color="#999" style={styles.searchIcon} />
+            {/* Contenedor relativo para posicionar las sugerencias */}
+            <View style={styles.searchWrapper}>
+                <View style={styles.searchContainer}>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Buscar clase"
+                        placeholderTextColor="#999"
+                        value={searchText}
+                        onChangeText={handleTextChange}
+                    />
+                    {searchText.length > 0 ? (
+                        <TouchableOpacity onPress={clearSearch} style={styles.searchIcon}>
+                            <MaterialIcons name="close" size={24} color="#999" />
+                        </TouchableOpacity>
+                    ) : (
+                    <MaterialIcons name="search" size={24} color="#999" style={styles.searchIcon} />
+                    )}
+                </View>
+
+                {/* Sugerencias de autocompletado - Posicionadas absolutamente */}
+                {showSuggestions && suggestions.length > 0 && (
+                    <View style={styles.suggestionsContainer}>
+                        {suggestions.map((suggestion) => (
+                            <TouchableOpacity
+                                key={suggestion.id}
+                                style={styles.suggestionItem}
+                                onPress={() => selectSuggestion(suggestion)}
+                            >
+                                <MaterialIcons name="fitness-center" size={20} color={theme.colors.primary} />
+                                <Text style={styles.suggestionText}>{suggestion.nombre}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
                 )}
             </View>
-
-            {/* Sugerencias de autocompletado */}
-            {showSuggestions && suggestions.length > 0 && (
-                <View style={styles.suggestionsContainer}>
-                    {suggestions.map((suggestion) => (
-                        <TouchableOpacity
-                            key={suggestion.id}
-                            style={styles.suggestionItem}
-                            onPress={() => selectSuggestion(suggestion)}
-                        >
-                            <MaterialIcons name="fitness-center" size={20} color={theme.colors.primary} />
-                            <Text style={styles.suggestionText}>{suggestion.nombre}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            )}
 
             {filteredClases.length > 0 ? (
                 <>

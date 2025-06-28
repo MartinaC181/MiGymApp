@@ -10,6 +10,7 @@ export default StyleSheet.create({
     zIndex: 10,
     overflow: 'visible',
     backgroundColor: 'transparent',
+    pointerEvents: 'box-none',
   },
   container: {
     flexDirection: 'row',
@@ -19,6 +20,7 @@ export default StyleSheet.create({
     paddingVertical: theme.spacing.sm + 4,
     borderTopLeftRadius: theme.borderRadius.lg,
     borderTopRightRadius: theme.borderRadius.lg,
+    pointerEvents: 'auto',
   },
   iconContainer: {
     width: 75,
