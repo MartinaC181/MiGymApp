@@ -69,6 +69,7 @@ export default function Navigation() {
         <NavItem iconName="home" label="Inicio" route="/home" />
         <NavItem iconName="weight-lifter" label="Rutina" route="/entrenamiento" />
         <NavItem iconName="wallet" label="Cuota" route="/cuota" />
+        {/* <NavItem iconName="timer-outline" label="Temporizador" route="/temporizador" /> */}
         <NavItem iconName="account" label="Perfil" route="/perfil" />
       </View>
     </SafeAreaView>
