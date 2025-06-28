@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image, Switch, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, Image, Switch, TouchableOpacity, Share, Alert} from 'react-native';
 
 import modeIcon from '../../../assets/settings/modoscuro.png';
 import changeIcon from '../../../assets/settings/llave.png';
@@ -11,28 +11,65 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {useRouter} from "expo-router";
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
+import TerminosModal from "../../components/TerminosModal";
+import PoliticasModal from "../../components/PoliticasModal";
+import SobreAppModal from "../../components/SobreAppModal";
 
 const Settings = () => {
 
     const router = useRouter();
     const [darkMode, setDarkMode] = useState(false);
+    const [showTerminos, setShowTerminos] = useState(false);
+    const [showPoliticas, setShowPoliticas] = useState(false);
+    const [showSobreApp, setShowSobreApp] = useState(false);
+
+    const handleShareApp = async () => {
+        try {
+            const result = await Share.share({
+                title: 'MiGymApp - Gestiona tu Fitness',
+                message: '¡Descubre MiGymApp! La aplicación perfecta para gestionar tu membresía de gimnasio, marcar asistencia y realizar seguimiento de tu progreso fitness. ¡Descárgala ahora y comienza tu camino hacia una vida más saludable!',
+                url: 'https://migymapp.com', // Reemplaza con la URL real de tu app
+            });
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // Compartido con una actividad específica
+                    console.log('Compartido con:', result.activityType);
+                } else {
+                    // Compartido
+                    console.log('Compartido exitosamente');
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // Cancelado
+                console.log('Compartir cancelado');
+            }
+        } catch (error) {
+            Alert.alert(
+                'Error',
+                'No se pudo compartir la aplicación. Inténtalo de nuevo.',
+                [{ text: 'OK' }]
+            );
+        }
+    };
 
     const items = [
         {
             icon: aboutIcon, label: 'Sobre la app', onPress: () => {
+                setShowSobreApp(true);
             }
         },
         {
             icon: termsIcon, label: 'Términos y condiciones', onPress: () => {
+                setShowTerminos(true);
             }
         },
         {
             icon: privacyIcon, label: 'Políticas de privacidad', onPress: () => {
+                setShowPoliticas(true);
             }
         },
         {
-            icon: shareIcon, label: 'Compartir esta aplicación', onPress: () => {
-            }
+            icon: shareIcon, label: 'Compartir esta aplicación', onPress: handleShareApp
         },
 
 
@@ -81,6 +118,24 @@ const Settings = () => {
                 }
 
             </View>
+
+            {/* Modal de Términos y Condiciones */}
+            <TerminosModal
+                visible={showTerminos}
+                onClose={() => setShowTerminos(false)}
+            />
+
+            {/* Modal de Políticas de Privacidad */}
+            <PoliticasModal
+                visible={showPoliticas}
+                onClose={() => setShowPoliticas(false)}
+            />
+
+            {/* Modal de Sobre la App */}
+            <SobreAppModal
+                visible={showSobreApp}
+                onClose={() => setShowSobreApp(false)}
+            />
 
         </View>
     )

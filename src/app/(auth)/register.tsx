@@ -1,11 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView, Modal } from "react-native";
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserRole } from "../../data/Usuario";
+import BirthDateWheel from "../../components/BirthDateWheel";
 
 function isValidEmail(email: string) {
   // Simple email regex
@@ -28,16 +29,39 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showGymSuggestions, setShowGymSuggestions] = useState(false);
+  const [gymQuery, setGymQuery] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isSelectingGym, setIsSelectingGym] = useState(false);
+  const [visibleSuccess, setVisibleSuccess] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Campos específicos para gimnasio
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
   
+  // Lista de gimnasios disponibles
+  const gymOptions = [
+    "Gimnasio Central",
+    "FitLife Sports Club", 
+    "PowerGym Elite",
+    "Wellness Center",
+    "SportClub Premium"
+  ];
+
   useEffect(() => {
     if (!userType) {
       router.replace("/user-type-selection");
     }
   }, [userType]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSend = async () => {
     if (!name.trim()) {
@@ -82,7 +106,12 @@ export default function Register() {
     // Simular proceso de registro
     setTimeout(() => {
       setIsLoading(false);
-      router.push("/login");
+      setVisibleSuccess(true);
+      
+      // Cerrar modal y navegar al login después de 3 segundos
+      timeoutRef.current = setTimeout(() => {
+        handleGoToLogin();
+      }, 3000);
     }, 2000);
   };
 
@@ -97,6 +126,81 @@ export default function Register() {
   };
 
   const isButtonDisabled = getButtonDisabledState();
+
+  const handleGymSelect = (gym: string) => {
+    setIsSelectingGym(true);
+    setSelectedOption(gym);
+    setGymQuery(gym);
+    setShowGymSuggestions(false);
+    // Reset flag después de un breve delay
+    setTimeout(() => {
+      setIsSelectingGym(false);
+    }, 100);
+  };
+
+  const filteredGyms = useMemo(() => {
+    if (!gymQuery.trim()) {
+      return gymOptions; // Mostrar todas las opciones cuando no hay búsqueda
+    }
+    return gymOptions.filter(gym =>
+      gym.toLowerCase().includes(gymQuery.toLowerCase())
+    );
+  }, [gymQuery]);
+
+  const handleGymTextChange = (text: string) => {
+    setGymQuery(text);
+    
+    // Si estamos seleccionando desde las opciones, no mostrar sugerencias
+    if (isSelectingGym) {
+      return;
+    }
+    
+    // Solo resetear la selección si el texto no coincide exactamente
+    if (selectedOption && text !== selectedOption) {
+      setSelectedOption(null);
+    }
+    
+    // Mostrar sugerencias solo si hay texto y no estamos seleccionando
+    setShowGymSuggestions(text.length > 0);
+  };
+
+  const clearGymSearch = () => {
+    setGymQuery("");
+    setSelectedOption(null);
+    setShowGymSuggestions(false);
+    setIsSelectingGym(false);
+  };
+
+  const handleGymFocus = () => {
+    // Solo mostrar sugerencias si no hay una selección válida o si hay texto para buscar
+    if (!selectedOption || gymQuery.length > 0) {
+      setShowGymSuggestions(true);
+    }
+  };
+
+  const handleGymBlur = () => {
+    // Delay para permitir que el onPress de las sugerencias funcione
+    setTimeout(() => {
+      setShowGymSuggestions(false);
+    }, 150);
+  };
+
+  const handleDropdownPress = () => {
+    setShowGymSuggestions(!showGymSuggestions);
+  };
+
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
+
+  const handleGoToLogin = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setVisibleSuccess(false);
+    router.replace("/login");
+  };
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
@@ -175,7 +279,10 @@ export default function Register() {
         ) : (
           <>
             <Text style={globalStyles.label}>FECHA DE NACIMIENTO</Text>
-            <TouchableOpacity style={globalStyles.pickerContainer}>
+            <TouchableOpacity 
+              style={globalStyles.pickerContainer}
+              onPress={() => setShowDatePicker(true)}
+            >
               <Text style={selectedDate ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
                 {selectedDate
                   ? selectedDate.toLocaleDateString("es-ES")
@@ -189,16 +296,63 @@ export default function Register() {
             </TouchableOpacity>
 
             <Text style={globalStyles.label}>GIMNASIO</Text>
-            <TouchableOpacity style={globalStyles.pickerContainer}>
-              <Text style={selectedOption ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
-                {selectedOption ? selectedOption : "Seleccionar"}
-              </Text>
-              <MaterialIcons
-                name="arrow-drop-down"
-                size={24}
-                color={theme.colors.primary}
-              />
-            </TouchableOpacity>
+            <View style={globalStyles.autocompleteContainer}>
+              <View style={[
+                showGymSuggestions && filteredGyms.length > 0
+                  ? globalStyles.autocompleteInputContainerFocused 
+                  : globalStyles.autocompleteInputContainer
+              ]}>
+                                 <View style={globalStyles.autocompleteInputWrapper}>
+                   <MaterialIcons 
+                     name="fitness-center" 
+                     size={20} 
+                     color={selectedOption ? theme.colors.primary : showGymSuggestions ? theme.colors.primary : "#999"} 
+                   />
+                                     <TextInput
+                     style={globalStyles.autocompleteInput}
+                     placeholder="Seleccionar gimnasio"
+                     placeholderTextColor="#999"
+                     value={gymQuery}
+                     onChangeText={handleGymTextChange}
+                     onFocus={handleGymFocus}
+                     onBlur={handleGymBlur}
+                   />
+                                     {gymQuery.length > 0 ? (
+                     <TouchableOpacity onPress={clearGymSearch} style={globalStyles.autocompleteIcon}>
+                       <MaterialIcons name="clear" size={20} color="#999" />
+                     </TouchableOpacity>
+                   ) : (
+                     <TouchableOpacity onPress={handleDropdownPress} style={globalStyles.autocompleteIcon}>
+                       <MaterialCommunityIcons 
+                         name={showGymSuggestions ? "chevron-up" : "chevron-down"} 
+                         size={20} 
+                         color="#999" 
+                       />
+                     </TouchableOpacity>
+                   )}
+                </View>
+                                 {showGymSuggestions && filteredGyms.length > 0 && (
+                   <View style={globalStyles.suggestionsContainer}>
+                     <ScrollView 
+                       nestedScrollEnabled={true}
+                       showsVerticalScrollIndicator={false}
+                       style={{ maxHeight: 200 }}
+                     >
+                       {filteredGyms.map((gym, index) => (
+                         <TouchableOpacity
+                           key={gym}
+                           style={index === filteredGyms.length - 1 ? globalStyles.suggestionItemLast : globalStyles.suggestionItem}
+                           onPress={() => handleGymSelect(gym)}
+                         >
+                           <MaterialIcons name="fitness-center" size={18} color={theme.colors.primary} />
+                           <Text style={globalStyles.suggestionText}>{gym}</Text>
+                         </TouchableOpacity>
+                       ))}
+                     </ScrollView>
+                   </View>
+                 )}
+              </View>
+            </View>
           </>
         )}
         
@@ -238,6 +392,39 @@ export default function Register() {
           </Text>
         </Text>
       </ScrollView>
+      
+      <BirthDateWheel
+        isVisible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onDateSelect={handleDateSelect}
+        initialDate={selectedDate}
+      />
+
+      <Modal
+        visible={visibleSuccess}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setVisibleSuccess(false)}
+      >
+        <View style={globalStyles.modalOverlay}>
+          <View style={globalStyles.successContainer}>
+            <Text style={globalStyles.successTitle}>
+              ¡Tu cuenta se creó con éxito!
+            </Text>
+
+            <MaterialCommunityIcons
+              name="check-circle-outline"
+              size={64}
+              color={theme.colors.primary}
+              style={{ marginVertical: theme.spacing.lg }}
+            />
+
+            <TouchableOpacity>
+              <Text>Ahora podés <Text style={globalStyles.successLink} onPress={handleGoToLogin}>iniciar sesión.</Text></Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
