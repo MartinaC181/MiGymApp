@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import theme from '../constants/theme';
+import globalStyles from './global';
 
 const { width } = Dimensions.get('window');
 // Rediseño del carrusel para snap perfecto
@@ -35,31 +36,17 @@ const styles = StyleSheet.create({
         color: theme.colors.textSecondary,
     },
     searchWrapper: {
-        position: 'relative',
-        marginBottom: theme.spacing.md,
+        ...globalStyles.searchWrapper,
     },
     searchContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: theme.colors.background,
-        borderRadius: theme.borderRadius.md,
-        paddingHorizontal: theme.spacing.md,
+        ...globalStyles.searchContainer,
         marginHorizontal: theme.spacing.lg,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
     },
     searchInput: {
-        flex: 1,
-        height: 40,
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textPrimary,
+        ...globalStyles.searchInput,
     },
     searchIcon: {
-        marginLeft: theme.spacing.sm,
+        ...globalStyles.searchIcon,
     },
     // Rediseño completo del carrusel
     carouselContent: {
@@ -192,33 +179,15 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     suggestionsContainer: {
-        position: 'absolute',
-        top: 56, // Altura aproximada del search input + padding
+        ...globalStyles.suggestionsContainer,
         left: theme.spacing.lg,
         right: theme.spacing.lg,
-        backgroundColor: theme.colors.background,
-        borderRadius: theme.borderRadius.md,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        zIndex: 1000,
     },
     suggestionItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: theme.spacing.md,
-        paddingHorizontal: theme.spacing.lg,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.surface,
+        ...globalStyles.suggestionItem,
     },
     suggestionText: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.medium,
-        color: theme.colors.textPrimary,
-        marginLeft: theme.spacing.sm,
-        flex: 1,
+        ...globalStyles.suggestionText,
     },
 });
 
