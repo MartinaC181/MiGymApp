@@ -5,8 +5,9 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { UserRole } from "../../data/Usuario";
+import { UserRole, ClientUser, GymUser } from "../../data/Usuario";
 import BirthDateWheel from "../../components/BirthDateWheel";
+import { saveUser, saveSession, getGymNames } from "../../utils/storage";
 
 function isValidEmail(email: string) {
   // Simple email regex
@@ -40,20 +41,36 @@ export default function Register() {
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
   
-  // Lista de gimnasios disponibles
-  const gymOptions = [
-    "Gimnasio Central",
-    "FitLife Sports Club", 
-    "PowerGym Elite",
-    "Wellness Center",
-    "SportClub Premium"
-  ];
+  // Lista de gimnasios disponibles (cargada desde AsyncStorage)
+  const [gymOptions, setGymOptions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!userType) {
       router.replace("/user-type-selection");
     }
   }, [userType]);
+
+  // Cargar gimnasios desde AsyncStorage al montar el componente
+  useEffect(() => {
+    const loadGyms = async () => {
+      try {
+        const gyms = await getGymNames();
+        setGymOptions(gyms);
+      } catch (error) {
+        console.error("Error cargando gimnasios:", error);
+        // Fallback a gimnasios por defecto en caso de error
+        setGymOptions([
+          "Gimnasio Central",
+          "FitLife Sports Club", 
+          "PowerGym Elite",
+          "Wellness Center",
+          "SportClub Premium"
+        ]);
+      }
+    };
+
+    loadGyms();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -103,8 +120,46 @@ export default function Register() {
     setIsLoading(true);
     setError("");
 
-    // Simular proceso de registro
-    setTimeout(() => {
+    try {
+      // Crear objeto de usuario según el tipo
+      const newUserId = `${userType}_${Date.now()}`;
+      
+      if (userType === 'gym') {
+        const newGymUser: GymUser = {
+          id: newUserId,
+          email,
+          password,
+          role: 'gym',
+          name,
+          businessName,
+          address,
+          clients: [],
+          classes: []
+        };
+        
+        await saveUser(newGymUser);
+        await saveSession(newGymUser);
+        
+        // Recargar lista de gimnasios para futuros registros de clientes
+        await reloadGyms();
+      } else {
+        const newClientUser: ClientUser = {
+          id: newUserId,
+          email,
+          password,
+          role: 'client',
+          name,
+          weeklyGoal: 3,
+          attendance: [],
+          weeklyStreak: 0,
+          gymId: selectedOption || undefined,
+          birthDate: selectedDate?.toISOString() || undefined
+        };
+        
+        await saveUser(newClientUser);
+        await saveSession(newClientUser);
+      }
+      
       setIsLoading(false);
       setVisibleSuccess(true);
       
@@ -112,7 +167,10 @@ export default function Register() {
       timeoutRef.current = setTimeout(() => {
         handleGoToLogin();
       }, 3000);
-    }, 2000);
+    } catch (error) {
+      setIsLoading(false);
+      setError("Error al crear la cuenta. Intenta nuevamente.");
+    }
   };
 
   const getButtonDisabledState = () => {
@@ -145,7 +203,7 @@ export default function Register() {
     return gymOptions.filter(gym =>
       gym.toLowerCase().includes(gymQuery.toLowerCase())
     );
-  }, [gymQuery]);
+  }, [gymQuery, gymOptions]);
 
   const handleGymTextChange = (text: string) => {
     setGymQuery(text);
@@ -191,6 +249,16 @@ export default function Register() {
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
+  };
+
+  // Función para recargar la lista de gimnasios
+  const reloadGyms = async () => {
+    try {
+      const gyms = await getGymNames();
+      setGymOptions(gyms);
+    } catch (error) {
+      console.error("Error recargando gimnasios:", error);
+    }
   };
 
   const handleGoToLogin = () => {
@@ -407,20 +475,59 @@ export default function Register() {
         onRequestClose={() => setVisibleSuccess(false)}
       >
         <View style={globalStyles.modalOverlay}>
-          <View style={globalStyles.successContainer}>
-            <Text style={globalStyles.successTitle}>
+          <View style={{
+            backgroundColor: theme.colors.background,
+            borderRadius: theme.borderRadius.lg,
+            padding: theme.spacing.xl,
+            alignItems: "center",
+            width: "90%",
+            maxWidth: 400,
+            minHeight: 300,
+            justifyContent: 'center',
+          }}>
+            <Text style={{
+              fontSize: theme.typography.fontSize.title,
+              fontFamily: theme.typography.fontFamily.bold,
+              color: theme.colors.textPrimary,
+              textAlign: "center",
+              marginBottom: theme.spacing.lg,
+            }}>
               ¡Tu cuenta se creó con éxito!
             </Text>
 
             <MaterialCommunityIcons
               name="check-circle-outline"
-              size={64}
+              size={80}
               color={theme.colors.primary}
-              style={{ marginVertical: theme.spacing.lg }}
+              style={{ marginBottom: theme.spacing.xl }}
             />
 
-            <TouchableOpacity>
-              <Text>Ahora podés <Text style={globalStyles.successLink} onPress={handleGoToLogin}>iniciar sesión.</Text></Text>
+            <TouchableOpacity 
+              onPress={handleGoToLogin}
+              style={{
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              <Text style={{
+                fontSize: theme.typography.fontSize.medium,
+                fontFamily: theme.typography.fontFamily.regular,
+                color: theme.colors.textSecondary,
+                textAlign: "center",
+                lineHeight: 24,
+              }}>
+                Ahora podés{"\n"}
+                <Text style={{
+                  color: theme.colors.primary,
+                  fontFamily: theme.typography.fontFamily.bold,
+                  textDecorationLine: "underline",
+                  fontSize: theme.typography.fontSize.medium,
+                }}>
+                  iniciar sesión
+                </Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

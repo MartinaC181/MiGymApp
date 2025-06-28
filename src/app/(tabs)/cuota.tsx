@@ -4,33 +4,66 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
-
-// Función hardcode para verificar estados de vista
-function getCuotaInfo() {
-    // Cambiá este valor para probar ambos estados
-    const pendiente = true;
-
-    if (pendiente) {
-        return {
-            pendiente: true,
-            monto: 10213.89,
-            nombre: "Teo Risso",
-            dni: "40.000.000"
-        };
-    } else {
-        return {
-            pendiente: false,
-            monto: 0,
-            nombre: "Teo Risso",
-            dni: "40.000.000"
-        };
-    }
-}
+import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
+import { ClientUser } from "../../data/Usuario";
 
 export default function Cuota() {
-    const cuota = getCuotaInfo();
     const router = useRouter();
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+    const [cuota, setCuota] = useState(null);
+    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Cargar datos del usuario y su información de pago
+    useEffect(() => {
+        loadPaymentData();
+    }, []);
+
+    const loadPaymentData = async () => {
+        try {
+            // Obtener usuario actual
+            const user = await getCurrentUser() as ClientUser;
+            if (!user) {
+                setCuota({
+                    pendiente: false,
+                    monto: 0,
+                    nombre: "Usuario no encontrado",
+                    dni: "N/A"
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            setCurrentUser(user);
+
+            // Obtener información de pago del usuario
+            const paymentInfo = await getUserPaymentInfo(user.id);
+            
+            // Formatear la información para el componente
+            const cuotaInfo = {
+                pendiente: paymentInfo.pendiente,
+                monto: paymentInfo.monto,
+                nombre: user.name,
+                dni: (user as any).dni || "No especificado",
+                numeroFactura: paymentInfo.numeroFactura,
+                fechaEmision: paymentInfo.fechaEmision,
+                fechaVencimiento: paymentInfo.fechaVencimiento,
+                periodo: paymentInfo.periodo
+            };
+
+            setCuota(cuotaInfo);
+        } catch (error) {
+            console.error("Error cargando datos de pago:", error);
+            setCuota({
+                pendiente: false,
+                monto: 0,
+                nombre: "Error cargando datos",
+                dni: "N/A"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Efecto para cambiar el StatusBar cuando el modal esté abierto
     useEffect(() => {
@@ -63,6 +96,37 @@ export default function Cuota() {
     const closeInvoiceModal = () => {
         setShowInvoiceModal(false);
     };
+
+    // Función para formatear fechas
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "N/A";
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        } catch (error) {
+            return "Fecha inválida";
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text>Cargando información de cuota...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (!cuota) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text>Error cargando información de cuota</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -124,7 +188,7 @@ export default function Cuota() {
                     </>
                 )}
             </View>
-            {showInvoiceModal && (
+            {showInvoiceModal && cuota && (
                 <Modal
                     visible={showInvoiceModal}
                     animationType="fade"
@@ -147,17 +211,17 @@ export default function Cuota() {
                             <View style={styles.invoiceInfo}>
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Número de Factura:</Text>
-                                    <Text style={styles.invoiceValue}>#2024-001</Text>
+                                    <Text style={styles.invoiceValue}>{cuota.numeroFactura || '#2024-001'}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
-                                    <Text style={styles.invoiceValue}>15/01/2024</Text>
+                                    <Text style={styles.invoiceValue}>{formatDate(cuota.fechaEmision)}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
-                                    <Text style={styles.invoiceValue}>15/02/2024</Text>
+                                    <Text style={styles.invoiceValue}>{formatDate(cuota.fechaVencimiento)}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
@@ -177,7 +241,7 @@ export default function Cuota() {
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Período:</Text>
-                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
+                                    <Text style={styles.invoiceValue}>{cuota.periodo || 'N/A'}</Text>
                                 </View>
                                 
                                 <View style={styles.totalRow}>

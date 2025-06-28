@@ -1,17 +1,39 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
+import { getCurrentUser, updateUserProfile } from '../../utils/storage';
+import { ClientUser } from '../../data/Usuario';
 
 const EditProfile = ({navigation}: any) => {
 
-        const [name, setName] = useState('Mirtho Legrand');
-        const [email, setEmail] = useState('elMailDeMirtho@UTN.edu.ar');
-        const [weight, setWeight] = useState('75');
-        const [idealWeight, setIdealWeight] = useState('65');
-        const [height, setHeight] = useState('1.72');
+        const [name, setName] = useState('');
+        const [email, setEmail] = useState('');
+        const [weight, setWeight] = useState('');
+        const [idealWeight, setIdealWeight] = useState('');
+        const [height, setHeight] = useState('');
+        const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+        const [isLoading, setIsLoading] = useState(false);
+
+        // Cargar datos del usuario actual
+        useEffect(() => {
+            loadUserData();
+        }, []);
+
+        const loadUserData = async () => {
+            const user = await getCurrentUser() as ClientUser;
+            if (user && user.role === 'client') {
+                setCurrentUser(user);
+                setName(user.name || '');
+                setEmail(user.email || '');
+                // Estos campos pueden no existir aún, los agregamos como extensiones
+                setWeight((user as any).weight || '');
+                setIdealWeight((user as any).idealWeight || '');
+                setHeight((user as any).height || '');
+            }
+        };
 
         // const handleSave = () => {
     //     const updateData = {
@@ -24,18 +46,30 @@ const EditProfile = ({navigation}: any) => {
     //     console.log("Datos guardados:", updateData);
     // };
 
-    const handleSave = () => {
-        router.push({
-            pathname: '/perfil',
-            params: {
+    const handleSave = async () => {
+        if (!currentUser) return;
+        
+        setIsLoading(true);
+        
+        try {
+            // Actualizar usuario con los nuevos datos
+            const updates = {
                 name,
                 email,
                 weight,
                 idealWeight,
-                height,
-            },
-        });
-
+                height
+            };
+            
+            await updateUserProfile(currentUser.id, updates);
+            
+            // Navegar de vuelta al perfil
+            router.push('/perfil');
+        } catch (error) {
+            console.error('Error guardando perfil:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
 
@@ -79,7 +113,7 @@ const EditProfile = ({navigation}: any) => {
                         placeholder="cm"
                         keyboardType="decimal-pad"/>
 
-                    <TouchableOpacity style={styles.primaryButton} onPress={handleSave}>
+                    <TouchableOpacity style={globalStyles.LoginButton} onPress={handleSave}>
                         <Text style={globalStyles.buttonText}>Guardar cambios</Text>
                     </TouchableOpacity>
                 </View>

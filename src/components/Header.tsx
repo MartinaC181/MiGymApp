@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
 import theme from "../constants/theme";
+import { clearSession } from "../utils/storage";
 
 type HeaderProps = {
   title: string;
@@ -24,8 +25,9 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowLogoutModal(false);
+    await clearSession(); // Limpiar la sesión de AsyncStorage
     router.replace("/login"); // replace para limpiar el stack
   };
 

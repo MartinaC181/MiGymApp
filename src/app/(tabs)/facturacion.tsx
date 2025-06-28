@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import theme from "../../constants/theme";
@@ -6,13 +6,15 @@ import globalStyles from "../../styles/global";
 import pagoCorrecto from '../../../assets/pagocorrecto.png';
 import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
-
-// Hardcodea el resultado del pago aquí
-const pagoExitoso = true; // Cambia a false para probar el error
+import { getCurrentUser, getUserPaymentInfo, processPayment, updateUserPaymentInfo } from "../../utils/storage";
+import { ClientUser } from "../../data/Usuario";
 
 export default function Facturacion() {
     const [procesando, setProcesando] = useState(false);
     const [resultado, setResultado] = useState<null | "exito" | "error">(null);
+    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+    const [paymentInfo, setPaymentInfo] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     
     // Estados para los campos del formulario
     const [cardName, setCardName] = useState("");
@@ -27,6 +29,31 @@ export default function Facturacion() {
         expiry: false,
         cvv: false
     });
+
+    // Cargar datos del usuario y pago al montar
+    useEffect(() => {
+        loadPaymentData();
+    }, []);
+
+    const loadPaymentData = async () => {
+        try {
+            const user = await getCurrentUser() as ClientUser;
+            if (!user) {
+                Alert.alert("Error", "Debes estar logueado para acceder a la facturación");
+                router.back();
+                return;
+            }
+
+            setCurrentUser(user);
+            const payment = await getUserPaymentInfo(user.id);
+            setPaymentInfo(payment);
+        } catch (error) {
+            console.error("Error cargando datos de pago:", error);
+            Alert.alert("Error", "No se pudieron cargar los datos de pago");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Función para formatear el número de tarjeta
     const formatCardNumber = (text: string) => {
@@ -105,15 +132,61 @@ export default function Facturacion() {
                cvv.length >= 3;
     };
 
-    const handlePagar = () => {
+    const handlePagar = async () => {
         if (!validateForm()) return;
+        if (!currentUser || !paymentInfo) return;
         
         setProcesando(true);
-        setTimeout(() => {
+
+        try {
+            // Simular procesamiento con AsyncStorage
+            const paymentData = {
+                metodo: 'Tarjeta de crédito',
+                tarjeta: `****${cardNumber.slice(-4)}`,
+                nombre: cardName,
+                monto: paymentInfo.monto
+            };
+
+            // Procesar pago usando la función de storage
+            const result = await processPayment(currentUser.id, paymentData);
+            
+            // Simular delay de procesamiento
+            setTimeout(() => {
+                setProcesando(false);
+                setResultado(result.success ? "exito" : "error");
+            }, 3000);
+            
+        } catch (error) {
+            console.error("Error procesando pago:", error);
             setProcesando(false);
-            setResultado(pagoExitoso ? "exito" : "error");
-        }, 3000);
+            setResultado("error");
+        }
     };
+
+    // Mostrar loading mientras se cargan los datos
+    if (isLoading) {
+        return (
+            <View style={[globalStyles.container, styles.center]}>
+                <ActivityIndicator size={60} color={theme.colors.primary} />
+                <Text style={styles.procesandoText}>Cargando información de pago...</Text>
+            </View>
+        );
+    }
+
+    // Verificar que tengamos los datos necesarios
+    if (!currentUser || !paymentInfo) {
+        return (
+            <View style={[globalStyles.container, styles.center]}>
+                <Text style={styles.procesandoText}>Error: No se pudieron cargar los datos de pago</Text>
+                <TouchableOpacity 
+                    style={styles.volverButton} 
+                    onPress={() => router.back()}
+                >
+                    <Text style={styles.volverButtonText}>Volver</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     // Pantalla de procesando
     if (procesando) {
@@ -265,7 +338,7 @@ export default function Facturacion() {
 
                 <View style={styles.amountContainer}>
                     <Text style={styles.amountLabel}>MONTO A PAGAR</Text>
-                    <Text style={styles.amount}>$10,213.89</Text>
+                    <Text style={styles.amount}>${paymentInfo.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
             </View>
 
                 <TouchableOpacity 
@@ -276,7 +349,7 @@ export default function Facturacion() {
                     disabled={!isFormComplete()}
                 >
                     <Text style={globalStyles.buttonText}>
-                        PAGAR $10,213.89
+                        PAGAR ${paymentInfo.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
                     </Text>
             </TouchableOpacity>
         </View>
