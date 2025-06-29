@@ -7,6 +7,7 @@ import {
     ScrollView, 
     Image, 
     TouchableOpacity,
+    Animated,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles, { CARD_WIDTH, CARD_SPACING } from "../../styles/home";
@@ -27,12 +28,30 @@ export default function Home() {
     const [clases, setClases] = useState([]);
     // Estado para el usuario actual
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+    // Animación para las cards
+    const fadeAnim = new Animated.Value(1);
     const router = useRouter();
 
     // Cargar datos desde AsyncStorage al montar el componente
     useEffect(() => {
         loadData();
     }, []);
+
+    // Animación cuando cambia el slide activo
+    useEffect(() => {
+        Animated.sequence([
+            Animated.timing(fadeAnim, {
+                toValue: 0.8,
+                duration: 150,
+                useNativeDriver: true,
+            }),
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 150,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [activeSlide]);
 
     const loadData = async () => {
         try {

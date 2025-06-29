@@ -34,7 +34,7 @@ export default function Entrenamiento() {
       title: 'Rutina',
       description: 'Crea y personaliza tus rutinas de entrenamiento',
       icon: 'fitness-center',
-      colors: ['#b3dcec', '#e6f3f9'],
+      colors: ['#667eea', '#764ba2'],
       route: '/rutina'
     },
     {
@@ -42,22 +42,24 @@ export default function Entrenamiento() {
       title: 'Cronómetro',
       description: 'Controla el tiempo de tus series y descansos',
       icon: 'timer',
-      colors: ['#b3dcec', '#e6f3f9'],
+      colors: ['#f093fb', '#f5576c'],
       route: '/temporizador'
     },
     {
       id: 'guia',
-      title: 'Guía de Ejercicios',
-      description: 'Aprende técnicas y formas correctas',
+      title: 'Biblioteca de Ejercicios',
+      description: 'Explora más de 1300 ejercicios con videos',
       icon: 'menu-book',
-      colors: ['#b3dcec', '#e6f3f9'],
+      colors: ['#4facfe', '#00f2fe'],
+      route: '/biblioteca-ejercicios'
     },
     {
       id: 'calculadora',
       title: 'Calculadora RPM',
       description: 'Calcula tu ritmo y repeticiones máximas',
       icon: 'calculate',
-      colors: ['#b3dcec', '#e6f3f9'],
+      colors: ['#43e97b', '#38f9d7'],
+      route: '/calculadora-rpm'
     }
   ];
 
@@ -74,7 +76,7 @@ export default function Entrenamiento() {
       key={option.id}
       style={styles.menuCard}
       onPress={() => handleMenuPress(option)}
-      activeOpacity={0.8}
+      activeOpacity={0.85}
     >
       <LinearGradient
         colors={option.colors}
@@ -86,7 +88,7 @@ export default function Entrenamiento() {
           <View style={styles.iconContainer}>
             <MaterialIcons 
               name={option.icon as any} 
-              size={24} 
+              size={26} 
               color="white" 
             />
           </View>
@@ -101,8 +103,8 @@ export default function Entrenamiento() {
           <View style={styles.arrowContainer}>
             <MaterialIcons 
               name="keyboard-arrow-right" 
-              size={20} 
-              color={theme.colors.textSecondary} 
+              size={24} 
+              color="rgba(255,255,255,0.8)" 
             />
           </View>
         </View>

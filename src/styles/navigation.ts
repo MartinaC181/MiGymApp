@@ -73,6 +73,12 @@ export default function useNavigationStyles() {
       color: isDarkMode ? '#000000' : 'white',
       marginTop: 4,
     },
+    iconTextActive: {
+      fontSize: theme.typography.fontSize.medium,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: isDarkMode ? '#000000' : 'white',
+      marginTop: 4,
+    },
     navItemWrapper: {
       alignItems: 'center',
       justifyContent: 'center',
