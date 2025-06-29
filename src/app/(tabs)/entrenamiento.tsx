@@ -59,6 +59,7 @@ export default function Entrenamiento() {
       description: 'Calcula tu ritmo y repeticiones máximas',
       icon: 'calculate',
       colors: ['#43e97b', '#38f9d7'],
+      route: '/calculadora-rpm'
     }
   ];
 

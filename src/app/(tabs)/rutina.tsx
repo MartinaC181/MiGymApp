@@ -9,28 +9,28 @@ import React from 'react';
 const grupos = [
   {
     nombre: 'Piernas',
-    icon: 'directions-run',
+    icon: 'run',
     gradient: ['#667eea', '#764ba2'],
     ejercicios: 12,
     descripcion: 'Cuádriceps, glúteos y pantorrillas'
   },
   {
     nombre: 'Brazos',
-    icon: 'fitness-center',
+    icon: 'arm-flex',
     gradient: ['#f093fb', '#f5576c'],
     ejercicios: 8,
     descripcion: 'Bíceps, tríceps y antebrazos'
   },
   {
     nombre: 'Pecho',
-    icon: 'sports-gymnastics',
+    icon: 'weight-lifter',
     gradient: ['#4facfe', '#00f2fe'],
     ejercicios: 6,
     descripcion: 'Pectorales mayor y menor'
   },
   {
     nombre: 'Espalda',
-    icon: 'accessibility',
+    icon: 'human-handsup',
     gradient: ['#43e97b', '#38f9d7'],
     ejercicios: 10,
     descripcion: 'Dorsales, romboides y trapecio'
