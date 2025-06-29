@@ -47,13 +47,25 @@ export default function Login() {
           // Guardar en AsyncStorage para próximas veces
           await saveUser(hardcodedUser);
           await saveSession(hardcodedUser);
-          router.push("/home");
+          
+          // Redirigir según el tipo de usuario
+          if (hardcodedUser.role === 'gym') {
+            router.push("/(gimnasio)/gestion-socios");
+          } else {
+            router.push("/home");
+          }
         } else {
           setError("Correo o contraseña incorrectos");
         }
       } else {
         setError("");
-        router.push("/home");
+        
+        // Redirigir según el tipo de usuario
+        if (user.role === 'gym') {
+          router.push("/(gimnasio)/gestion-socios");
+        } else {
+          router.push("/home");
+        }
       }
     } catch (error) {
       setError("Error al iniciar sesión");

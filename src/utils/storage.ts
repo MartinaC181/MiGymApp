@@ -555,3 +555,62 @@ export const loadThemePreference = async (): Promise<boolean> => {
     return false; // Por defecto modo claro
   }
 };
+
+// === FUNCIONES DE CLASES DE GIMNASIO ===
+
+export const saveGymClasses = async (gymUserId: string, classes: any[]) => {
+  try {
+    const key = `@MiGymApp:gymClasses:${gymUserId}`;
+    await AsyncStorage.setItem(key, JSON.stringify(classes));
+    return true;
+  } catch (error) {
+    console.error("Error guardando clases del gimnasio:", error);
+    return false;
+  }
+};
+
+export const getGymClasses = async (gymUserId: string) => {
+  try {
+    const key = `@MiGymApp:gymClasses:${gymUserId}`;
+    const classes = await AsyncStorage.getItem(key);
+    return classes ? JSON.parse(classes) : [];
+  } catch (error) {
+    console.error("Error obteniendo clases del gimnasio:", error);
+    return [];
+  }
+};
+
+export const addGymClass = async (gymUserId: string, newClass: any) => {
+  try {
+    const existingClasses = await getGymClasses(gymUserId);
+    const updatedClasses = [...existingClasses, newClass];
+    return await saveGymClasses(gymUserId, updatedClasses);
+  } catch (error) {
+    console.error("Error agregando clase del gimnasio:", error);
+    return false;
+  }
+};
+
+export const updateGymClass = async (gymUserId: string, classId: number, updatedClass: any) => {
+  try {
+    const existingClasses = await getGymClasses(gymUserId);
+    const updatedClasses = existingClasses.map((clase: any) => 
+      clase.id === classId ? updatedClass : clase
+    );
+    return await saveGymClasses(gymUserId, updatedClasses);
+  } catch (error) {
+    console.error("Error actualizando clase del gimnasio:", error);
+    return false;
+  }
+};
+
+export const deleteGymClass = async (gymUserId: string, classId: number) => {
+  try {
+    const existingClasses = await getGymClasses(gymUserId);
+    const updatedClasses = existingClasses.filter((clase: any) => clase.id !== classId);
+    return await saveGymClasses(gymUserId, updatedClasses);
+  } catch (error) {
+    console.error("Error eliminando clase del gimnasio:", error);
+    return false;
+  }
+};

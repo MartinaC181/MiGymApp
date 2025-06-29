@@ -4,7 +4,7 @@ const lightColors = {
   textPrimary: '#111111',
   textSecondary: '#3E3E3E',
   surface: '#F4F4F4',
-  success: '#88DA62',
+  success: '#B8E6B8',
   error: '#FF5A5F',
   card: '#ffffff',
   border: '#E0E0E0',

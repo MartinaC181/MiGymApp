@@ -39,6 +39,8 @@ export default function TabsLayout() {
     if (path.includes('/GrupoDetalle')) return 'Editar Rutina';
     if (path.includes('/facturacion')) return 'Facturación';
     if (path.includes('/temporizador')) return 'Temporizador';
+    if (path.includes('/gestion-clases')) return 'Gestión de Clases';
+    if (path.includes('/socios')) return 'Socios';
     return 'Mi Gym App';
   };
 

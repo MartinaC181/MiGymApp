@@ -3,6 +3,7 @@ import SplashLoader from '../components/SplashLoader';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
+import { getCurrentUser } from '../utils/storage';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,7 +23,14 @@ export default function Index() {
       
       // Redirigir según el estado de autenticación
       if (isAuthenticated) {
-        router.replace('/home');
+        // Obtener el usuario actual para determinar el tipo
+        const currentUser = await getCurrentUser();
+        
+        if (currentUser?.role === 'gym') {
+          router.replace('/(gimnasio)/gestion-socios');
+        } else {
+          router.replace('/home');
+        }
       } else {
         router.replace('/login');
       }
@@ -43,6 +51,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-  }
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

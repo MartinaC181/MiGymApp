@@ -26,7 +26,7 @@ export default StyleSheet.create({
     },
     clasesContainer: {
         paddingHorizontal: theme.spacing.lg,
-        paddingBottom: 120, // Ajustado para el nuevo FAB más cerca
+        paddingBottom: 120, 
     },
     claseCard: {
         backgroundColor: theme.colors.background,
@@ -140,13 +140,13 @@ export default StyleSheet.create({
         backgroundColor: theme.colors.primary,
     },
     activarButton: {
-        backgroundColor: '#b3dcec', 
+        backgroundColor: theme.colors.success,
     },
     desactivarButton: {
-        backgroundColor: '#b3dcec', 
+        backgroundColor: '#F5E6A8',
     },
     eliminarButton: {
-        backgroundColor: '#b3dcec', 
+        backgroundColor: '#F8BDBD',
     },
     accionButtonText: {
         fontSize: theme.typography.fontSize.small,
@@ -155,7 +155,7 @@ export default StyleSheet.create({
     },
     fabButton: {
         position: 'absolute',
-        bottom: 90, // Más cerca de la navegación
+        bottom: 50, 
         right: theme.spacing.lg,
         width: 56,
         height: 56,
@@ -188,12 +188,19 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    modalTitleContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     modalTitle: {
         fontSize: theme.typography.fontSize.large,
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.textPrimary,
-        flex: 1,
-        textAlign: 'center',
+    },
+    modalSpacerButton: {
+        width: 40,
+        height: 40,
     },
     modalSaveButton: {
         width: 80,
@@ -201,7 +208,7 @@ export default StyleSheet.create({
     },
     modalSaveText: {
         fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.medium,
+        fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.primary,
     },
     modalContent: {
@@ -215,23 +222,23 @@ export default StyleSheet.create({
         fontSize: theme.typography.fontSize.large,
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.textPrimary,
-        marginBottom: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
     },
     formSectionSubtitle: {
         fontSize: theme.typography.fontSize.small,
         fontFamily: theme.typography.fontFamily.regular,
         color: theme.colors.textSecondary,
-        marginBottom: theme.spacing.md,
-        lineHeight: 18,
+        marginBottom: theme.spacing.lg,
+        lineHeight: 20,
     },
     inputGroup: {
-        marginBottom: theme.spacing.md,
+        marginBottom: theme.spacing.lg,
     },
     inputLabel: {
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.medium,
         color: theme.colors.textPrimary,
-        marginBottom: theme.spacing.xs,
+        marginBottom: theme.spacing.sm,
     },
     textInput: {
         borderWidth: 1,
@@ -243,21 +250,31 @@ export default StyleSheet.create({
         color: theme.colors.textPrimary,
         backgroundColor: theme.colors.background,
     },
+    inputError: {
+        borderColor: '#FF6B6B',
+        borderWidth: 2,
+    },
+    errorText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: '#FF6B6B',
+        marginTop: theme.spacing.xs,
+    },
     textAreaInput: {
-        minHeight: 80,
+        height: 80,
         textAlignVertical: 'top',
     },
     switchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: theme.spacing.md,
+        marginBottom: theme.spacing.lg,
     },
     diaContainer: {
-        marginBottom: theme.spacing.md,
+        marginBottom: theme.spacing.lg,
     },
     diaHeader: {
-        marginBottom: theme.spacing.xs,
+        marginBottom: theme.spacing.sm,
     },
     diaCheckbox: {
         flexDirection: 'row',
@@ -278,10 +295,122 @@ export default StyleSheet.create({
         borderColor: '#E0E0E0',
         borderRadius: theme.borderRadius.md,
         padding: theme.spacing.sm,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        backgroundColor: '#F8F8F8',
+        marginLeft: theme.spacing.xl,
+    },
+    // Nuevos estilos para modalidad de clase
+    modalidadContainer: {
+        flexDirection: 'row',
+        marginBottom: theme.spacing.lg,
+        borderRadius: theme.borderRadius.md,
+        backgroundColor: '#F8F8F8',
+        padding: theme.spacing.xs,
+    },
+    modalidadButton: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.md,
+        borderRadius: theme.borderRadius.sm,
+        gap: theme.spacing.xs,
+    },
+    modalidadButtonActive: {
+        backgroundColor: theme.colors.background,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    modalidadText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: '#999',
+    },
+    modalidadTextActive: {
+        color: theme.colors.primary,
+        fontFamily: theme.typography.fontFamily.medium,
+    },
+    previsualizacionContainer: {
+        backgroundColor: '#F0F0F0',
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        marginTop: theme.spacing.md,
+    },
+    previsualizacionTitle: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+        marginBottom: theme.spacing.xs,
+    },
+    previsualizacionText: {
         fontSize: theme.typography.fontSize.small,
         fontFamily: theme.typography.fontFamily.regular,
         color: theme.colors.textPrimary,
-        backgroundColor: theme.colors.surface,
-        marginLeft: theme.spacing.xl,
+        lineHeight: 18,
+    },
+    modalFooter: {
+        padding: theme.spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: '#F0F0F0',
+    },
+    // Nuevos estilos para selector flexible de días
+    diasFlexiblesContainer: {
+        marginBottom: theme.spacing.lg,
+    },
+    diasFlexiblesGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: theme.spacing.sm,
+        marginTop: theme.spacing.sm,
+    },
+    diaFlexibleButton: {
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        backgroundColor: theme.colors.background,
+        minWidth: 50,
+        alignItems: 'center',
+    },
+    diaFlexibleButtonActive: {
+        backgroundColor: theme.colors.primary,
+        borderColor: theme.colors.primary,
+    },
+    diaFlexibleText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+    },
+    diaFlexibleTextActive: {
+        color: '#FFFFFF',
+    },
+    // Estilos para estado vacío
+    emptyStateContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: theme.spacing.xl * 2,
+        paddingHorizontal: theme.spacing.lg,
+    },
+    emptyStateTitle: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textSecondary,
+        marginTop: theme.spacing.lg,
+        marginBottom: theme.spacing.sm,
+        textAlign: 'center',
+    },
+    emptyStateSubtitle: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        textAlign: 'center',
+        lineHeight: 22,
     },
 }); 
