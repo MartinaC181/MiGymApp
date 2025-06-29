@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Linking, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import globalStyles from "../../styles/global";
-import theme from "../../constants/theme";
+import { useTheme } from '../../context/ThemeContext';
 import { getCurrentUser, getGymUserByBusinessName } from '../../utils/storage';
 import { ClientUser, GymUser } from '../../data/Usuario';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -10,6 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const GymProfile = () => {
     const router = useRouter();
+    const { theme, isDarkMode } = useTheme();
     const [userData, setUserData] = useState<ClientUser | null>(null);
     const [gymData, setGymData] = useState<GymUser | null>(null);
     const [loading, setLoading] = useState(true);
@@ -161,6 +162,178 @@ const GymProfile = () => {
             Alert.alert('Error', 'No se pudo abrir la aplicación de contacto');
         }
     };
+
+    // Estilos dinámicos que usan el tema
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.background,
+        },
+        loadingText: {
+            marginTop: theme.spacing.md,
+            fontSize: theme.typography.fontSize.medium,
+            color: theme.colors.textSecondary,
+            fontFamily: theme.typography.fontFamily.regular,
+        },
+        noGymTitle: {
+            fontSize: theme.typography.fontSize.large,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+            marginTop: theme.spacing.md,
+            textAlign: 'center',
+        },
+        noGymText: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textSecondary,
+            marginTop: theme.spacing.sm,
+            textAlign: 'center',
+            paddingHorizontal: theme.spacing.lg,
+        },
+        header: {
+            height: 200,
+            marginBottom: theme.spacing.lg,
+        },
+        headerGradient: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: theme.spacing.xl,
+        },
+        logoContainer: {
+            width: 80,
+            height: 80,
+            borderRadius: 40,
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: theme.spacing.md,
+        },
+        gymName: {
+            fontSize: theme.typography.fontSize.title,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: 'white',
+            textAlign: 'center',
+            marginBottom: theme.spacing.xs,
+        },
+        gymType: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: 'rgba(255,255,255,0.8)',
+            textAlign: 'center',
+        },
+        content: {
+            padding: theme.spacing.lg,
+        },
+        section: {
+            marginBottom: theme.spacing.xl,
+        },
+        sectionTitle: {
+            fontSize: theme.typography.fontSize.large,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+            marginBottom: theme.spacing.md,
+        },
+        infoCard: {
+            marginBottom: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            overflow: 'hidden',
+            shadowColor: isDarkMode ? "#ffffff" : "#000000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: isDarkMode ? 0.1 : 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        infoCardGradient: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: theme.spacing.md,
+        },
+        infoCardContent: {
+            marginLeft: theme.spacing.md,
+            flex: 1,
+        },
+        infoCardTitle: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: 'rgba(255,255,255,0.8)',
+            marginBottom: 2,
+        },
+        infoCardValue: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: 'white',
+        },
+        infoCardChevron: {
+            marginLeft: 'auto',
+            alignSelf: 'center',
+        },
+        descriptionCard: {
+            backgroundColor: theme.colors.surface,
+            padding: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            borderLeftWidth: 4,
+            borderLeftColor: theme.colors.primary,
+        },
+        descriptionText: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textPrimary,
+            lineHeight: 22,
+        },
+        statsContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+        },
+        statCard: {
+            flex: 1,
+            marginHorizontal: theme.spacing.xs,
+            borderRadius: theme.borderRadius.md,
+            overflow: 'hidden',
+            shadowColor: isDarkMode ? "#ffffff" : "#000000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: isDarkMode ? 0.1 : 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        statCardGradient: {
+            alignItems: 'center',
+            padding: theme.spacing.md,
+        },
+        statCardValue: {
+            fontSize: theme.typography.fontSize.title,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: 'white',
+            marginTop: theme.spacing.xs,
+        },
+        statCardTitle: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: 'rgba(255,255,255,0.8)',
+            marginTop: 2,
+        },
+        planCard: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: theme.colors.surface,
+            padding: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            borderLeftWidth: 4,
+            borderLeftColor: theme.colors.primary,
+        },
+        planText: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+            marginLeft: theme.spacing.sm,
+        },
+        contactButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: theme.spacing.lg,
+        },
+    });
 
     if (loading) {
         return (
@@ -320,241 +493,80 @@ const GymProfile = () => {
             </View>
         </ScrollView>
     );
+
+    // Componente InfoCard dentro del componente principal para acceder a styles
+    function InfoCard({ icon, title, value, gradientColors, onPress }: {
+        icon: string;
+        title: string;
+        value: string;
+        gradientColors: [string, string];
+        onPress?: () => void;
+    }) {
+        return (
+            <TouchableOpacity 
+                style={styles.infoCard} 
+                activeOpacity={onPress ? 0.8 : 1} 
+                onPress={onPress}
+                disabled={!onPress}
+            >
+                <LinearGradient
+                    colors={gradientColors}
+                    style={styles.infoCardGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    <MaterialCommunityIcons 
+                        name={icon as any} 
+                        size={24} 
+                        color="white" 
+                    />
+                    <View style={styles.infoCardContent}>
+                        <Text style={styles.infoCardTitle}>{title}</Text>
+                        <Text style={styles.infoCardValue}>{value}</Text>
+                    </View>
+                    {onPress && (
+                        <MaterialCommunityIcons 
+                            name="chevron-right" 
+                            size={20} 
+                            color="rgba(255,255,255,0.8)" 
+                            style={styles.infoCardChevron}
+                        />
+                    )}
+                </LinearGradient>
+            </TouchableOpacity>
+        );
+    }
+
+    // Componente StatCard dentro del componente principal para acceder a styles
+    function StatCard({ icon, title, value, gradientColors }: {
+        icon: string;
+        title: string;
+        value: string;
+        gradientColors: [string, string];
+    }) {
+        return (
+            <View style={styles.statCard}>
+                <LinearGradient
+                    colors={gradientColors}
+                    style={styles.statCardGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    <MaterialCommunityIcons 
+                        name={icon as any} 
+                        size={32} 
+                        color="white" 
+                    />
+                    <Text style={styles.statCardValue}>{value}</Text>
+                    <Text style={styles.statCardTitle}>{title}</Text>
+                </LinearGradient>
+            </View>
+        );
+    }
 };
 
-const InfoCard = ({ icon, title, value, gradientColors, onPress }: {
-    icon: string;
-    title: string;
-    value: string;
-    gradientColors: [string, string];
-    onPress?: () => void;
-}) => (
-    <TouchableOpacity 
-        style={styles.infoCard} 
-        activeOpacity={onPress ? 0.8 : 1} 
-        onPress={onPress}
-        disabled={!onPress}
-    >
-        <LinearGradient
-            colors={gradientColors}
-            style={styles.infoCardGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-        >
-            <MaterialCommunityIcons 
-                name={icon as any} 
-                size={24} 
-                color="white" 
-            />
-            <View style={styles.infoCardContent}>
-                <Text style={styles.infoCardTitle}>{title}</Text>
-                <Text style={styles.infoCardValue}>{value}</Text>
-            </View>
-            {onPress && (
-                <MaterialCommunityIcons 
-                    name="chevron-right" 
-                    size={20} 
-                    color="rgba(255,255,255,0.8)" 
-                    style={styles.infoCardChevron}
-                />
-            )}
-        </LinearGradient>
-    </TouchableOpacity>
-);
 
-const StatCard = ({ icon, title, value, gradientColors }: {
-    icon: string;
-    title: string;
-    value: string;
-    gradientColors: [string, string];
-}) => (
-    <View style={styles.statCard}>
-        <LinearGradient
-            colors={gradientColors}
-            style={styles.statCardGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-        >
-            <MaterialCommunityIcons 
-                name={icon as any} 
-                size={32} 
-                color="white" 
-            />
-            <Text style={styles.statCardValue}>{value}</Text>
-            <Text style={styles.statCardTitle}>{title}</Text>
-        </LinearGradient>
-    </View>
-);
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.background,
-    },
-    loadingText: {
-        marginTop: theme.spacing.md,
-        fontSize: theme.typography.fontSize.medium,
-        color: theme.colors.textSecondary,
-        fontFamily: theme.typography.fontFamily.regular,
-    },
-    noGymTitle: {
-        fontSize: theme.typography.fontSize.large,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-        marginTop: theme.spacing.md,
-        textAlign: 'center',
-    },
-    noGymText: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
-        marginTop: theme.spacing.sm,
-        textAlign: 'center',
-        paddingHorizontal: theme.spacing.lg,
-    },
-    header: {
-        height: 200,
-        marginBottom: theme.spacing.lg,
-    },
-    headerGradient: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingTop: theme.spacing.xl,
-    },
-    logoContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: theme.spacing.md,
-    },
-    gymName: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: 'white',
-        textAlign: 'center',
-        marginBottom: theme.spacing.xs,
-    },
-    gymType: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: 'rgba(255,255,255,0.8)',
-        textAlign: 'center',
-    },
-    content: {
-        padding: theme.spacing.lg,
-    },
-    section: {
-        marginBottom: theme.spacing.xl,
-    },
-    sectionTitle: {
-        fontSize: theme.typography.fontSize.large,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-        marginBottom: theme.spacing.md,
-    },
-    infoCard: {
-        marginBottom: theme.spacing.md,
-        borderRadius: theme.borderRadius.md,
-        overflow: 'hidden',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    infoCardGradient: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: theme.spacing.md,
-    },
-    infoCardContent: {
-        marginLeft: theme.spacing.md,
-        flex: 1,
-    },
-    infoCardTitle: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.medium,
-        color: 'rgba(255,255,255,0.8)',
-        marginBottom: 2,
-    },
-    infoCardValue: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: 'white',
-    },
-    infoCardChevron: {
-        marginLeft: 'auto',
-        alignSelf: 'center',
-    },
-    descriptionCard: {
-        backgroundColor: theme.colors.surface,
-        padding: theme.spacing.md,
-        borderRadius: theme.borderRadius.md,
-        borderLeftWidth: 4,
-        borderLeftColor: theme.colors.primary,
-    },
-    descriptionText: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textPrimary,
-        lineHeight: 22,
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    statCard: {
-        flex: 1,
-        marginHorizontal: theme.spacing.xs,
-        borderRadius: theme.borderRadius.md,
-        overflow: 'hidden',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    statCardGradient: {
-        alignItems: 'center',
-        padding: theme.spacing.md,
-    },
-    statCardValue: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: 'white',
-        marginTop: theme.spacing.xs,
-    },
-    statCardTitle: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.medium,
-        color: 'rgba(255,255,255,0.8)',
-        marginTop: 2,
-    },
-    planCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: theme.colors.surface,
-        padding: theme.spacing.md,
-        borderRadius: theme.borderRadius.md,
-        borderLeftWidth: 4,
-        borderLeftColor: theme.colors.primary,
-    },
-    planText: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-        marginLeft: theme.spacing.sm,
-    },
-    contactButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: theme.spacing.lg,
-    },
-});
+
 
 export default GymProfile; 

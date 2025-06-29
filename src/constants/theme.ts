@@ -22,13 +22,13 @@ const lightColors = {
   buttonBackground: '#00BFFF',
   socialButtonBackground: '#ffffff',
   shadowColor: '#000000',
-  // Gradientes unificados basados en el color primario
-  gradient1: ['#00BFFF', '#0099CC'] as [string, string],
-  gradient2: ['#33CCFF', '#00BFFF'] as [string, string],
-  gradient3: ['#66D9FF', '#33CCFF'] as [string, string],
-  gradient4: ['#0099CC', '#0077AA'] as [string, string],
-  gradient5: ['#E6F7FF', '#CCF2FF'] as [string, string],
-  gradient6: ['#00BFFF', '#66D9FF'] as [string, string],
+  // Gradientes ajustados para mejor contraste
+  gradient1: ['#4DD0FF', '#66D9FF'] as [string, string],
+  gradient2: ['#00BFFF', '#33CCFF'] as [string, string],  // Más sólido, mejor contraste
+  gradient3: ['#0099CC', '#00BFFF'] as [string, string],  // Más sólido, mejor contraste
+  gradient4: ['#33CCFF', '#66D9FF'] as [string, string],
+  gradient5: ['#1E88E5', '#42A5F5'] as [string, string],  // Mucho más sólido para buen contraste
+  gradient6: ['#1AC6FF', '#4DD0FF'] as [string, string],
 };
 
 const darkColors = {
@@ -55,13 +55,13 @@ const darkColors = {
   buttonBackground: '#00BFFF',
   socialButtonBackground: '#2A2A2A',
   shadowColor: '#000000',
-  // Gradientes unificados para modo oscuro
-  gradient1: ['#00BFFF', '#0088CC'] as [string, string],
-  gradient2: ['#1A3A5F', '#2A4A6F'] as [string, string],
-  gradient3: ['#2A4A6F', '#3A5A7F'] as [string, string],
-  gradient4: ['#0088CC', '#006699'] as [string, string],
-  gradient5: ['#1A1A1A', '#2A2A2A'] as [string, string],
-  gradient6: ['#00BFFF', '#4FC3F7'] as [string, string],
+  // Gradientes ajustados para mejor contraste en modo oscuro
+  gradient1: ['#1AC6FF', '#4DD0FF'] as [string, string],
+  gradient2: ['#0088CC', '#00BFFF'] as [string, string],  // Mejor contraste
+  gradient3: ['#006699', '#0088CC'] as [string, string],  // Más sólido para modo oscuro
+  gradient4: ['#0099CC', '#33CCFF'] as [string, string],
+  gradient5: ['#1565C0', '#1976D2'] as [string, string],  // Más sólido y contrastante
+  gradient6: ['#00BFFF', '#66D9FF'] as [string, string],
 };
 
 const spacing = {
