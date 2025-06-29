@@ -39,15 +39,15 @@ export default function PoliticasModal({
 
           {/* Título del modal */}
           <Text style={[styles.title, { color: theme.colors.textPrimary }]}>
-            {/* TEXTO: Título principal del modal */}
             Políticas de Privacidad
           </Text>
 
           {/* Contenedor del scroll para el contenido */}
           <ScrollView 
             style={styles.scrollContainer}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
             contentContainerStyle={styles.scrollContent}
+            nestedScrollEnabled={true}
           >
             {/* Sección de introducción */}
             <Text style={[styles.sectionTitle, { color: theme.colors.textPrimary }]}>

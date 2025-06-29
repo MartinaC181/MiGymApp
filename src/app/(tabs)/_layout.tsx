@@ -33,6 +33,7 @@ export default function TabsLayout() {
     if (path.includes('/entrenamiento')) return 'Entrenamiento';
     if (path.includes('/cuota')) return 'Cuota';
     if (path.includes('/perfil')) return 'Perfil';
+    if (path.includes('/perfil-gimnasio')) return 'Perfil del Gimnasio';
     if (path.includes('/Imc')) return 'IMC';
     if (path.includes('/EditProfile')) return 'Editar Perfil';
     if (path.includes('/Settings')) return 'Configuración';
