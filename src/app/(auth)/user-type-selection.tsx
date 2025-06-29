@@ -47,15 +47,22 @@ export default function UserTypeSelection() {
         </TouchableOpacity>
 
         {/* Link para ir al login */}
-        <Text style={[globalStyles.registerText, { marginTop: theme.spacing.lg }]}>
-          ¿Ya tenés una cuenta?{" "}
-          <Text
-            style={globalStyles.textLink}
-            onPress={() => router.push("/login")}
-          >
-            Iniciá Sesión
+        <TouchableOpacity 
+          onPress={() => router.push("/login")}
+          style={{
+            paddingVertical: 16,
+            paddingHorizontal: 20,
+            alignItems: 'center',
+            marginTop: theme.spacing.lg
+          }}
+        >
+          <Text style={globalStyles.registerText}>
+            ¿Ya tenés una cuenta?{" "}
+            <Text style={globalStyles.textLink}>
+              Iniciá Sesión
+            </Text>
           </Text>
-        </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

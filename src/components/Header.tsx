@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
 import theme from "../constants/theme";
+import { clearSession } from "../utils/storage";
 
 type HeaderProps = {
   title: string;
@@ -24,8 +25,9 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowLogoutModal(false);
+    await clearSession(); // Limpiar la sesión de AsyncStorage
     router.replace("/login"); // replace para limpiar el stack
   };
 
@@ -40,7 +42,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
           <TouchableOpacity style={styles.leftIcon} onPress={handleBackPress}>
             <MaterialIcons
               name="chevron-left"
-              size={24}
+              size={28}
               color={theme.colors.background}
             />
           </TouchableOpacity>
@@ -54,7 +56,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
         >
           <MaterialCommunityIcons
             name="cog-outline"
-            size={20}
+            size={24}
             color={theme.colors.background}
           />
         </TouchableOpacity>
@@ -115,12 +117,12 @@ const styles = StyleSheet.create({
   leftIcon: {
     position: "absolute",
     left: 16,
-    top: 50,
+    top: 54,
   },
   rightIcon: {
     position: "absolute",
     right: 16,
-    top: 50,
+    top: 54,
   },
   // Estilos del modal
   modalOverlay: {
