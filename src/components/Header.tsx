@@ -42,7 +42,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
           <TouchableOpacity style={styles.leftIcon} onPress={handleBackPress}>
             <MaterialIcons
               name="chevron-left"
-              size={24}
+              size={28}
               color={theme.colors.background}
             />
           </TouchableOpacity>
@@ -56,7 +56,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
         >
           <MaterialCommunityIcons
             name="cog-outline"
-            size={20}
+            size={24}
             color={theme.colors.background}
           />
         </TouchableOpacity>
@@ -117,12 +117,12 @@ const styles = StyleSheet.create({
   leftIcon: {
     position: "absolute",
     left: 16,
-    top: 50,
+    top: 54,
   },
   rightIcon: {
     position: "absolute",
     right: 16,
-    top: 50,
+    top: 54,
   },
   // Estilos del modal
   modalOverlay: {

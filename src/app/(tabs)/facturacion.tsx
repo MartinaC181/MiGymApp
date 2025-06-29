@@ -6,15 +6,17 @@ import globalStyles from "../../styles/global";
 import pagoCorrecto from '../../../assets/pagocorrecto.png';
 import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
-import { getCurrentUser, getUserPaymentInfo, processPayment, updateUserPaymentInfo } from "../../utils/storage";
+import { openBrowserAsync } from "expo-web-browser";
+import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
+import { getCurrentUser, getUserPaymentInfo, processPayment } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
+
+// Hardcodea el resultado del pago aquí
+const pagoExitoso = true; // Cambia a false para probar el error
 
 export default function Facturacion() {
     const [procesando, setProcesando] = useState(false);
     const [resultado, setResultado] = useState<null | "exito" | "error">(null);
-    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
-    const [paymentInfo, setPaymentInfo] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
     
     // Estados para los campos del formulario
     const [cardName, setCardName] = useState("");
@@ -29,6 +31,12 @@ export default function Facturacion() {
         expiry: false,
         cvv: false
     });
+
+    // Estados adicionales
+    const [metodoPago, setMetodoPago] = useState<"mercadopago" | "tarjeta">("mercadopago");
+    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+    const [paymentInfo, setPaymentInfo] = useState<any | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // Cargar datos del usuario y pago al montar
     useEffect(() => {
@@ -126,15 +134,32 @@ export default function Facturacion() {
 
     // Función para verificar si todos los campos están completos
     const isFormComplete = () => {
-        return cardName.trim() && 
-               cardNumber.replace(/\s/g, '').length >= 16 && 
-               expiry.length >= 5 && 
-               cvv.length >= 3;
+        if (metodoPago === "mercadopago") {
+            return true; // Mercado Pago no requiere campos adicionales
+        }
+        if (metodoPago === "tarjeta") {
+            return cardName.trim() && 
+                   cardNumber.replace(/\s/g, '').length >= 16 && 
+                   expiry.length >= 5 && 
+                   cvv.length >= 3;
+        }
+        return false;
+    };
+     // Función para manejar el pago con Mercado Pago
+     const handleMercadoPagoPayment = async () => {
+        // Aquí iría la lógica de integración con Mercado Pago
+        console.log("Procesando pago con Mercado Pago...");
+        const data = await handleIntegrationMercadoPago();
+
+        if (!data) {
+           return console.error("Error al procesar el pago con Mercado Pago");
+        }
+
+        openBrowserAsync(data);
     };
 
     const handlePagar = async () => {
         if (!validateForm()) return;
-        if (!currentUser || !paymentInfo) return;
         
         setProcesando(true);
 
@@ -148,6 +173,7 @@ export default function Facturacion() {
             };
 
             // Procesar pago usando la función de storage
+            if (!currentUser || !paymentInfo) return;
             const result = await processPayment(currentUser.id, paymentData);
             
             // Simular delay de procesamiento
@@ -238,107 +264,170 @@ export default function Facturacion() {
 
     // Pantalla de formulario
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
             <View style={styles.titleContainer}>
                 <MaterialIcons name="credit-card" size={32} color={theme.colors.primary} />
-                <Text style={styles.title}>Información de la tarjeta</Text>
+                <Text style={styles.title}>Método de pago</Text>
             </View>
 
             <View style={styles.formContainer}>
-                <Text style={globalStyles.label}>NOMBRE EN LA TARJETA</Text>
-            <TextInput
+                {/* Opciones de método de pago */}
+                <Text style={styles.sectionTitle}>SELECCIONA TU MÉTODO DE PAGO</Text>
+                
+                <TouchableOpacity 
                     style={[
-                        styles.input,
-                        errors.cardName && styles.inputError
+                        styles.paymentOption,
+                        metodoPago === "mercadopago" && styles.paymentOptionSelected
                     ]}
-                    placeholder="Nombre y Apellido"
-                placeholderTextColor={theme.colors.textSecondary}
-                    value={cardName}
-                    onChangeText={(text) => {
-                        setCardName(text);
-                        if (errors.cardName) validateField('cardName', text);
-                    }}
-                    onBlur={() => validateField('cardName', cardName)}
-                    autoCapitalize="words"
-                />
-                {errors.cardName && (
-                    <Text style={styles.errorText}>El nombre es requerido</Text>
-                )}
-
-                <Text style={globalStyles.label}>NÚMERO DE TARJETA</Text>
-            <TextInput
-                    style={[
-                        styles.input,
-                        errors.cardNumber && styles.inputError
-                    ]}
-                placeholder="0000 0000 0000 0000"
-                placeholderTextColor={theme.colors.textSecondary}
-                keyboardType="numeric"
-                maxLength={19}
-                    value={cardNumber}
-                    onChangeText={(text) => {
-                        const formatted = formatCardNumber(text);
-                        setCardNumber(formatted);
-                        if (errors.cardNumber) validateField('cardNumber', formatted);
-                    }}
-                    onBlur={() => validateField('cardNumber', cardNumber)}
-                />
-                {errors.cardNumber && (
-                    <Text style={styles.errorText}>Ingresa un número de tarjeta válido</Text>
-                )}
-
-            <View style={styles.row}>
-                    <View style={styles.halfInput}>
-                        <Text style={globalStyles.label}>VENCIMIENTO</Text>
-                    <TextInput
-                            style={[
-                                styles.input,
-                                errors.expiry && styles.inputError
-                            ]}
-                            placeholder="MM/AA"
-                        placeholderTextColor={theme.colors.textSecondary}
-                        keyboardType="numeric"
-                        maxLength={5}
-                            value={expiry}
-                            onChangeText={(text) => {
-                                const formatted = formatExpiry(text);
-                                setExpiry(formatted);
-                                if (errors.expiry) validateField('expiry', formatted);
-                            }}
-                            onBlur={() => validateField('expiry', expiry)}
+                    onPress={() => setMetodoPago("mercadopago")}
+                >
+                    <View style={styles.paymentOptionContent}>
+                        <MaterialIcons 
+                            name="account-balance-wallet" 
+                            size={24} 
+                            color={metodoPago === "mercadopago" ? theme.colors.surface : theme.colors.primary} 
                         />
-                        {errors.expiry && (
-                            <Text style={styles.errorText}>Fecha requerida</Text>
-                        )}
-                </View>
-                    <View style={styles.halfInput}>
-                    <Text style={globalStyles.label}>CVV</Text>
-                    <TextInput
-                            style={[
-                                styles.input,
-                                errors.cvv && styles.inputError
-                            ]}
-                            placeholder="123"
-                        placeholderTextColor={theme.colors.textSecondary}
-                        keyboardType="numeric"
-                        maxLength={4}
-                        secureTextEntry
-                            value={cvv}
-                            onChangeText={(text) => {
-                                setCvv(text);
-                                if (errors.cvv) validateField('cvv', text);
-                            }}
-                            onBlur={() => validateField('cvv', cvv)}
-                        />
-                        {errors.cvv && (
-                            <Text style={styles.errorText}>CVV requerido</Text>
-                        )}
+                        <Text style={[
+                            styles.paymentOptionText,
+                            metodoPago === "mercadopago" && styles.paymentOptionTextSelected
+                        ]}>
+                            Pagar con Mercado Pago
+                        </Text>
                     </View>
-                </View>
+                    {metodoPago === "mercadopago" && (
+                        <MaterialIcons name="check-circle" size={24} color={theme.colors.surface} />
+                    )}
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    style={[
+                        styles.paymentOption,
+                        metodoPago === "tarjeta" && styles.paymentOptionSelected
+                    ]}
+                    onPress={() => setMetodoPago("tarjeta")}
+                >
+                    <View style={styles.paymentOptionContent}>
+                        <MaterialIcons 
+                            name="credit-card" 
+                            size={24} 
+                            color={metodoPago === "tarjeta" ? theme.colors.surface : theme.colors.primary} 
+                        />
+                        <Text style={[
+                            styles.paymentOptionText,
+                            metodoPago === "tarjeta" && styles.paymentOptionTextSelected
+                        ]}>
+                            Pagar con tarjeta
+                        </Text>
+                    </View>
+                    {metodoPago === "tarjeta" && (
+                        <MaterialIcons name="check-circle" size={24} color={theme.colors.surface} />
+                    )}
+                </TouchableOpacity>
+
+                {/* Campos de tarjeta (solo se muestran si se selecciona tarjeta) */}
+                {metodoPago === "tarjeta" && (
+                    <View style={styles.cardFieldsContainer}>
+                        <View style={styles.cardFieldsHeader}>
+                            <MaterialIcons name="credit-card" size={20} color={theme.colors.primary} />
+                            <Text style={styles.cardFieldsTitle}>Información de la tarjeta</Text>
+                        </View>
+                        
+                        <Text style={styles.fieldLabel}>NOMBRE EN LA TARJETA</Text>
+                        <TextInput
+                            style={[
+                                styles.cardInput,
+                                errors.cardName && styles.inputError
+                            ]}
+                            placeholder="Nombre y Apellido"
+                            placeholderTextColor={theme.colors.textSecondary}
+                            value={cardName}
+                            onChangeText={(text) => {
+                                setCardName(text);
+                                if (errors.cardName) validateField('cardName', text);
+                            }}
+                            onBlur={() => validateField('cardName', cardName)}
+                            autoCapitalize="words"
+                        />
+                        {errors.cardName && (
+                            <Text style={styles.errorText}>El nombre es requerido</Text>
+                        )}
+
+                        <Text style={styles.fieldLabel}>NÚMERO DE TARJETA</Text>
+                        <TextInput
+                            style={[
+                                styles.cardInput,
+                                errors.cardNumber && styles.inputError
+                            ]}
+                            placeholder="0000 0000 0000 0000"
+                            placeholderTextColor={theme.colors.textSecondary}
+                            keyboardType="numeric"
+                            maxLength={19}
+                            value={cardNumber}
+                            onChangeText={(text) => {
+                                const formatted = formatCardNumber(text);
+                                setCardNumber(formatted);
+                                if (errors.cardNumber) validateField('cardNumber', formatted);
+                            }}
+                            onBlur={() => validateField('cardNumber', cardNumber)}
+                        />
+                        {errors.cardNumber && (
+                            <Text style={styles.errorText}>Ingresa un número de tarjeta válido</Text>
+                        )}
+
+                        <View style={styles.cardRow}>
+                            <View style={styles.halfInput}>
+                                <Text style={styles.fieldLabel}>VENCIMIENTO</Text>
+                                <TextInput
+                                    style={[
+                                        styles.cardInput,
+                                        errors.expiry && styles.inputError
+                                    ]}
+                                    placeholder="MM/AA"
+                                    placeholderTextColor={theme.colors.textSecondary}
+                                    keyboardType="numeric"
+                                    maxLength={5}
+                                    value={expiry}
+                                    onChangeText={(text) => {
+                                        const formatted = formatExpiry(text);
+                                        setExpiry(formatted);
+                                        if (errors.expiry) validateField('expiry', formatted);
+                                    }}
+                                    onBlur={() => validateField('expiry', expiry)}
+                                />
+                                {errors.expiry && (
+                                    <Text style={styles.errorText}>Fecha requerida</Text>
+                                )}
+                            </View>
+                            <View style={styles.halfInput}>
+                                <Text style={styles.fieldLabel}>CVV</Text>
+                                <TextInput
+                                    style={[
+                                        styles.cardInput,
+                                        errors.cvv && styles.inputError
+                                    ]}
+                                    placeholder="123"
+                                    placeholderTextColor={theme.colors.textSecondary}
+                                    keyboardType="numeric"
+                                    maxLength={4}
+                                    secureTextEntry
+                                    value={cvv}
+                                    onChangeText={(text) => {
+                                        setCvv(text);
+                                        if (errors.cvv) validateField('cvv', text);
+                                    }}
+                                    onBlur={() => validateField('cvv', cvv)}
+                                />
+                                {errors.cvv && (
+                                    <Text style={styles.errorText}>CVV requerido</Text>
+                                )}
+                            </View>
+                        </View>
+                    </View>
+                )}
 
                 <View style={styles.amountContainer}>
                     <Text style={styles.amountLabel}>MONTO A PAGAR</Text>
-                    <Text style={styles.amount}>${paymentInfo.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                    <Text style={styles.amount}>$10,213.89</Text>
             </View>
 
                 <TouchableOpacity 
@@ -349,10 +438,10 @@ export default function Facturacion() {
                     disabled={!isFormComplete()}
                 >
                     <Text style={globalStyles.buttonText}>
-                        PAGAR ${paymentInfo.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                        PAGAR $10,213.89
                     </Text>
-            </TouchableOpacity>
-        </View>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 }
@@ -363,6 +452,9 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: theme.spacing.lg,
         paddingTop: theme.spacing.lg,
+    },
+    scrollContent: {
+        paddingBottom: 100, // Espacio extra para evitar que choque con el navbar
     },
     titleContainer: {
         flexDirection: "row",
@@ -375,6 +467,13 @@ const styles = StyleSheet.create({
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.textPrimary,
         marginLeft: theme.spacing.sm,
+    },
+    sectionTitle: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.md,
+        textAlign: "center",
     },
     input: {
         ...globalStyles.input,
@@ -391,6 +490,7 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.md,
         alignItems: "center",
         marginTop: theme.spacing.lg,
+        marginBottom: theme.spacing.xl,
     },
     center: {
         justifyContent: "center",
@@ -473,10 +573,11 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surface,
         padding: theme.spacing.md,
         borderRadius: theme.borderRadius.md,
-        marginBottom: theme.spacing.lg,
+        marginBottom: theme.spacing.xs,
+        marginTop: theme.spacing.md,
     },
     amountLabel: {
-        fontSize: theme.typography.fontSize.medium,
+        fontSize: 17,
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.textPrimary,
     },
@@ -493,5 +594,90 @@ const styles = StyleSheet.create({
         color: theme.colors.error,
         fontSize: theme.typography.fontSize.small,
         marginTop: theme.spacing.sm,
+        marginBottom: theme.spacing.sm,
+    },
+    paymentOption: {
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        marginBottom: theme.spacing.sm,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: theme.colors.textSecondary,
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    paymentOptionSelected: {
+        backgroundColor: theme.colors.primary,
+        borderColor: theme.colors.primary,
+        elevation: 4,
+        shadowOpacity: 0.2,
+    },
+    paymentOptionContent: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+    },
+    paymentOptionText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        marginLeft: theme.spacing.sm,
+    },
+    paymentOptionTextSelected: {
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.surface,
+    },
+    cardFieldsContainer: {
+        marginTop: theme.spacing.lg,
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.lg,
+        marginBottom: theme.spacing.md,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+        elevation: 1,
+    },
+    cardFieldsHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: theme.spacing.md,
+    },
+    cardFieldsTitle: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginLeft: theme.spacing.sm,
+    },
+    fieldLabel: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.sm,
+        marginTop: theme.spacing.md,
+    },
+    cardInput: {
+        backgroundColor: theme.colors.background,
+        borderRadius: theme.borderRadius.md,
+        paddingHorizontal: theme.spacing.md,
+        paddingVertical: theme.spacing.sm,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        borderWidth: 1,
+        borderColor: theme.colors.textSecondary,
+        marginBottom: theme.spacing.sm,
+    },
+    cardRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: theme.spacing.md,
     },
 });
