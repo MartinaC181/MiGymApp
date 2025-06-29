@@ -77,7 +77,7 @@ export default function Cuota() {
                 pendiente: paymentInfo.pendiente,
                 monto: paymentInfo.monto,
                 nombre: user.name,
-                dni: (user as any).dni || "No especificado",
+                dni: user.dni || "No especificado",
                 numeroFactura: paymentInfo.numeroFactura,
                 fechaEmision: paymentInfo.fechaEmision,
                 fechaVencimiento: paymentInfo.fechaVencimiento,
@@ -124,14 +124,14 @@ export default function Cuota() {
 
     // Datos mock para la factura
     const factura = {
-        numeroFactura: "0001-00000001",
-        fechaEmision: formatDate("2024-01-15"),
-        fechaVencimiento: formatDate("2024-02-15"),
-        cliente: cuota.nombre,
-        dni: cuota.dni,
+        numeroFactura: cuotaData?.numeroFactura || "N/A",
+        fechaEmision: formatDate(cuotaData?.fechaEmision || ""),
+        fechaVencimiento: formatDate(cuotaData?.fechaVencimiento || ""),
+        cliente: cuotaData?.nombre || "Usuario no especificado",
+        dni: cuotaData?.dni || "N/A",
         servicio: "Membresía Gimnasio",
-        total: cuota.monto,
-        periodo: "Enero 2024"
+        total: cuotaData?.monto || 0,
+        periodo: cuotaData?.periodo || "N/A"
     };
 
     if (isLoading) {

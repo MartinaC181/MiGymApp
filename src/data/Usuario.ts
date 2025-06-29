@@ -14,6 +14,7 @@ export interface ClientUser {
   gymId?: string; // ID del gimnasio al que pertenece
   birthDate?: string;
   membershipType?: string;
+  dni?: string; // Documento Nacional de Identidad
 }
 
 // Interface para gimnasios
@@ -48,7 +49,8 @@ export const UsuarioAtleta: ClientUser = {
   weeklyStreak: 1,
   gymId: "gym_1",
   birthDate: "1990-05-15",
-  membershipType: "premium"
+  membershipType: "premium",
+  dni: "20.123.456"
 };
 
 // Usuario gimnasio de ejemplo

@@ -1,4 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  StyleSheet,
+  ScrollView,
+  Modal,
+} from "react-native";
 import { createGlobalStyles } from "../../styles/global";
 import { useTheme } from "../../context/ThemeContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -7,7 +17,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserRole, ClientUser, GymUser } from "../../data/Usuario";
 import BirthDateWheel from "../../components/BirthDateWheel";
-import { saveUser, saveSession, getGymNames, getGymUserByBusinessName, addGymClient } from "../../utils/storage";
+import {
+  saveUser,
+  saveSession,
+  getGymNames,
+  getGymUserByBusinessName,
+  addGymClient,
+} from "../../utils/storage";
 
 function isValidEmail(email: string) {
   // Simple email regex
@@ -19,13 +35,17 @@ function isValidPassword(password: string) {
   return password.length >= 6;
 }
 
+function isValidDni(dni: string) {
+  return /^\d{7,8}$/.test(dni);
+}
+
 export default function Register() {
   const { theme } = useTheme();
   const globalStyles = createGlobalStyles(theme);
-  
+
   const router = useRouter();
-  const { userType } = useLocalSearchParams<{ userType?: 'gym' | 'client' }>();
-  
+  const { userType } = useLocalSearchParams<{ userType?: "gym" | "client" }>();
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -40,13 +60,16 @@ export default function Register() {
   const [isEditingGym, setIsEditingGym] = useState(false);
   const [visibleSuccess, setVisibleSuccess] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Campos específicos para gimnasio
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
-  
+
   // Lista de gimnasios disponibles (cargada desde AsyncStorage)
   const [gymOptions, setGymOptions] = useState<string[]>([]);
+
+  // Campo para el DNI (solo cliente)
+  const [dni, setDni] = useState("");
 
   useEffect(() => {
     if (!userType) {
@@ -65,10 +88,10 @@ export default function Register() {
         // Fallback a gimnasios por defecto en caso de error
         setGymOptions([
           "Gimnasio Central",
-          "FitLife Sports Club", 
+          "FitLife Sports Club",
           "PowerGym Elite",
           "Wellness Center",
-          "SportClub Premium"
+          "SportClub Premium",
         ]);
       }
     };
@@ -89,7 +112,7 @@ export default function Register() {
       setError("Por favor ingresa tu nombre completo");
       return;
     }
-    
+
     if (!isValidEmail(email)) {
       setError("Por favor ingresa un correo válido");
       return;
@@ -100,8 +123,7 @@ export default function Register() {
       return;
     }
 
-   
-    if (userType === 'gym') {
+    if (userType === "gym") {
       if (!businessName.trim()) {
         setError("Por favor ingresa el nombre del gimnasio");
         return;
@@ -119,6 +141,14 @@ export default function Register() {
         setError("Por favor selecciona un gimnasio");
         return;
       }
+      if (!dni.trim()) {
+        setError("Por favor ingresa tu DNI");
+        return;
+      }
+      if (!isValidDni(dni)) {
+        setError("El DNI debe tener entre 7 y 8 dígitos, sin puntos.");
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -127,23 +157,23 @@ export default function Register() {
     try {
       // Crear objeto de usuario según el tipo
       const newUserId = `${userType}_${Date.now()}`;
-      
-      if (userType === 'gym') {
+
+      if (userType === "gym") {
         const newGymUser: GymUser = {
           id: newUserId,
           email,
           password,
-          role: 'gym',
+          role: "gym",
           name,
           businessName,
           address,
           clients: [],
-          classes: []
+          classes: [],
         };
-        
+
         await saveUser(newGymUser);
         await saveSession(newGymUser);
-        
+
         // Recargar lista de gimnasios para futuros registros de clientes
         await reloadGyms();
       } else {
@@ -151,15 +181,15 @@ export default function Register() {
           id: newUserId,
           email,
           password,
-          role: 'client',
+          role: "client",
           name,
           weeklyGoal: 3,
           attendance: [],
           weeklyStreak: 0,
           gymId: selectedOption || undefined,
-          birthDate: selectedDate?.toISOString() || undefined
+          birthDate: selectedDate?.toISOString() || undefined,
         };
-        
+
         await saveUser(newClientUser);
         if (selectedOption) {
           // Asociar cliente al gimnasio
@@ -178,10 +208,10 @@ export default function Register() {
         }
         await saveSession(newClientUser);
       }
-      
+
       setIsLoading(false);
       setVisibleSuccess(true);
-      
+
       // Cerrar modal y navegar al login después de 3 segundos
       timeoutRef.current = setTimeout(() => {
         handleGoToLogin();
@@ -194,11 +224,11 @@ export default function Register() {
 
   const getButtonDisabledState = () => {
     const commonFields = !name.trim() || !email || !password || isLoading;
-    
-    if (userType === 'gym') {
+
+    if (userType === "gym") {
       return commonFields || !businessName.trim() || !address.trim();
     } else {
-      return commonFields || !selectedDate || !selectedOption;
+      return commonFields || !selectedDate || !selectedOption || !dni.trim();
     }
   };
 
@@ -216,7 +246,7 @@ export default function Register() {
     if (!gymQuery.trim()) {
       return gymOptions; // Mostrar todas las opciones cuando no hay búsqueda
     }
-    return gymOptions.filter(gym =>
+    return gymOptions.filter((gym) =>
       gym.toLowerCase().includes(gymQuery.toLowerCase())
     );
   }, [gymQuery, gymOptions]);
@@ -224,14 +254,14 @@ export default function Register() {
   const handleGymTextChange = (text: string) => {
     // Entrar en modo edición
     setIsEditingGym(true);
-    
+
     // Si había un gimnasio seleccionado y el usuario empieza a escribir, limpiar la selección
     if (selectedOption && text !== selectedOption) {
       setSelectedOption(null);
     }
-    
+
     setGymQuery(text);
-    
+
     // Mostrar sugerencias cuando hay texto
     if (text.length > 0) {
       setShowGymSuggestions(true);
@@ -253,7 +283,7 @@ export default function Register() {
       setGymQuery(selectedOption);
       setIsEditingGym(true);
     }
-    
+
     // Siempre mostrar sugerencias al hacer focus si no hay texto de búsqueda
     if (gymQuery.length === 0 || selectedOption) {
       setShowGymSuggestions(true);
@@ -314,7 +344,7 @@ export default function Register() {
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
-      <ScrollView 
+      <ScrollView
         style={[styles.scrollView, { backgroundColor: theme.colors.surface }]}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -326,21 +356,21 @@ export default function Register() {
           />
         </View>
         <Text style={globalStyles.title}>
-          {userType === 'gym' ? 'Registrar Gimnasio' : 'Crea una nueva cuenta'}
+          {userType === "gym" ? "Registrar Gimnasio" : "Crea una nueva cuenta"}
         </Text>
 
         <Text style={globalStyles.label}>
-          {userType === 'gym' ? 'NOMBRE DEL RESPONSABLE' : 'NOMBRE Y APELLIDO'}
+          {userType === "gym" ? "NOMBRE DEL RESPONSABLE" : "NOMBRE Y APELLIDO"}
         </Text>
         <TextInput
           style={globalStyles.input}
-          placeholder={userType === 'gym' ? "Juan Pérez" : "Mirtho Legrand"}
+          placeholder={userType === "gym" ? "Juan Pérez" : "Mirtho Legrand"}
           placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
         />
-        
-        {userType === 'gym' && (
+
+        {userType === "gym" && (
           <>
             <Text style={globalStyles.label}>NOMBRE DEL GIMNASIO</Text>
             <TextInput
@@ -351,6 +381,23 @@ export default function Register() {
               onChangeText={setBusinessName}
             />
           </>
+        )}
+
+        <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>
+          DNI <Text style={{ color: '#999' }}>(sin puntos)</Text>
+        </Text>
+        <TextInput
+          style={globalStyles.input}
+          placeholder="12345678"
+          placeholderTextColor="#999"
+          keyboardType="number-pad"
+          value={dni}
+          onChangeText={setDni}
+        />
+        {dni && (
+          <Text style={{ color: '#999', fontSize: 12, marginTop: 4 }}>
+            Requerido para facturación. No compartiremos tus datos con nadie.
+          </Text>
         )}
 
         <Text style={globalStyles.label}>CORREO ELECTRÓNICO</Text>
@@ -373,7 +420,7 @@ export default function Register() {
           onChangeText={setPassword}
         />
 
-        {userType === 'gym' ? (
+        {userType === "gym" ? (
           <>
             <Text style={globalStyles.label}>DIRECCIÓN</Text>
             <TextInput
@@ -387,11 +434,17 @@ export default function Register() {
         ) : (
           <>
             <Text style={globalStyles.label}>FECHA DE NACIMIENTO</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={globalStyles.pickerContainer}
               onPress={() => setShowDatePicker(true)}
             >
-              <Text style={selectedDate ? globalStyles.pickerText : globalStyles.pickerTextPlaceholder}>
+              <Text
+                style={
+                  selectedDate
+                    ? globalStyles.pickerText
+                    : globalStyles.pickerTextPlaceholder
+                }
+              >
                 {selectedDate
                   ? selectedDate.toLocaleDateString("es-ES")
                   : "Seleccionar"}
@@ -405,46 +458,61 @@ export default function Register() {
 
             <Text style={globalStyles.label}>GIMNASIO</Text>
             <View style={globalStyles.autocompleteContainer}>
-              <View style={[
-                showGymSuggestions && filteredGyms.length > 0
-                  ? globalStyles.autocompleteInputContainerFocused 
-                  : globalStyles.autocompleteInputContainer
-              ]}>
+              <View
+                style={[
+                  showGymSuggestions && filteredGyms.length > 0
+                    ? globalStyles.autocompleteInputContainerFocused
+                    : globalStyles.autocompleteInputContainer,
+                ]}
+              >
                 <View style={globalStyles.autocompleteInputWrapper}>
-                  <MaterialIcons 
-                    name="fitness-center" 
-                    size={20} 
-                    color={selectedOption && !isEditingGym ? theme.colors.primary : "#999"} 
+                  <MaterialIcons
+                    name="fitness-center"
+                    size={20}
+                    color={
+                      selectedOption && !isEditingGym
+                        ? theme.colors.primary
+                        : "#999"
+                    }
                   />
                   <TextInput
                     style={[
                       globalStyles.autocompleteInput,
-                      selectedOption && !isEditingGym && { color: theme.colors.textPrimary }
+                      selectedOption &&
+                        !isEditingGym && { color: theme.colors.textPrimary },
                     ]}
                     placeholder="Seleccionar gimnasio"
                     placeholderTextColor="#999"
-                    value={isEditingGym ? gymQuery : (selectedOption || gymQuery)}
+                    value={isEditingGym ? gymQuery : selectedOption || gymQuery}
                     onChangeText={handleGymTextChange}
                     onFocus={handleGymFocus}
                     onBlur={handleGymBlur}
                   />
-                  {(gymQuery.length > 0 || isEditingGym) ? (
-                    <TouchableOpacity onPress={clearGymSearch} style={globalStyles.autocompleteIcon}>
+                  {gymQuery.length > 0 || isEditingGym ? (
+                    <TouchableOpacity
+                      onPress={clearGymSearch}
+                      style={globalStyles.autocompleteIcon}
+                    >
                       <MaterialIcons name="clear" size={20} color="#999" />
                     </TouchableOpacity>
                   ) : (
-                    <TouchableOpacity onPress={handleDropdownPress} style={globalStyles.autocompleteIcon}>
-                      <MaterialCommunityIcons 
-                        name={showGymSuggestions ? "chevron-up" : "chevron-down"} 
-                        size={20} 
-                        color="#999" 
+                    <TouchableOpacity
+                      onPress={handleDropdownPress}
+                      style={globalStyles.autocompleteIcon}
+                    >
+                      <MaterialCommunityIcons
+                        name={
+                          showGymSuggestions ? "chevron-up" : "chevron-down"
+                        }
+                        size={20}
+                        color="#999"
                       />
                     </TouchableOpacity>
                   )}
                 </View>
                 {showGymSuggestions && filteredGyms.length > 0 && (
                   <View style={globalStyles.suggestionsContainer}>
-                    <ScrollView 
+                    <ScrollView
                       nestedScrollEnabled={true}
                       showsVerticalScrollIndicator={false}
                       style={{ maxHeight: 200 }}
@@ -453,31 +521,41 @@ export default function Register() {
                         <TouchableOpacity
                           key={gym}
                           style={[
-                            index === filteredGyms.length - 1 ? globalStyles.suggestionItemLast : globalStyles.suggestionItem,
-                            selectedOption === gym && { backgroundColor: theme.colors.surface }
+                            index === filteredGyms.length - 1
+                              ? globalStyles.suggestionItemLast
+                              : globalStyles.suggestionItem,
+                            selectedOption === gym && {
+                              backgroundColor: theme.colors.surface,
+                            },
                           ]}
                           onPress={() => handleGymSelect(gym)}
                         >
-                          <MaterialIcons 
-                            name="fitness-center" 
-                            size={18} 
-                            color={selectedOption === gym ? theme.colors.primary : theme.colors.textSecondary} 
-                          />
-                          <Text style={[
-                            globalStyles.suggestionText,
-                            selectedOption === gym && { 
-                              color: theme.colors.primary, 
-                              fontFamily: theme.typography.fontFamily.bold 
+                          <MaterialIcons
+                            name="fitness-center"
+                            size={18}
+                            color={
+                              selectedOption === gym
+                                ? theme.colors.primary
+                                : theme.colors.textSecondary
                             }
-                          ]}>
+                          />
+                          <Text
+                            style={[
+                              globalStyles.suggestionText,
+                              selectedOption === gym && {
+                                color: theme.colors.primary,
+                                fontFamily: theme.typography.fontFamily.bold,
+                              },
+                            ]}
+                          >
                             {gym}
                           </Text>
                           {selectedOption === gym && (
-                            <MaterialIcons 
-                              name="check" 
-                              size={18} 
-                              color={theme.colors.primary} 
-                              style={{ marginLeft: 'auto' }}
+                            <MaterialIcons
+                              name="check"
+                              size={18}
+                              color={theme.colors.primary}
+                              style={{ marginLeft: "auto" }}
                             />
                           )}
                         </TouchableOpacity>
@@ -489,26 +567,36 @@ export default function Register() {
             </View>
           </>
         )}
-        
-        {error ? (
-          <Text style={globalStyles.errorText}>{error}</Text>
-        ) : null}
-        
-        <TouchableOpacity 
-          style={isButtonDisabled ? globalStyles.LoginButtonDisabled : globalStyles.LoginButton} 
+
+        {error ? <Text style={globalStyles.errorText}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={
+            isButtonDisabled
+              ? globalStyles.LoginButtonDisabled
+              : globalStyles.LoginButton
+          }
           onPress={handleSend}
           disabled={isButtonDisabled}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={[
-              globalStyles.buttonText,
-              !isButtonDisabled && theme.colors.background === '#0A0A0A' && { color: '#FFFFFF' },
-              !isButtonDisabled && theme.colors.background === '#ffffff' && { color: '#333333' },
-              isButtonDisabled && theme.colors.background === '#0A0A0A' && { color: '#666666' },
-              isButtonDisabled && theme.colors.background === '#ffffff' && { color: '#999999' }
-            ]}>Registrarse</Text>
+            <Text
+              style={[
+                globalStyles.buttonText,
+                !isButtonDisabled &&
+                  theme.colors.background === "#0A0A0A" && { color: "#FFFFFF" },
+                !isButtonDisabled &&
+                  theme.colors.background === "#ffffff" && { color: "#333333" },
+                isButtonDisabled &&
+                  theme.colors.background === "#0A0A0A" && { color: "#666666" },
+                isButtonDisabled &&
+                  theme.colors.background === "#ffffff" && { color: "#999999" },
+              ]}
+            >
+              Registrarse
+            </Text>
           )}
         </TouchableOpacity>
 
@@ -522,7 +610,9 @@ export default function Register() {
           </Text>
         </Text>
 
-        <Text style={[globalStyles.registerText, { marginTop: theme.spacing.xs }]}>
+        <Text
+          style={[globalStyles.registerText, { marginTop: theme.spacing.xs }]}
+        >
           ¿Querés cambiar el tipo de usuario?{" "}
           <Text
             style={globalStyles.textLink}
@@ -532,7 +622,7 @@ export default function Register() {
           </Text>
         </Text>
       </ScrollView>
-      
+
       <BirthDateWheel
         isVisible={showDatePicker}
         onClose={() => setShowDatePicker(false)}
@@ -547,23 +637,27 @@ export default function Register() {
         onRequestClose={() => setVisibleSuccess(false)}
       >
         <View style={globalStyles.modalOverlay}>
-          <View style={{
-            backgroundColor: theme.colors.background,
-            borderRadius: theme.borderRadius.lg,
-            padding: theme.spacing.xl,
-            alignItems: "center",
-            width: "90%",
-            maxWidth: 400,
-            minHeight: 300,
-            justifyContent: 'center',
-          }}>
-            <Text style={{
-              fontSize: theme.typography.fontSize.title,
-              fontFamily: theme.typography.fontFamily.bold,
-              color: theme.colors.textPrimary,
-              textAlign: "center",
-              marginBottom: theme.spacing.lg,
-            }}>
+          <View
+            style={{
+              backgroundColor: theme.colors.background,
+              borderRadius: theme.borderRadius.lg,
+              padding: theme.spacing.xl,
+              alignItems: "center",
+              width: "90%",
+              maxWidth: 400,
+              minHeight: 300,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: theme.typography.fontSize.title,
+                fontFamily: theme.typography.fontFamily.bold,
+                color: theme.colors.textPrimary,
+                textAlign: "center",
+                marginBottom: theme.spacing.lg,
+              }}
+            >
               ¡Tu cuenta se creó con éxito!
             </Text>
 
@@ -574,29 +668,33 @@ export default function Register() {
               style={{ marginBottom: theme.spacing.xl }}
             />
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleGoToLogin}
               style={{
                 paddingVertical: theme.spacing.lg,
                 paddingHorizontal: theme.spacing.xl,
-                alignItems: 'center',
-                width: '100%',
+                alignItems: "center",
+                width: "100%",
               }}
             >
-              <Text style={{
-                fontSize: theme.typography.fontSize.medium,
-                fontFamily: theme.typography.fontFamily.regular,
-                color: theme.colors.textSecondary,
-                textAlign: "center",
-                lineHeight: 24,
-              }}>
-                Ahora podés{"\n"}
-                <Text style={{
-                  color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamily.bold,
-                  textDecorationLine: "underline",
+              <Text
+                style={{
                   fontSize: theme.typography.fontSize.medium,
-                }}>
+                  fontFamily: theme.typography.fontFamily.regular,
+                  color: theme.colors.textSecondary,
+                  textAlign: "center",
+                  lineHeight: 24,
+                }}
+              >
+                Ahora podés{"\n"}
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    fontFamily: theme.typography.fontFamily.bold,
+                    textDecorationLine: "underline",
+                    fontSize: theme.typography.fontSize.medium,
+                  }}
+                >
                   iniciar sesión
                 </Text>
               </Text>
@@ -615,7 +713,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 24,
     alignItems: "center",
-    paddingTop: 48, 
+    paddingTop: 48,
     paddingBottom: 32,
   },
 });
