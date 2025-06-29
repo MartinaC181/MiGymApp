@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Pressable, Text, Keyboard, Animated } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -37,7 +37,16 @@ export default function Navigation() {
     route: string;
   }) => {
     const isActive = pathname === route;
-    const scaleAnim = new Animated.Value(isActive ? 1.08 : 1);
+    const scaleAnim = useRef(new Animated.Value(isActive ? 1.08 : 1)).current;
+    
+    useEffect(() => {
+      Animated.spring(scaleAnim, {
+        toValue: isActive ? 1.08 : 1,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }).start();
+    }, [isActive, scaleAnim]);
     
     const handlePressIn = () => {
       Animated.spring(scaleAnim, {
@@ -63,7 +72,6 @@ export default function Navigation() {
     
     return (
       <View style={styles.navItemWrapper}>
-<<<<<<< HEAD
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           <Pressable
             style={[
@@ -77,7 +85,7 @@ export default function Navigation() {
             <MaterialCommunityIcons
               name={iconName}
               size={isActive ? 38 : 36}
-              color={theme.colors.primary}
+              color={isDarkMode ? '#000000' : theme.colors.primary}
             />
             {isActive && <View style={styles.activeIndicator} />}
           </Pressable>
@@ -86,23 +94,6 @@ export default function Navigation() {
           styles.iconText,
           isActive && styles.iconTextActive
         ]}>
-=======
-        <Pressable
-          style={({ pressed }) => [
-            styles.iconContainer,
-            isActive && styles.iconContainerActive,
-            pressed ? styles.iconContainerPressed : {},
-          ]}
-          onPress={() => router.push(route)}
-        >
-          <MaterialCommunityIcons
-            name={iconName}
-            size={36}
-            color={isDarkMode ? '#000000' : theme.colors.primary}
-          />
-        </Pressable>
-        <Text style={styles.iconText}>
->>>>>>> d42276fec0e478aa814894107b34b340480ad486
           {label}
         </Text>
       </View>

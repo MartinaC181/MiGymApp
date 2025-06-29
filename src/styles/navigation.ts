@@ -73,6 +73,12 @@ export default function useNavigationStyles() {
       color: isDarkMode ? '#000000' : 'white',
       marginTop: 4,
     },
+    iconTextActive: {
+      fontSize: theme.typography.fontSize.medium,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: isDarkMode ? '#000000' : 'white',
+      marginTop: 4,
+    },
     navItemWrapper: {
       alignItems: 'center',
       justifyContent: 'center',
@@ -88,55 +94,7 @@ export default function useNavigationStyles() {
       borderWidth: 1,
       borderColor: isDarkMode ? '#ffffff' : theme.colors.primary,
     },
-<<<<<<< HEAD
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  iconContainerPressed: {
-     backgroundColor: theme.colors.surface,
-  },
-  iconPressable: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: theme.borderRadius.pill,
-  },
-  iconText: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: 'white',
-    marginTop: 4,
-  },
-  iconTextActive: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
-    marginTop: 4,
-  },
-  navItemWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 10,
-  },
-  activeIndicator: {
-    position: 'absolute',
-    top: -5,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'white',
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.6,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-});
-=======
   });
 }
->>>>>>> d42276fec0e478aa814894107b34b340480ad486
 
 
