@@ -4,6 +4,7 @@ import Flame from "./Flame";
 import styles from "../styles/rachaModal";
 import theme from "../constants/theme";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "../context/ThemeContext";
 
 interface Props {
   visible: boolean;
@@ -16,9 +17,9 @@ interface Props {
   currentWeekCount: number;
 }
 
-const flameColor = (streak: number) => {
-  if (streak === 0) return "#d8d8d8";
-  if (streak < 3) return theme.colors.primary;
+const flameColor = (streak: number, currentTheme: typeof theme) => {
+  if (streak === 0) return currentTheme.colors.border;
+  if (streak < 3) return currentTheme.colors.primary;
   return "#FF5722";
 };
 
@@ -47,6 +48,9 @@ export default function RachaModal({
   const flameScale = useRef(new Animated.Value(1)).current;
   const successAnimation = useRef(new Animated.Value(0)).current;
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  // Obtener el tema actual
+  const { theme: currentTheme, isDarkMode } = useTheme();
 
   useEffect(() => {
     if (visible) {
@@ -103,7 +107,7 @@ export default function RachaModal({
           <MaterialIcons
             name={isActive ? "check-circle" : "radio-button-unchecked"}
             size={22}
-            color={isActive ? theme.colors.primary : "#d8d8d8"}
+            color={isActive ? currentTheme.colors.primary : (isDarkMode ? '#666666' : currentTheme.colors.border)}
           />
         </View>
       );
@@ -113,37 +117,84 @@ export default function RachaModal({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.modal} onPress={(e) => e.stopPropagation()}>
+        <Pressable style={[styles.modal, { 
+          backgroundColor: isDarkMode ? '#3A3A3A' : currentTheme.colors.background,
+          borderWidth: isDarkMode ? 2 : 0,
+          borderColor: isDarkMode ? '#4A4A4A' : 'transparent',
+          shadowColor: isDarkMode ? "#000" : "#000",
+          shadowOffset: { width: 0, height: isDarkMode ? 6 : 3 },
+          shadowOpacity: isDarkMode ? 0.5 : 0.2,
+          shadowRadius: isDarkMode ? 12 : 8,
+          elevation: isDarkMode ? 16 : 8
+        }]} onPress={(e) => e.stopPropagation()}>
           {/* Botón de cerrar (cruz) */}
           <Pressable style={styles.closeButton} onPress={onClose}>
-            <MaterialIcons name="close" size={24} color={theme.colors.textSecondary} />
+            <MaterialIcons name="close" size={24} color={isDarkMode ? '#E0E0E0' : currentTheme.colors.textSecondary} />
           </Pressable>
 
           <Animated.View style={{ transform: [{ scale: flameScale }] }}>
             <Flame size={90} muted={streak === 0 && currentWeekCount === 0} />
           </Animated.View>
-          <Text style={styles.streakNumber}>{streak}</Text>
-          <Text style={styles.streakLabel}>
+          <Text style={[styles.streakNumber, { 
+            color: isDarkMode ? '#FFFFFF' : currentTheme.colors.textPrimary,
+            textShadowColor: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'transparent',
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 2
+          }]}>{streak}</Text>
+          <Text style={[styles.streakLabel, { 
+            color: isDarkMode ? '#E0E0E0' : currentTheme.colors.textSecondary,
+            fontWeight: isDarkMode ? '500' : 'normal'
+          }]}>
             {streak === 1 ? "semana de racha!" : "semanas de racha!"}
           </Text>
-          <Text style={styles.streakMessage}>{getRachaMessage(streak, currentWeekCount, weeklyGoal)}</Text>
+          <Text style={[styles.streakMessage, { 
+            color: isDarkMode ? '#CCCCCC' : currentTheme.colors.textSecondary,
+            fontWeight: isDarkMode ? '500' : 'normal'
+          }]}>{getRachaMessage(streak, currentWeekCount, weeklyGoal)}</Text>
           
-          <Text style={styles.weeklyGoalText}>Asistencia {currentWeekCount} días por semana</Text>
+          <Text style={[styles.weeklyGoalText, { 
+            color: isDarkMode ? '#CCCCCC' : currentTheme.colors.textSecondary,
+            fontWeight: isDarkMode ? '500' : 'normal'
+          }]}>Asistencia {currentWeekCount} días por semana</Text>
           <View style={styles.progressWrapper}>{renderProgressDots()}</View>
           
-          <Pressable style={styles.ctaButton} onPress={handleMarkAttendanceWithAnimation}>
-            <Text style={styles.ctaText}>Marcar asistencia</Text>
+          <Pressable style={[styles.ctaButton, { 
+            backgroundColor: isDarkMode ? 'rgba(0, 191, 255, 0.95)' : currentTheme.colors.primary,
+            shadowColor: isDarkMode ? "#000" : "#000",
+            shadowOffset: { width: 0, height: isDarkMode ? 3 : 2 },
+            shadowOpacity: isDarkMode ? 0.4 : 0.25,
+            shadowRadius: isDarkMode ? 6 : 4,
+            elevation: isDarkMode ? 8 : 4
+          }]} onPress={handleMarkAttendanceWithAnimation}>
+            <Text style={[styles.ctaText, { 
+              color: isDarkMode ? '#FFFFFF' : currentTheme.colors.background,
+              fontWeight: isDarkMode ? '600' : 'normal'
+            }]}>Marcar asistencia</Text>
           </Pressable>
           
           {__DEV__ && onResetAttendance && (
-            <Pressable onPress={onResetAttendance} style={styles.resetButton}>
-              <Text style={styles.resetText}>Reset asistencia (DEV)</Text>
+            <Pressable onPress={onResetAttendance} style={[styles.resetButton, { 
+              backgroundColor: isDarkMode ? '#4A4A4A' : currentTheme.colors.surface,
+              borderWidth: isDarkMode ? 1 : 0,
+              borderColor: isDarkMode ? '#5A5A5A' : 'transparent'
+            }]}>
+              <Text style={[styles.resetText, { 
+                color: isDarkMode ? '#E0E0E0' : currentTheme.colors.textSecondary,
+                fontWeight: isDarkMode ? '500' : 'normal'
+              }]}>Reset asistencia (DEV)</Text>
             </Pressable>
           )}
 
           {__DEV__ && onIncrementStreak && (
-            <Pressable onPress={onIncrementStreak} style={styles.resetButton}>
-              <Text style={styles.resetText}>Incrementar racha (DEV)</Text>
+            <Pressable onPress={onIncrementStreak} style={[styles.resetButton, { 
+              backgroundColor: isDarkMode ? '#4A4A4A' : currentTheme.colors.surface,
+              borderWidth: isDarkMode ? 1 : 0,
+              borderColor: isDarkMode ? '#5A5A5A' : 'transparent'
+            }]}>
+              <Text style={[styles.resetText, { 
+                color: isDarkMode ? '#E0E0E0' : currentTheme.colors.textSecondary,
+                fontWeight: isDarkMode ? '500' : 'normal'
+              }]}>Incrementar racha (DEV)</Text>
             </Pressable>
           )}
 
@@ -158,8 +209,11 @@ export default function RachaModal({
                 }
               ]}
             >
-              <MaterialIcons name="check-circle" size={80} color={theme.colors.primary} />
-              <Text style={styles.successText}>¡Asistencia marcada!</Text>
+              <MaterialIcons name="check-circle" size={80} color={currentTheme.colors.primary} />
+              <Text style={[styles.successText, { 
+                color: isDarkMode ? '#FFFFFF' : currentTheme.colors.textPrimary,
+                fontWeight: isDarkMode ? '600' : 'normal'
+              }]}>¡Asistencia marcada!</Text>
             </Animated.View>
           )}
         </Pressable>

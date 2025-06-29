@@ -202,7 +202,7 @@ export default function Cuota() {
                             <View style={styles.paymentButtonsContainer}>
                             <TouchableOpacity
                                 style={styles.payButton}
-                                onPress={() => router.push("/facturacion")}
+                                onPress={() => router.push("/MetodoDePago")}
                             >
                                 <Text style={globalStyles.buttonText}>Pagar</Text>
                             </TouchableOpacity>

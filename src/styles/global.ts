@@ -684,12 +684,12 @@ export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.creat
     backgroundColor: theme.colors.background,
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
-    maxHeight: 200,
+    maxHeight: 120,
   },
   suggestionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.surface,
@@ -697,7 +697,7 @@ export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.creat
   suggestionItemLast: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
     borderBottomWidth: 0,
   },

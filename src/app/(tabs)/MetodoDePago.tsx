@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.textPrimary,
         marginBottom: theme.spacing.md,
-        textAlign: "center",
+        textAlign: "left",
     },
     input: {
         ...globalStyles.input,

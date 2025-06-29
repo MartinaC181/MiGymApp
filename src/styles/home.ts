@@ -180,8 +180,9 @@ const styles = StyleSheet.create({
     },
     suggestionsContainer: {
         ...globalStyles.suggestionsContainer,
-        left: theme.spacing.lg,
-        right: theme.spacing.lg,
+        width: '87%',
+        height: 45,
+        alignSelf: 'center',
     },
     suggestionItem: {
         ...globalStyles.suggestionItem,
