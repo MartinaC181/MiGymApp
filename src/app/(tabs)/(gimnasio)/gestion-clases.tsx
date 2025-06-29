@@ -9,7 +9,7 @@ import {
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import theme from '../../../constants/theme';
 import globalStyles from '../../../styles/global';
-import styles from '../../../styles/gestion-clases';
+import styles from '../../../styles/gestion-gimnasio';
 import { Clase, diasSemana } from '../../../types/Clase';
 import ClassFormModal from '../../../components/ClassFormModal';
 import FloatingActionButton from '../../../components/FloatingActionButton';

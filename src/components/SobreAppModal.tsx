@@ -32,15 +32,15 @@ export default function SobreAppModal({
 
           {/* Título del modal */}
           <Text style={[styles.title, { color: theme.colors.textPrimary }]}>
-            {/* TEXTO: Título principal del modal */}
             Sobre MiGymApp
           </Text>
 
           {/* Contenedor del scroll para el contenido */}
           <ScrollView 
             style={styles.scrollContainer}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
             contentContainerStyle={styles.scrollContent}
+            nestedScrollEnabled={true}
           >
             {/* Sección de descripción general */}
             <Text style={[styles.sectionTitle, { color: theme.colors.textPrimary }]}>

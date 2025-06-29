@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import globalStyles from '../../styles/global';
 import { useTheme } from '../../context/ThemeContext';
 import { exerciseAPI, Exercise, ExerciseFilter, getAvailableMuscleGroups, getCommonEquipment } from '../../utils/ExerciseAPI';
+import { translateText } from '../../utils/translator';
 
 const { width } = Dimensions.get('window');
 
@@ -232,7 +233,13 @@ export default function BibliotecaEjercicios() {
     );
   };
 
-  const showExerciseDetails = (exercise: Exercise) => {
+  const showExerciseDetails = async (exercise: Exercise) => {
+    if (exercise.instructions?.length) {
+      const translated = await Promise.all(
+        exercise.instructions.map(i => translateText(i))
+      );
+      exercise = { ...exercise, instructions: translated };
+    }
     setSelectedExercise(exercise);
     setShowExerciseModal(true);
   };

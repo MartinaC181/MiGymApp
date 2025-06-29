@@ -46,7 +46,7 @@ export default function Entrenamiento() {
     },
     {
       id: 'reloj',
-      title: 'Cronómetro',
+      title: 'Temporizador',
       description: 'Controla el tiempo de tus series y descansos',
       icon: 'timer',
       colors: {

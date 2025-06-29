@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import { useTheme } from '../../context/ThemeContext';
@@ -65,76 +65,104 @@ const Profile = () => {
     }
 
     return (
-        <View style={[globalStyles.container, { backgroundColor: theme.colors.background }]}>
-            {/* Contenedor para avatar, nombre y email */}
-            <View style={[styles.profileSection, { 
-                backgroundColor: theme.colors.surface,
-                shadowColor: isDarkMode ? '#ffffff' : '#000000',
-                shadowOpacity: isDarkMode ? 0.1 : 0.1
-            }]}>
-                {/* Avatar con fondo y botón de edición*/}
-                <View style={[styles.avatarWrapper, { backgroundColor: theme.colors.surface }]}>
-                    <Image source={perfilMirtho} style={styles.avatar}/>
-                    <TouchableOpacity 
-                        style={[styles.editIcon, { backgroundColor: theme.colors.primary, borderColor: theme.colors.surface }]}
-                        onPress={() => router.push('EditProfile')}>
-                        <MaterialCommunityIcons name="pencil" size={16} color="white"/>
-                    </TouchableOpacity>
+        <ScrollView 
+            style={[styles.container, { backgroundColor: theme.colors.background }]} 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+        >
+            <View style={[globalStyles.container, { backgroundColor: theme.colors.background }]}>
+                {/* Contenedor para avatar, nombre y email */}
+                <View style={[styles.profileSection, { 
+                    backgroundColor: theme.colors.surface,
+                    shadowColor: isDarkMode ? '#ffffff' : '#000000',
+                    shadowOpacity: isDarkMode ? 0.1 : 0.1
+                }]}>
+                    {/* Avatar con fondo y botón de edición*/}
+                    <View style={[styles.avatarWrapper, { backgroundColor: theme.colors.surface }]}>
+                        <Image source={perfilMirtho} style={styles.avatar}/>
+                        <TouchableOpacity 
+                            style={[styles.editIcon, { backgroundColor: theme.colors.primary, borderColor: theme.colors.surface }]}
+                            onPress={() => router.push('EditProfile')}>
+                            <MaterialCommunityIcons name="pencil" size={16} color="white"/>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Nombre y correo */}
+                    <Text style={[styles.name, { color: theme.colors.textPrimary }]}>{name}</Text>
+                    <Text style={[styles.email, { color: theme.colors.textSecondary }]}>{email}</Text>
                 </View>
 
-                {/* Nombre y correo */}
-                <Text style={[styles.name, { color: theme.colors.textPrimary }]}>{name}</Text>
-                <Text style={[styles.email, { color: theme.colors.textSecondary }]}>{email}</Text>
-            </View>
+                {/* Cuadricula */}
+                <View style={styles.grid}>
+                    <InfoBox 
+                        icon="peso" 
+                        label="Peso" 
+                        value={`${weight || '---'} kg`} 
+                        gradientColors={isDarkMode ? ['#2d3748', '#4a5568'] : ['#667eea', '#764ba2']} 
+                    />
+                    <InfoBox 
+                        icon="altura" 
+                        label="Altura" 
+                        value={`${heightInMeters || '---'} m`} 
+                        gradientColors={isDarkMode ? ['#553c9a', '#805ad5'] : ['#f093fb', '#f5576c']} 
+                    />
+                    <InfoBox 
+                        icon="ideal" 
+                        label="Peso ideal" 
+                        value={`${idealWeight || '---'} kg`} 
+                        gradientColors={isDarkMode ? ['#2c5282', '#3182ce'] : ['#4facfe', '#00f2fe']} 
+                    />
+                    <InfoBox 
+                        icon="imc" 
+                        label="IMC" 
+                        value={`${imc || '---'}`} 
+                        gradientColors={isDarkMode ? ['#276749', '#38a169'] : ['#43e97b', '#38f9d7']} 
+                        onPress={() => router.push({
+                            pathname: '/Imc',
+                            params: { weight, height }
+                        })} 
+                    />
+                </View>
 
-            {/* Cuadricula */}
-            <View style={styles.grid}>
-                <InfoBox 
-                    icon="peso" 
-                    label="Peso" 
-                    value={`${weight || '---'} kg`} 
-                    gradientColors={isDarkMode ? ['#2d3748', '#4a5568'] : ['#667eea', '#764ba2']} 
-                />
-                <InfoBox 
-                    icon="altura" 
-                    label="Altura" 
-                    value={`${heightInMeters || '---'} m`} 
-                    gradientColors={isDarkMode ? ['#553c9a', '#805ad5'] : ['#f093fb', '#f5576c']} 
-                />
-                <InfoBox 
-                    icon="ideal" 
-                    label="Peso ideal" 
-                    value={`${idealWeight || '---'} kg`} 
-                    gradientColors={isDarkMode ? ['#2c5282', '#3182ce'] : ['#4facfe', '#00f2fe']} 
-                />
-                <InfoBox 
-                    icon="imc" 
-                    label="IMC" 
-                    value={`${imc || '---'}`} 
-                    gradientColors={isDarkMode ? ['#276749', '#38a169'] : ['#43e97b', '#38f9d7']} 
-                    onPress={() => router.push({
-                        pathname: '/Imc',
-                        params: { weight, height }
-                    })} 
-                />
-            </View>
+                {/* Botón de editar */}
+                <TouchableOpacity 
+                    style={[
+                        globalStyles.LoginButton, 
+                        { 
+                            width: 280, 
+                            alignSelf: 'center', 
+                            maxWidth: '100%',
+                            backgroundColor: theme.colors.primary 
+                        }
+                    ]}
+                    onPress={() => router.push('EditProfile')}
+                >
+                    <Text style={[globalStyles.buttonText, { color: '#000000' }]}>Editar</Text>
+                </TouchableOpacity>
 
-            {/* Botón de editar */}
-            <TouchableOpacity 
-                style={[
-                    globalStyles.LoginButton, 
-                    { 
-                        width: 280, 
-                        alignSelf: 'center', 
-                        maxWidth: '100%',
-                        backgroundColor: theme.colors.primary 
-                    }
-                ]}
-                onPress={() => router.push('EditProfile')}
-            >
-                <Text style={[globalStyles.buttonText, { color: '#000000' }]}>Editar</Text>
-            </TouchableOpacity>
-        </View>
+                {/* Botón para ver perfil del gimnasio */}
+                {userData?.gymId && (
+                    <TouchableOpacity 
+                        style={[styles.gymButton, { 
+                            width: 280, 
+                            alignSelf: 'center', 
+                            maxWidth: '100%',
+                            backgroundColor: theme.colors.surface,
+                            borderColor: theme.colors.primary
+                        }]}
+                        onPress={() => router.push('perfil-gimnasio')}
+                    >
+                        <MaterialCommunityIcons 
+                            name="dumbbell" 
+                            size={20} 
+                            color={theme.colors.primary} 
+                            style={{ marginRight: 8 }}
+                        />
+                        <Text style={[styles.gymButtonText, { color: theme.colors.primary }]}>Ver Perfil del Gimnasio</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </ScrollView>
     );
 };
 
@@ -174,18 +202,21 @@ const InfoBox = ({icon, value, label, gradientColors, onPress}: {
 );
 
 const styles = StyleSheet.create({
-    // Se eliminaron header y title redundantes
     container: {
         flex: 1,
-        justifyContent: 'flex-start',
+    },
+    scrollContent: {
+        flexGrow: 1,
         alignItems: 'center',
-        padding: 24, // Usar valor fijo en lugar de theme.spacing.lg
+        paddingTop: 24,
+        paddingBottom: 32,
+        padding: 24,
     },
     avatarWrapper: {
         position: 'relative',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 16, // Usar valor fijo en lugar de theme.spacing.md
+        marginBottom: 16,
         width: 110,
         height: 110,
         borderRadius: 55,
@@ -207,14 +238,14 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     name: {
-        fontSize: 20, // Usar valor fijo en lugar de theme.typography.fontSize.large
-        fontFamily: 'Roboto-Bold', // Usar valor fijo en lugar de theme.typography.fontFamily.bold
+        fontSize: 20,
+        fontFamily: 'Roboto-Bold',
         marginBottom: 4,
     },
     email: {
-        fontSize: 14, // Usar valor fijo en lugar de theme.typography.fontSize.medium
-        fontFamily: 'Roboto-Regular', // Usar valor fijo en lugar de theme.typography.fontFamily.regular
-        marginBottom: 24, // Usar valor fijo en lugar de theme.spacing.lg
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        marginBottom: 24,
     },
     grid: {
         flexDirection: 'row',
@@ -222,15 +253,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         maxWidth: 280,
-        rowGap: 16, // Usar valor fijo en lugar de theme.spacing.md
-        columnGap: 16, // Usar valor fijo en lugar de theme.spacing.md
-        marginBottom: 24, // Usar valor fijo en lugar de theme.spacing.lg
+        rowGap: 16,
+        columnGap: 16,
+        marginBottom: 24,
     },
     box: {
         width: 130,
         height: 120,
-        borderRadius: 8, // Usar valor fijo en lugar de theme.borderRadius.md
-        marginBottom: 10, // Usar valor fijo en lugar de theme.spacing.md
+        borderRadius: 8,
+        marginBottom: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.15,
@@ -245,7 +276,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.2)',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 4, // Usar valor fijo en lugar de theme.spacing.xs
+        marginBottom: 4,
     },
     iconImage: {
         width: 28,
@@ -254,25 +285,25 @@ const styles = StyleSheet.create({
         tintColor: 'white',
     },
     boxValue: {
-        fontSize: 20, // Usar valor fijo en lugar de theme.typography.fontSize.large
-        fontFamily: 'Roboto-Bold', // Usar valor fijo en lugar de theme.typography.fontFamily.bold
+        fontSize: 20,
+        fontFamily: 'Roboto-Bold',
         color: 'white',
-        marginTop: 4, // Usar valor fijo en lugar de theme.spacing.xs
+        marginTop: 4,
         textShadowColor: 'rgba(0,0,0,0.3)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
     },
     boxLabel: {
-        fontSize: 12, // Usar valor fijo en lugar de theme.typography.fontSize.small
-        fontFamily: 'Roboto-Medium', // Usar valor fijo en lugar de theme.typography.fontFamily.medium
+        fontSize: 12,
+        fontFamily: 'Roboto-Medium',
         color: 'rgba(255,255,255,0.9)',
-        marginTop: 4, // Usar valor fijo en lugar de theme.spacing.xs
+        marginTop: 4,
     },
     boxGradient: {
         flex: 1,
-        borderRadius: 8, // Usar valor fijo en lugar de theme.borderRadius.md
-        paddingVertical: 8, // Usar valor fijo en lugar de theme.spacing.sm
-        paddingHorizontal: 4, // Usar valor fijo en lugar de theme.spacing.xs
+        borderRadius: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 4,
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
@@ -281,6 +312,25 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 8,
         top: 8,
+    },
+    gymButton: {
+        borderWidth: 2,
+        borderRadius: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    gymButtonText: {
+        fontSize: 14,
+        fontFamily: 'Roboto-Bold',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     profileSection: {
         alignItems: 'center',

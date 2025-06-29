@@ -606,11 +606,140 @@ export const updateGymClass = async (gymUserId: string, classId: number, updated
 
 export const deleteGymClass = async (gymUserId: string, classId: number) => {
   try {
-    const existingClasses = await getGymClasses(gymUserId);
-    const updatedClasses = existingClasses.filter((clase: any) => clase.id !== classId);
-    return await saveGymClasses(gymUserId, updatedClasses);
+    const classes = await getGymClasses(gymUserId);
+    const updatedClasses = classes.filter((_, index) => index !== classId);
+    await saveGymClasses(gymUserId, updatedClasses);
+    return true;
   } catch (error) {
-    console.error("Error eliminando clase del gimnasio:", error);
+    console.error("Error eliminando clase:", error);
     return false;
+  }
+};
+
+// === FUNCIONES DE CLIENTES (SOCIOS) DE GIMNASIO ===
+
+export const saveGymClients = async (gymUserId: string, clients: any[]) => {
+  try {
+    const key = `@MiGymApp:gymClients:${gymUserId}`;
+    await AsyncStorage.setItem(key, JSON.stringify(clients));
+    return true;
+  } catch (error) {
+    console.error("Error guardando clientes del gimnasio:", error);
+    return false;
+  }
+};
+
+export const getGymClients = async (gymUserId: string) => {
+  try {
+    const key = `@MiGymApp:gymClients:${gymUserId}`;
+    const clients = await AsyncStorage.getItem(key);
+    return clients ? JSON.parse(clients) : [];
+  } catch (error) {
+    console.error("Error obteniendo clientes del gimnasio:", error);
+    return [];
+  }
+};
+
+export const addGymClient = async (gymUserId: string, newClient: any) => {
+  try {
+    const existingClients = await getGymClients(gymUserId);
+    const updatedClients = [...existingClients, newClient];
+    return await saveGymClients(gymUserId, updatedClients);
+  } catch (error) {
+    console.error("Error agregando cliente del gimnasio:", error);
+    return false;
+  }
+};
+
+export const updateGymClient = async (gymUserId: string, clientId: string, updatedClient: any) => {
+  try {
+    const existingClients = await getGymClients(gymUserId);
+    const updatedClients = existingClients.map((client: any) =>
+      client.id === clientId ? updatedClient : client
+    );
+    return await saveGymClients(gymUserId, updatedClients);
+  } catch (error) {
+    console.error("Error actualizando cliente del gimnasio:", error);
+    return false;
+  }
+};
+
+export const deleteGymClient = async (gymUserId: string, clientId: string) => {
+  try {
+    const existingClients = await getGymClients(gymUserId);
+    const updatedClients = existingClients.filter((client: any) => client.id !== clientId);
+    return await saveGymClients(gymUserId, updatedClients);
+  } catch (error) {
+    console.error("Error eliminando cliente del gimnasio:", error);
+    return false;
+  }
+};
+
+export const getGymUserByBusinessName = async (businessName: string): Promise<GymUser | null> => {
+  try {
+    const usersDB = await getUsersDB();
+    const gym = Object.values(usersDB).find(u => (u as GymUser).role === 'gym' && (u as GymUser).businessName === businessName) as GymUser | undefined;
+    if (gym) return gym;
+
+    // Fallback: si no existe en la base registrada, devolver uno por defecto
+    const defaultGyms: Record<string, Partial<GymUser>> = {
+      "Gimnasio Central": {
+        businessName: "Gimnasio Central",
+        address: "Av. 9 de Julio 1500, CABA",
+        phone: "+54 11 5555-1234",
+        description: "Gimnasio moderno en el corazón de la ciudad con equipamiento de última generación y clases personalizadas.",
+        subscriptionPlan: "premium",
+      },
+      "FitLife Sports Club": {
+        businessName: "FitLife Sports Club",
+        address: "Av. Santa Fe 2000, CABA",
+        phone: "+54 11 2345-6789",
+        description: "Club deportivo completo con piscina, canchas de tenis y gimnasio de alta calidad.",
+        subscriptionPlan: "pro",
+      },
+      "PowerGym Elite": {
+        businessName: "PowerGym Elite",
+        address: "Av. Córdoba 1800, CABA",
+        phone: "+54 11 3456-7890",
+        description: "Gimnasio especializado en entrenamiento de fuerza y musculación con equipos profesionales.",
+        subscriptionPlan: "basic",
+      },
+      "Wellness Center": {
+        businessName: "Wellness Center",
+        address: "Av. Callao 1200, CABA",
+        phone: "+54 11 4567-8901",
+        description: "Centro de bienestar integral con yoga, pilates, spa y gimnasio funcional.",
+        subscriptionPlan: "premium",
+      },
+      "SportClub Premium": {
+        businessName: "SportClub Premium",
+        address: "Av. Libertador 2500, CABA",
+        phone: "+54 11 5678-9012",
+        description: "Club deportivo premium con instalaciones de lujo y servicios exclusivos.",
+        subscriptionPlan: "premium",
+      },
+    };
+
+    const def = defaultGyms[businessName];
+    if (def) {
+      return {
+        id: `default_${businessName.toLowerCase().replace(/\s+/g, '_')}`,
+        email: `${businessName.toLowerCase().replace(/\s+/g, '')}@gym.com`,
+        password: 'default_password',
+        role: 'gym',
+        name: `Admin ${businessName}`,
+        businessName: def.businessName!,
+        address: def.address,
+        phone: def.phone,
+        description: def.description,
+        clients: [],
+        classes: [],
+        subscriptionPlan: def.subscriptionPlan,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error buscando gimnasio por nombre:', error);
+    return null;
   }
 };

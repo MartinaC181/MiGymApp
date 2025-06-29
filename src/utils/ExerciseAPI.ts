@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RAPIDAPI_KEY, EXERCISEDB_API_URL } from '../../config.json';
+import { translateText } from './translator';
 
 // Configuración de la API de ExerciseDB
 const EXERCISEDB_CONFIG = {
@@ -37,6 +38,85 @@ const BODY_PART_MAPPING = {
   'Core': ['waist']
 };
 
+// Función para traducir de inglés a español usando los mapeos existentes invertidos
+const translateFromEnglish = (englishTerm: string, category: 'bodyPart' | 'equipment'): string => {
+  if (!englishTerm) return englishTerm;
+  
+  const lowerTerm = englishTerm.toLowerCase().trim();
+  
+  if (category === 'bodyPart') {
+    // Buscar en BODY_PART_MAPPING de forma inversa (inglés → español)
+    for (const [spanish, englishArray] of Object.entries(BODY_PART_MAPPING)) {
+      if (englishArray.some(eng => eng.toLowerCase() === lowerTerm)) {
+        return spanish;
+      }
+    }
+    
+    // Traducciones específicas para músculos que no están en el mapeo principal
+    const specificMuscles: Record<string, string> = {
+      'pectorals': 'Pectorales',
+      'lats': 'Dorsales',
+      'quads': 'Cuádriceps',
+      'quadriceps': 'Cuádriceps',
+      'hamstrings': 'Isquiotibiales',
+      'glutes': 'Glúteos',
+      'calves': 'Pantorrillas',
+      'biceps': 'Bíceps',
+      'triceps': 'Tríceps',
+      'delts': 'Deltoides',
+      'deltoids': 'Deltoides',
+      'traps': 'Trapecio',
+      'abs': 'Abdominales',
+      'abdominals': 'Abdominales',
+      'forearms': 'Antebrazos',
+      'rhomboids': 'Romboides',
+      'spine': 'Columna',
+      'shoulders': 'Hombros',
+      'anterior deltoid': 'Deltoides anterior',
+      'middle deltoid': 'Deltoides medio', 
+      'posterior deltoid': 'Deltoides posterior'
+    };
+    
+    return specificMuscles[lowerTerm] || englishTerm;
+  }
+  
+  if (category === 'equipment') {
+    const equipmentTranslations: Record<string, string> = {
+      'body weight': 'Peso corporal',
+      'dumbbell': 'Mancuernas',
+      'barbell': 'Barra',
+      'cable': 'Cable',
+      'machine': 'Máquina',
+      'leverage machine': 'Máquina de cuadriseps leverage',
+      'resistance band': 'Banda elástica',
+      'kettlebell': 'Kettlebell',
+      'assisted': 'Asistido',
+      'smith machine': 'Máquina Smith',
+      'ez barbell': 'Barra EZ',
+      'rope': 'Cuerda'
+    };
+    
+    return equipmentTranslations[lowerTerm] || englishTerm;
+  }
+  
+  return englishTerm;
+};
+
+// Función para traducir un ejercicio completo de inglés a español
+const translateExercise = (exercise: Exercise): Exercise => {
+  if (!exercise) return exercise;
+  
+  return {
+    ...exercise,
+    bodyPart: translateFromEnglish(exercise.bodyPart, 'bodyPart'),
+    target: translateFromEnglish(exercise.target, 'bodyPart'),
+    equipment: translateFromEnglish(exercise.equipment, 'equipment'),
+    secondaryMuscles: exercise.secondaryMuscles?.map(muscle => 
+      translateFromEnglish(muscle, 'bodyPart')
+    ) || [],
+    instructions: exercise.instructions
+  };
+};
 // Cache keys
 const CACHE_KEYS = {
   EXERCISES: '@ExerciseDB:exercises',
@@ -101,9 +181,11 @@ class ExerciseDBService {
         index === self.findIndex(e => e.id === exercise.id)
       );
 
-      // Cachear resultados
-      await this.cacheExercises(muscleGroup, uniqueExercises);
-      return uniqueExercises;
+      // Traducir ejercicios antes de cachear y devolver
+      const translatedExercises = uniqueExercises.map(translateExercise);
+      await this.cacheExercises(muscleGroup, translatedExercises);
+      return translatedExercises;
+
     } catch (error) {
       console.error(`Error obteniendo ejercicios para ${muscleGroup}:`, error);
       return this.getMockExercises(muscleGroup);
@@ -115,16 +197,17 @@ class ExerciseDBService {
       // Buscar por nombre
       const exerciseByName = await this.makeRequest(`/exercises/name/${searchTerm.toLowerCase()}`);
       if (exerciseByName && Array.isArray(exerciseByName)) {
-        return exerciseByName;
+        return exerciseByName.map(translateExercise);
       }
 
       // Si no encuentra, buscar en todos limitado
       const allExercises = await this.makeRequest('/exercises?limit=100');
       if (allExercises && Array.isArray(allExercises)) {
-        return allExercises.filter(exercise => 
+        const prelim = allExercises.filter(exercise => 
           exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           exercise.target.toLowerCase().includes(searchTerm.toLowerCase())
-        ).slice(0, 20);
+        ).slice(0, 20).map(translateExercise);
+        return prelim;
       }
 
       return [];
@@ -170,7 +253,8 @@ class ExerciseDBService {
         }
 
         const limit = filter.limit || 50;
-        return filteredExercises.slice(0, limit);
+        const prelim = filteredExercises.slice(0, limit).map(translateExercise);
+        return prelim;
       }
 
       return [];

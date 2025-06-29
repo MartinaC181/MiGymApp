@@ -190,10 +190,13 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     width: "100%",
-    maxHeight: 400,
+    flex: 1,
+    minHeight: 200,
+    maxHeight: 350,
   },
   scrollContent: {
     paddingBottom: 24,
+    flexGrow: 1,
   },
   sectionTitle: {
     fontSize: 16,

@@ -13,7 +13,7 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Clase, ClaseFormData, diasSemana } from '../types/Clase';
 import theme from '../constants/theme';
-import styles from '../styles/gestion-clases';
+import styles from '../styles/gestion-gimnasio';
 import globalStyles from '../styles/global';
 
 interface ClassFormModalProps {
