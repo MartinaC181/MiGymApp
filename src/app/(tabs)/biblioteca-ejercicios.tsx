@@ -47,8 +47,28 @@ export default function BibliotecaEjercicios() {
     { id: 'Core', name: 'Core', icon: 'karate', gradient: ['#96C93D', '#4ECDC4'] }
   ]);
 
-  const muscleGroups = getAvailableMuscleGroups();
-  const equipmentTypes = getCommonEquipment();
+  // Listas en español para los filtros
+  const muscleGroups = [
+    'Pecho',
+    'Espalda', 
+    'Hombros',
+    'Brazos',
+    'Piernas',
+    'Core',
+    'Glúteos',
+    'Pantorrillas'
+  ];
+
+  const equipmentTypes = [
+    'Sin equipamiento',
+    'Mancuernas',
+    'Barra',
+    'Máquina',
+    'Cable',
+    'Banda elástica',
+    'Peso corporal',
+    'Kettlebell'
+  ];
 
   useEffect(() => {
     loadPopularExercises();
@@ -104,18 +124,30 @@ export default function BibliotecaEjercicios() {
       
       if (selectedMuscle && selectedMuscle !== 'Todos') {
         const bodyPartMapping = {
-          'Piernas': 'upper legs',
-          'Brazos': 'upper arms',
           'Pecho': 'chest',
           'Espalda': 'back',
-          'Hombros': 'shoulders',
-          'Core': 'waist'
+          'Hombros': 'shoulders', 
+          'Brazos': 'upper arms',
+          'Piernas': 'upper legs',
+          'Core': 'waist',
+          'Glúteos': 'upper legs',
+          'Pantorrillas': 'lower legs'
         };
         filter.bodyPart = bodyPartMapping[selectedMuscle as keyof typeof bodyPartMapping];
       }
       
       if (selectedEquipment && selectedEquipment !== 'Todos') {
-        filter.equipment = selectedEquipment;
+        const equipmentMapping = {
+          'Sin equipamiento': 'body weight',
+          'Mancuernas': 'dumbbell',
+          'Barra': 'barbell',
+          'Máquina': 'leverage machine',
+          'Cable': 'cable',
+          'Banda elástica': 'resistance band',
+          'Peso corporal': 'body weight',
+          'Kettlebell': 'kettlebell'
+        };
+        filter.equipment = equipmentMapping[selectedEquipment as keyof typeof equipmentMapping] || selectedEquipment;
       }
       
       const results = await exerciseAPI.getFilteredExercises(filter);
@@ -377,68 +409,100 @@ export default function BibliotecaEjercicios() {
       </View>
 
       {/* Modal de filtros mejorado */}
-      <Modal visible={showFilters} animationType="slide" transparent>
+      <Modal 
+        visible={showFilters} 
+        animationType="slide" 
+        transparent={true}
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowFilters(false)}
+      >
         <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={styles.modalBackdrop} 
+            activeOpacity={1}
+            onPress={() => setShowFilters(false)}
+          />
           <View style={styles.filterModal}>
+            {/* Header del modal */}
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Filtros</Text>
-              <TouchableOpacity onPress={() => setShowFilters(false)}>
+              <TouchableOpacity 
+                onPress={() => setShowFilters(false)}
+                style={styles.closeButton}
+              >
                 <MaterialIcons name="close" size={24} color={theme.colors.textPrimary} />
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.filterContent} showsVerticalScrollIndicator={false}>
+            {/* Contenido de filtros con scroll */}
+            <ScrollView 
+              style={styles.filterContent} 
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
               {/* Grupo Muscular */}
-              <Text style={styles.filterSectionTitle}>Grupo Muscular</Text>
-              <View style={styles.filterOptions}>
-                {['', ...muscleGroups].map((muscle) => (
-                  <TouchableOpacity
-                    key={muscle || 'all'}
-                    style={[
-                      styles.filterOption,
-                      selectedMuscle === muscle && styles.filterOptionSelected
-                    ]}
-                    onPress={() => setSelectedMuscle(muscle)}
-                  >
-                    <Text style={[
-                      styles.filterOptionText,
-                      selectedMuscle === muscle && styles.filterOptionTextSelected
-                    ]}>
-                      {muscle || 'Todos'}
-                    </Text>
-                    {selectedMuscle === muscle && (
-                      <MaterialIcons name="check" size={16} color="white" />
-                    )}
-                  </TouchableOpacity>
-                ))}
+              <View style={styles.filterSection}>
+                <Text style={styles.filterSectionTitle}>Grupo Muscular</Text>
+                <View style={styles.filterOptions}>
+                  {['Todos', ...muscleGroups].map((muscle) => (
+                    <TouchableOpacity
+                      key={muscle}
+                      style={[
+                        styles.filterOption,
+                        (selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && styles.filterOptionSelected
+                      ]}
+                      onPress={() => setSelectedMuscle(muscle === 'Todos' ? '' : muscle)}
+                    >
+                      <Text 
+                        style={[
+                          styles.filterOptionText,
+                          (selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && styles.filterOptionTextSelected
+                        ]}
+                      >
+                        {muscle}
+                      </Text>
+                      {(selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && (
+                        <MaterialIcons name="check" size={16} color="white" />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
 
               {/* Equipamiento */}
-              <Text style={styles.filterSectionTitle}>Equipamiento</Text>
-              <View style={styles.filterOptions}>
-                {['', ...equipmentTypes].map((equipment) => (
-                  <TouchableOpacity
-                    key={equipment || 'all'}
-                    style={[
-                      styles.filterOption,
-                      selectedEquipment === equipment && styles.filterOptionSelected
-                    ]}
-                    onPress={() => setSelectedEquipment(equipment)}
-                  >
-                    <Text style={[
-                      styles.filterOptionText,
-                      selectedEquipment === equipment && styles.filterOptionTextSelected
-                    ]}>
-                      {equipment || 'Todos'}
-                    </Text>
-                    {selectedEquipment === equipment && (
-                      <MaterialIcons name="check" size={16} color="white" />
-                    )}
-                  </TouchableOpacity>
-                ))}
+              <View style={styles.filterSection}>
+                <Text style={styles.filterSectionTitle}>Equipamiento</Text>
+                <View style={styles.filterOptions}>
+                  {['Todos', ...equipmentTypes].map((equipment) => (
+                    <TouchableOpacity
+                      key={equipment}
+                      style={[
+                        styles.filterOption,
+                        (selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && styles.filterOptionSelected
+                      ]}
+                      onPress={() => setSelectedEquipment(equipment === 'Todos' ? '' : equipment)}
+                    >
+                      <Text 
+                        style={[
+                          styles.filterOptionText,
+                          (selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && styles.filterOptionTextSelected
+                        ]}
+                      >
+                        {equipment}
+                      </Text>
+                      {(selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && (
+                        <MaterialIcons name="check" size={16} color="white" />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
+              
+              {/* Espaciado inferior para el scroll */}
+              <View style={{ height: 20 }} />
             </ScrollView>
 
+            {/* Botones de acción */}
             <View style={styles.modalActions}>
               <TouchableOpacity style={styles.clearBtn2} onPress={clearFilters}>
                 <Text style={styles.clearBtnText}>Limpiar</Text>
@@ -876,11 +940,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+  },
   filterModal: {
     backgroundColor: 'white',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '80%',
+    minHeight: '60%',
+    maxHeight: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 5,
+    flex: 1,
+  },
+  closeButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
   },
   exerciseModal: {
     backgroundColor: 'white',
@@ -905,42 +989,65 @@ const styles = StyleSheet.create({
   },
   filterContent: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  filterSection: {
+    marginBottom: 28,
   },
   filterSectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: 12,
-    marginTop: 20,
+    color: '#111827',
+    marginBottom: 16,
+    fontWeight: '700',
   },
   filterOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    paddingVertical: 4,
   },
   filterOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 2,
     borderColor: '#E2E8F0',
+    minWidth: 70,
+    minHeight: 40,
+    // Se removió maxWidth para permitir que se adapte al contenido
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+    marginBottom: 4,
   },
   filterOptionSelected: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
+    shadowColor: theme.colors.primary,
+    shadowOpacity: 0.3,
+    elevation: 4,
   },
   filterOptionText: {
     fontSize: 14,
-    color: theme.colors.textPrimary,
-    marginRight: 4,
+    color: '#1F2937',
+    textAlign: 'center',
+    fontFamily: theme.typography.fontFamily.medium,
+    fontWeight: '600',
+    paddingHorizontal: 2,
+    flexShrink: 1,
   },
   filterOptionTextSelected: {
-    color: 'white',
+    color: '#FFFFFF',
     fontFamily: theme.typography.fontFamily.bold,
+    fontWeight: '700',
   },
   modalActions: {
     flexDirection: 'row',
@@ -951,29 +1058,36 @@ const styles = StyleSheet.create({
   },
   clearBtn2: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 18,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
   },
   clearBtnText: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-    fontFamily: theme.typography.fontFamily.medium,
+    fontSize: 17,
+    color: '#374151',
+    fontFamily: theme.typography.fontFamily.bold,
+    fontWeight: '600',
   },
   applyBtn: {
     flex: 1,
     backgroundColor: theme.colors.primary,
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 18,
     alignItems: 'center',
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   applyBtnText: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
 
   // Modal de ejercicio
