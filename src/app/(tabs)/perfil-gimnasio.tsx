@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIn
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
-import { getCurrentUser, getGymByBusinessName } from '../../utils/storage';
+import { getCurrentUser, getGymUserByBusinessName } from '../../utils/storage';
 import { ClientUser, GymUser } from '../../data/Usuario';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,7 +23,7 @@ const GymProfile = () => {
             const user = await getCurrentUser() as ClientUser;
             if (user && user.gymId) {
                 setUserData(user);
-                const gym = await getGymByBusinessName(user.gymId);
+                const gym = await getGymUserByBusinessName(user.gymId);
                 setGymData(gym);
             }
         } catch (error) {

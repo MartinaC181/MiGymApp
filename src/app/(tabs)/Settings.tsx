@@ -159,7 +159,7 @@ const Settings = () => {
                 {/* Botón Cerrar sesión */}
                 <View style={[styles.logoutContainer, {marginTop: theme.spacing.xl}]}>
                     <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.colors.primary }]} onPress={() => setShowLogoutModal(true)}>
-                        <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+                        <Text style={[styles.logoutButtonText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>Cerrar sesión</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -193,7 +193,11 @@ const Settings = () => {
                 <View style={styles.modalOverlay}>
                     <View style={[
                         styles.modalContainer, 
-                        { backgroundColor: theme.colors.background }
+                        { 
+                            backgroundColor: isDarkMode ? '#2a2a2a' : theme.colors.background,
+                            borderWidth: isDarkMode ? 1 : 0,
+                            borderColor: isDarkMode ? '#404040' : 'transparent'
+                        }
                     ]}>
                         <Text style={[
                             styles.modalTitle, 
@@ -212,13 +216,17 @@ const Settings = () => {
                             <TouchableOpacity 
                                 style={[
                                     styles.cancelButton, 
-                                    { backgroundColor: theme.colors.surface }
+                                    { 
+                                        backgroundColor: isDarkMode ? '#404040' : theme.colors.surface,
+                                        borderWidth: isDarkMode ? 1 : 0,
+                                        borderColor: isDarkMode ? '#606060' : 'transparent'
+                                    }
                                 ]} 
                                 onPress={handleCancelLogout}
                             >
                                 <Text style={[
                                     styles.cancelButtonText, 
-                                    { color: theme.colors.textSecondary }
+                                    { color: isDarkMode ? '#ffffff' : theme.colors.textSecondary }
                                 ]}>
                                     Cancelar
                                 </Text>
@@ -233,7 +241,7 @@ const Settings = () => {
                             >
                                 <Text style={[
                                     styles.confirmButtonText, 
-                                    { color: theme.colors.background }
+                                    { color: isDarkMode ? '#000000' : '#ffffff' }
                                 ]}>
                                     Cerrar sesión
                                 </Text>
