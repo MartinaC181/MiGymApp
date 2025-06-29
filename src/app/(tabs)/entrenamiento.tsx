@@ -47,10 +47,11 @@ export default function Entrenamiento() {
     },
     {
       id: 'guia',
-      title: 'Guía de Ejercicios',
-      description: 'Aprende técnicas y formas correctas',
+      title: 'Biblioteca de Ejercicios',
+      description: 'Explora más de 1300 ejercicios con videos',
       icon: 'menu-book',
       colors: ['#b3dcec', '#e6f3f9'],
+      route: '/biblioteca-ejercicios'
     },
     {
       id: 'calculadora',
