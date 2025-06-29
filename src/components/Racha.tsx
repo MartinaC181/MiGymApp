@@ -9,6 +9,7 @@ import { ClientUser } from "../data/Usuario";
 import RachaModal from "./RachaModal";
 import Flame from "./Flame";
 import { Animated } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Racha({ onPress }: { onPress?: () => void }) {
   const [user, setUser] = useState<ClientUser | null>(null);
@@ -25,6 +26,9 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [dotScale] = useState(new Animated.Value(1));
+  
+  // Obtener el tema actual
+  const { theme: currentTheme, isDarkMode } = useTheme();
 
   // Cargar datos del usuario desde AsyncStorage
   useEffect(() => {
@@ -149,7 +153,7 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
           <MaterialIcons
             name={isActive ? "check-circle" : "radio-button-unchecked"}
             size={18}
-            color={isActive ? theme.colors.primary : "#d8d8d8"}
+            color={isActive ? currentTheme.colors.primary : (isDarkMode ? '#666666' : currentTheme.colors.border)}
           />
         </Wrapper>
       );
@@ -167,19 +171,37 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
   // Mostrar componente simplificado si está cargando o no hay usuario
   if (isLoading) {
     return (
-      <View style={styles.card}>
-        <Text>Cargando racha...</Text>
+      <View style={[styles.card, { 
+        backgroundColor: isDarkMode ? '#3A3A3A' : currentTheme.colors.surface,
+        borderWidth: isDarkMode ? 2 : 0,
+        borderColor: isDarkMode ? '#4A4A4A' : 'transparent',
+        shadowColor: isDarkMode ? "#000" : "#000",
+        shadowOffset: { width: 0, height: isDarkMode ? 4 : 2 },
+        shadowOpacity: isDarkMode ? 0.4 : 0.1,
+        shadowRadius: isDarkMode ? 8 : 4,
+        elevation: isDarkMode ? 12 : 2
+      }]}>
+        <Text style={{ color: currentTheme.colors.textPrimary }}>Cargando racha...</Text>
       </View>
     );
   }
 
   if (!user) {
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { 
+        backgroundColor: isDarkMode ? '#3A3A3A' : currentTheme.colors.surface,
+        borderWidth: isDarkMode ? 2 : 0,
+        borderColor: isDarkMode ? '#4A4A4A' : 'transparent',
+        shadowColor: isDarkMode ? "#000" : "#000",
+        shadowOffset: { width: 0, height: isDarkMode ? 4 : 2 },
+        shadowOpacity: isDarkMode ? 0.4 : 0.1,
+        shadowRadius: isDarkMode ? 8 : 4,
+        elevation: isDarkMode ? 12 : 2
+      }]}>
         <View style={styles.row}>
           <Flame size={28} muted={true} />
-          <Text style={styles.streakText}>0</Text>
-          <Text style={styles.label}>¡Inicia sesión para ver tu racha!</Text>
+          <Text style={[styles.streakText, { color: currentTheme.colors.textPrimary }]}>0</Text>
+          <Text style={[styles.label, { color: currentTheme.colors.textSecondary }]}>¡Inicia sesión para ver tu racha!</Text>
         </View>
       </View>
     );
@@ -189,27 +211,53 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
     <>
       <Pressable
         onPress={onPress ? onPress : () => setModalVisible(true)}
-        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+        style={({ pressed }) => [
+          styles.card, 
+          { 
+            backgroundColor: isDarkMode ? '#3A3A3A' : currentTheme.colors.surface,
+            borderWidth: isDarkMode ? 2 : 0,
+            borderColor: isDarkMode ? '#4A4A4A' : 'transparent',
+            shadowColor: isDarkMode ? "#000" : "#000",
+            shadowOffset: { width: 0, height: isDarkMode ? 4 : 2 },
+            shadowOpacity: isDarkMode ? 0.4 : 0.1,
+            shadowRadius: isDarkMode ? 8 : 4,
+            elevation: isDarkMode ? 12 : 2
+          },
+          pressed && { 
+            backgroundColor: isDarkMode ? '#4A4A4A' : currentTheme.colors.surface,
+            transform: [{ scale: 0.98 }]
+          }
+        ]}
       >
         <View style={styles.row}>
           <Flame size={28} muted={streak === 0 && currentWeekCount === 0} />
-          <Text style={styles.streakText}>{streak}</Text>
-          <Text style={styles.label}>
+          <Text style={[styles.streakText, { 
+            color: isDarkMode ? '#FFFFFF' : currentTheme.colors.textPrimary,
+            textShadowColor: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'transparent',
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 2
+          }]}>{streak}</Text>
+          <Text style={[styles.label, { 
+            color: isDarkMode ? '#E0E0E0' : currentTheme.colors.textSecondary,
+            fontWeight: isDarkMode ? '500' : 'normal'
+          }]}>
             {streak > 0
               ? "¡Estás en Racha!"
               : currentWeekCount > 0
-              ? "¡Racha en progreso!"
-              : "¡Racha Perdida!"}
+              ? "¡Sigue así!"
+              : "¡Comienza tu racha!"}
           </Text>
-          <MaterialIcons
-            name="keyboard-arrow-down"
-            size={22}
-            color={theme.colors.textSecondary}
-            style={{ marginLeft: "auto" }}
-          />
         </View>
         <View style={styles.progressWrapper}>{renderProgressDots()}</View>
+        <Text style={[styles.desc, { 
+          color: isDarkMode ? '#CCCCCC' : currentTheme.colors.textSecondary,
+          fontSize: isDarkMode ? 13 : 12,
+          fontWeight: isDarkMode ? '500' : 'normal'
+        }]}>
+          {currentWeekCount}/{weeklyGoal} esta semana
+        </Text>
       </Pressable>
+
       <RachaModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -217,8 +265,8 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
         onResetAttendance={handleResetAttendance}
         onIncrementStreak={handleIncrementStreak}
         streak={streak}
-        weeklyGoal={weeklyGoal}
         currentWeekCount={currentWeekCount}
+        weeklyGoal={weeklyGoal}
       />
     </>
   );

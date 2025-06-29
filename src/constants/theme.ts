@@ -12,14 +12,14 @@ const lightColors = {
 
 const darkColors = {
   primary: '#00BFFF',
-  background: '#121212',
-  textPrimary: '#ffffff',
-  textSecondary: '#B0B0B0',
-  surface: '#1E1E1E',
-  success: '#88DA62',
-  error: '#FF5A5F',
-  card: '#1E1E1E',
-  border: '#2C2C2C',
+  background: '#0A0A0A',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#CCCCCC',
+  surface: '#1A1A1A',
+  success: '#4CAF50',
+  error: '#FF5252',
+  card: '#2A2A2A',
+  border: '#404040',
 };
 
 const spacing = {

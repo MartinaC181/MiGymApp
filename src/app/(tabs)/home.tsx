@@ -16,6 +16,7 @@ import Racha from "../../components/Racha";
 import theme from "../../constants/theme";
 import { getCurrentUser, getAvailableClasses } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Home() {
     // Estado para controlar el slide activo
@@ -31,6 +32,9 @@ export default function Home() {
     // Animación para las cards
     const fadeAnim = new Animated.Value(1);
     const router = useRouter();
+    
+    // Obtener el tema actual
+    const { theme: currentTheme, isDarkMode } = useTheme();
 
     // Cargar datos desde AsyncStorage al montar el componente
     useEffect(() => {
@@ -131,10 +135,10 @@ export default function Home() {
     };
 
     return (
-        <View style={[globalStyles.container, styles.homeContainer]}>
+        <View style={[globalStyles.container, styles.homeContainer, { backgroundColor: currentTheme.colors.background }]}>
             <View style={styles.greetingContainer}>
-                <Text style={styles.greeting}>Hola, <Text style={styles.name}>{getUserName()}!</Text></Text>
-                <Text style={styles.subGreeting}>¿Listo para entrenar?</Text>
+                <Text style={[styles.greeting, { color: currentTheme.colors.primary }]}>Hola, <Text style={[styles.name, { color: currentTheme.colors.primary }]}>{getUserName()}!</Text></Text>
+                <Text style={[styles.subGreeting, { color: currentTheme.colors.textSecondary }]}>¿Listo para entrenar?</Text>
             </View>
 
             {/* Racha asistencia */}
@@ -144,34 +148,75 @@ export default function Home() {
 
             {/* Contenedor relativo para posicionar las sugerencias */}
             <View style={styles.searchWrapper}>
-                <View style={styles.searchContainer}>
+                <View style={[styles.searchContainer, { 
+                    backgroundColor: isDarkMode ? '#2A2A2A' : currentTheme.colors.surface,
+                    borderWidth: isDarkMode ? 1 : 1,
+                    borderColor: isDarkMode ? '#404040' : currentTheme.colors.border,
+                    shadowColor: isDarkMode ? "#000" : "#000",
+                    shadowOffset: { width: 0, height: isDarkMode ? 4 : 2 },
+                    shadowOpacity: isDarkMode ? 0.3 : 0.1,
+                    shadowRadius: isDarkMode ? 8 : 4,
+                    elevation: isDarkMode ? 8 : 2,
+                }]}>
                     <TextInput
-                        style={styles.searchInput}
+                        style={[styles.searchInput, { 
+                            backgroundColor: isDarkMode ? '#2A2A2A' : currentTheme.colors.surface,
+                            color: isDarkMode ? '#E0E0E0' : currentTheme.colors.textPrimary,
+                            borderColor: isDarkMode ? '#404040' : currentTheme.colors.border,
+                            fontSize: isDarkMode ? 15 : 14,
+                        }]}
                         placeholder="Buscar clase"
-                        placeholderTextColor="#999"
+                        placeholderTextColor={isDarkMode ? '#888888' : currentTheme.colors.textSecondary}
                         value={searchText}
                         onChangeText={handleTextChange}
                     />
                     {searchText.length > 0 ? (
                         <TouchableOpacity onPress={clearSearch} style={styles.searchIcon}>
-                            <MaterialIcons name="close" size={24} color="#999" />
+                            <MaterialIcons name="close" size={24} color={isDarkMode ? '#888888' : currentTheme.colors.textSecondary} />
                         </TouchableOpacity>
                     ) : (
-                    <MaterialIcons name="search" size={24} color="#999" style={styles.searchIcon} />
+                    <MaterialIcons name="search" size={24} color={isDarkMode ? '#888888' : currentTheme.colors.textSecondary} style={styles.searchIcon} />
                     )}
                 </View>
 
                 {/* Sugerencias de autocompletado - Posicionadas absolutamente */}
                 {showSuggestions && suggestions.length > 0 && (
-                    <View style={styles.suggestionsContainer}>
-                        {suggestions.map((suggestion) => (
+                    <View style={[styles.suggestionsContainer, { 
+                        backgroundColor: isDarkMode ? '#2A2A2A' : currentTheme.colors.surface,
+                        borderTopWidth: 1,
+                        borderTopColor: isDarkMode ? '#404040' : currentTheme.colors.border,
+                        shadowColor: isDarkMode ? "#000" : "#000",
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: isDarkMode ? 0.4 : 0.2,
+                        shadowRadius: isDarkMode ? 8 : 6,
+                        elevation: isDarkMode ? 10 : 6,
+                        borderRadius: isDarkMode ? 8 : 0,
+                        borderBottomLeftRadius: isDarkMode ? 8 : 0,
+                        borderBottomRightRadius: isDarkMode ? 8 : 0,
+                    }]}>
+                        {suggestions.map((suggestion, index) => (
                             <TouchableOpacity
                                 key={suggestion.id}
-                                style={styles.suggestionItem}
+                                style={[styles.suggestionItem, { 
+                                    backgroundColor: isDarkMode ? '#2A2A2A' : currentTheme.colors.surface,
+                                    borderBottomWidth: index < suggestions.length - 1 ? 1 : 0,
+                                    borderBottomColor: isDarkMode ? '#404040' : currentTheme.colors.border,
+                                    paddingVertical: isDarkMode ? 12 : 8,
+                                    paddingHorizontal: isDarkMode ? 20 : 16,
+                                }]}
                                 onPress={() => selectSuggestion(suggestion)}
                             >
-                                <MaterialIcons name="fitness-center" size={20} color={theme.colors.primary} />
-                                <Text style={styles.suggestionText}>{suggestion.nombre}</Text>
+                                <MaterialIcons 
+                                    name="fitness-center" 
+                                    size={20} 
+                                    color={isDarkMode ? '#00BFFF' : currentTheme.colors.primary} 
+                                />
+                                <Text style={[styles.suggestionText, { 
+                                    color: isDarkMode ? '#E0E0E0' : currentTheme.colors.textPrimary,
+                                    marginLeft: isDarkMode ? 12 : 8,
+                                    fontSize: isDarkMode ? 15 : 14,
+                                    fontFamily: isDarkMode ? 'Roboto-Medium' : 'Roboto-Regular',
+                                }]}>{suggestion.nombre}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -194,20 +239,43 @@ export default function Home() {
                         key={clase.id} 
                         style={index === filteredClases.length - 1 ? styles.lastCardContainer : styles.cardContainer}
                     >
-                        <View style={styles.card}>
+                        <View style={[styles.card, { 
+                            shadowColor: isDarkMode ? "#000" : "#000",
+                            backgroundColor: isDarkMode ? "#2A2A2A" : "#000",
+                            borderWidth: isDarkMode ? 1 : 0,
+                            borderColor: isDarkMode ? currentTheme.colors.border : 'transparent',
+                            shadowOffset: { width: 0, height: isDarkMode ? 4 : 3 },
+                            shadowOpacity: isDarkMode ? 0.3 : 0.2,
+                            shadowRadius: isDarkMode ? 8 : 6,
+                            elevation: isDarkMode ? 10 : 6
+                        }]}>
                             <Image
                                 source={{ uri: clase.imagen }}
                                 style={styles.cardImage}
                             />
-                            <View style={styles.cardOverlay} />
+                            <View style={[styles.cardOverlay, { 
+                                backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.4)'
+                            }]} />
                             <View style={styles.cardContent}>
-                                <Text style={styles.cardTitle}>{clase.nombre}</Text>
+                                <Text style={[styles.cardTitle, { 
+                                    color: isDarkMode ? '#E0E0E0' : currentTheme.colors.background,
+                                    textShadowColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
+                                    textShadowOffset: { width: 1, height: 1 },
+                                    textShadowRadius: isDarkMode ? 4 : 3
+                                }]}>{clase.nombre}</Text>
                                 <TouchableOpacity 
-                                    style={styles.verMasButton}
+                                    style={[styles.verMasButton, { 
+                                        backgroundColor: isDarkMode ? 'rgba(0, 191, 255, 0.95)' : 'rgba(0, 191, 255, 0.9)',
+                                        shadowColor: isDarkMode ? "#000" : "#000",
+                                        shadowOffset: { width: 0, height: 2 },
+                                        shadowOpacity: isDarkMode ? 0.4 : 0.25,
+                                        shadowRadius: isDarkMode ? 6 : 4,
+                                        elevation: isDarkMode ? 8 : 4
+                                    }]}
                                     onPress={() => handleVerMas(clase)}
                                 >
-                                    <Text style={styles.verMasText}>Ver más</Text>
-                                    <MaterialIcons name="keyboard-arrow-down" size={20} color="#FFFFFF" />
+                                    <Text style={[styles.verMasText, { color: currentTheme.colors.background }]}>Ver más</Text>
+                                    <MaterialIcons name="keyboard-arrow-down" size={20} color={currentTheme.colors.background} />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -221,7 +289,8 @@ export default function Home() {
                         key={index}
                         style={[
                             styles.paginationDot,
-                            index === activeSlide && styles.paginationDotActive,
+                            { backgroundColor: currentTheme.colors.border },
+                            index === activeSlide && [styles.paginationDotActive, { backgroundColor: currentTheme.colors.primary }],
                         ]}
                     />
                 ))}
@@ -229,9 +298,9 @@ export default function Home() {
                 </>
             ) : (
                 <View style={styles.noResultsContainer}>
-                    <MaterialIcons name="search-off" size={64} color="#999" />
-                    <Text style={styles.noResultsText}>No se encontraron clases</Text>
-                    <Text style={styles.noResultsSubtext}>
+                    <MaterialIcons name="search-off" size={64} color={currentTheme.colors.textSecondary} />
+                    <Text style={[styles.noResultsText, { color: currentTheme.colors.textSecondary }]}>No se encontraron clases</Text>
+                    <Text style={[styles.noResultsSubtext, { color: currentTheme.colors.textSecondary }]}>
                         Intenta con otro término de búsqueda
                     </Text>
                 </View>

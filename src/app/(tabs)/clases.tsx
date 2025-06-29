@@ -12,9 +12,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 import { useLocalSearchParams } from 'expo-router';
-import styles from '../../styles/clases';
+import useClasesStyles from '../../styles/clases';
 import globalStyles from '../../styles/global';
-import theme from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 import { getAvailableClasses, getCurrentUser, saveUserClasses, getUserClasses } from '../../utils/storage';
 
 export default function ClaseDetalle() {
@@ -28,6 +28,10 @@ export default function ClaseDetalle() {
     const [seleccionados, setSeleccionados] = useState({});
     const [diaSeleccionado, setDiaSeleccionado] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Estilos y tema
+    const styles = useClasesStyles();
+    const { theme } = useTheme();
 
     // Cargar información de la clase desde AsyncStorage
     useEffect(() => {
@@ -117,22 +121,22 @@ export default function ClaseDetalle() {
 
     if (isLoading) {
         return (
-            <View style={[globalStyles.container, { justifyContent: 'center' }]}>
-                <Text>Cargando información de la clase...</Text>
+            <View style={[globalStyles.container, { justifyContent: 'center', backgroundColor: theme.colors.background }]}>
+                <Text style={{ color: theme.colors.textPrimary }}>Cargando información de la clase...</Text>
             </View>
         );
     }
 
     if (!claseInfo || !claseInfo.horarios || claseInfo.horarios.length === 0) {
         return (
-            <View style={[globalStyles.container, { justifyContent: 'center' }]}>
-                <Text>No hay información disponible para esta clase</Text>
+            <View style={[globalStyles.container, { justifyContent: 'center', backgroundColor: theme.colors.background }]}>
+                <Text style={{ color: theme.colors.textPrimary }}>No hay información disponible para esta clase</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView style={globalStyles.safeArea}>
+        <ScrollView style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
             <View style={styles.headerImage}>
                 <Image 
                     source={{ uri: imagenClase || 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5' }} 
@@ -148,7 +152,7 @@ export default function ClaseDetalle() {
             </View>
             
             <View style={styles.contentContainer}>
-                <Text style={globalStyles.title}>Días y horarios</Text>
+                <Text style={[globalStyles.title, { color: theme.colors.textPrimary }]}>Días y horarios</Text>
                 
                 {/* Selector de días como pestañas */}
                 <ScrollView 

@@ -4,11 +4,13 @@ import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrentUser } from '../utils/storage';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, checkAuthStatus } = useAuth();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -42,7 +44,7 @@ export default function Index() {
   }, []);
 
   return isLoading || authLoading ? (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <SplashLoader size={150}/>
     </View>
   ) : null;

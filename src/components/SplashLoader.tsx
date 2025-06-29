@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, Image } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import globalStyles from '../styles/global';
-import theme from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { createGlobalStyles } from '../styles/global';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const darkerPrimary = '#007ACC';
 
 interface SplashLoaderProps {
   size?: number;
@@ -17,10 +16,11 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
   size = 120, 
   duration = 3000 
 }) => {
+  const { theme, isDarkMode } = useTheme();
+  const globalStyles = createGlobalStyles(theme);
   const progressValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-
     Animated.timing(progressValue, {
       toValue: 1,
       duration: duration,
@@ -46,19 +46,18 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={theme.colors.surface} 
+            stroke={isDarkMode ? '#3A3A3A' : theme.colors.surface} 
             strokeWidth={strokeWidth}
             fill="none"
           />
         </Svg>
 
- 
         <Svg width={size} height={size} style={globalStyles.progressCircle}>
           <AnimatedCircle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={darkerPrimary} 
+            stroke={theme.colors.primary} 
             strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}
@@ -67,10 +66,14 @@ const SplashLoader: React.FC<SplashLoaderProps> = ({
           />
         </Svg>
 
-    
         <Image
           source={require('../../assets/splash-icon.png')}
-          style={{ width: 150, height: 150, position: 'absolute' }}
+          style={{ 
+            width: 150, 
+            height: 150, 
+            position: 'absolute',
+            opacity: isDarkMode ? 0.95 : 1
+          }}
         />
       </View>
     </View>

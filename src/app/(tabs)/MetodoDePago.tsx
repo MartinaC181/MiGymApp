@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import theme from "../../constants/theme";
-import globalStyles from "../../styles/global";
+import { useTheme } from "../../context/ThemeContext";
+import { createGlobalStyles } from "../../styles/global";
 import pagoCorrecto from '../../../assets/pagocorrecto.png';
 import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
@@ -15,6 +15,13 @@ import { ClientUser } from "../../data/Usuario";
 const pagoExitoso = true; // Cambia a false para probar el error
 
 export default function Facturacion() {
+    // Hook para el tema dinámico
+    const { theme } = useTheme();
+    
+    // Generar estilos dinámicamente basados en el tema actual
+    const styles = createStyles(theme);
+    const globalStyles = createGlobalStyles(theme);
+    
     const [procesando, setProcesando] = useState(false);
     const [resultado, setResultado] = useState<null | "exito" | "error">(null);
     
@@ -455,12 +462,14 @@ export default function Facturacion() {
     );
 }
 
-const styles = StyleSheet.create({
+// Función para generar estilos dinámicos basados en el tema
+const createStyles = (theme: any) => StyleSheet.create({
     // Se eliminaron safeArea, header y title redundantes
     container: {
         flex: 1,
         paddingHorizontal: theme.spacing.lg,
         paddingTop: theme.spacing.lg,
+        backgroundColor: theme.colors.surface,
     },
     scrollContent: {
         paddingBottom: 100, // Espacio extra para evitar que choque con el navbar
@@ -470,6 +479,15 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginBottom: theme.spacing.lg,
         marginTop: theme.spacing.md,
+        backgroundColor: theme.colors.card,
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     title: {
         fontSize: theme.typography.fontSize.large,
@@ -482,10 +500,19 @@ const styles = StyleSheet.create({
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.textPrimary,
         marginBottom: theme.spacing.md,
-        textAlign: "center",
+        textAlign: "left",
     },
     input: {
-        ...globalStyles.input,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        borderRadius: theme.borderRadius.md,
+        height: 45,
+        width: "100%",
+        padding: theme.spacing.sm,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        backgroundColor: theme.colors.card,
+        color: theme.colors.textPrimary,
         marginBottom: theme.spacing.md,
     },
     row: {
@@ -500,6 +527,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: theme.spacing.lg,
         marginBottom: theme.spacing.xl,
+        // Sombras para destacar
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
     },
     center: {
         justifyContent: "center",
@@ -535,6 +568,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: theme.spacing.lg,
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.lg,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 6,
     },
     procesandoSubtext: {
         fontSize: theme.typography.fontSize.medium,
@@ -547,6 +588,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: theme.spacing.lg,
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.lg,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 6,
     },
     resultadoSubtext: {
         fontSize: theme.typography.fontSize.medium,
@@ -562,14 +611,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.spacing.lg,
         alignItems: "center",
         marginTop: theme.spacing.lg,
+        // Sombras para destacar
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
     },
     volverButtonText: {
-        color: theme.colors.surface,
+        color: theme.colors.background,
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.bold,
     },
     formContainer: {
         padding: theme.spacing.lg,
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.lg,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 4,
     },
     halfInput: {
         flex: 1,
@@ -584,6 +647,14 @@ const styles = StyleSheet.create({
         borderRadius: theme.borderRadius.md,
         marginBottom: theme.spacing.xs,
         marginTop: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        // Sombras sutiles
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
     },
     amountLabel: {
         fontSize: 17,
@@ -597,35 +668,42 @@ const styles = StyleSheet.create({
     },
     inputError: {
         borderColor: theme.colors.error,
-        borderWidth: 1,
+        borderWidth: 2,
+        backgroundColor: theme.colors.error + '10', // Fondo rojo sutil
     },
     errorText: {
         color: theme.colors.error,
         fontSize: theme.typography.fontSize.small,
         marginTop: theme.spacing.sm,
         marginBottom: theme.spacing.sm,
+        fontFamily: theme.typography.fontFamily.medium,
     },
     paymentOption: {
-        backgroundColor: theme.colors.surface,
+        backgroundColor: theme.colors.card,
         borderRadius: theme.borderRadius.md,
         padding: theme.spacing.md,
         marginBottom: theme.spacing.sm,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        borderWidth: 1,
-        borderColor: theme.colors.textSecondary,
-        elevation: 2,
-        shadowColor: "#000",
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        // Sombras para destacar
+        shadowColor: "#000000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        elevation: 3,
     },
     paymentOptionSelected: {
         backgroundColor: theme.colors.primary,
         borderColor: theme.colors.primary,
-        elevation: 4,
-        shadowOpacity: 0.2,
+        // Sombras más pronunciadas cuando está seleccionado
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
     },
     paymentOptionContent: {
         flexDirection: "row",
@@ -640,7 +718,7 @@ const styles = StyleSheet.create({
     },
     paymentOptionTextSelected: {
         fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.surface,
+        color: theme.colors.background,
     },
     cardFieldsContainer: {
         marginTop: theme.spacing.lg,
@@ -648,16 +726,22 @@ const styles = StyleSheet.create({
         borderRadius: theme.borderRadius.md,
         padding: theme.spacing.lg,
         marginBottom: theme.spacing.md,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-        elevation: 1,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 4,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
     },
     cardFieldsHeader: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: theme.spacing.md,
+        paddingBottom: theme.spacing.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.border,
     },
     cardFieldsTitle: {
         fontSize: theme.typography.fontSize.large,
@@ -673,16 +757,22 @@ const styles = StyleSheet.create({
         marginTop: theme.spacing.md,
     },
     cardInput: {
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.colors.card,
         borderRadius: theme.borderRadius.md,
         paddingHorizontal: theme.spacing.md,
         paddingVertical: theme.spacing.sm,
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.regular,
         color: theme.colors.textPrimary,
-        borderWidth: 1,
-        borderColor: theme.colors.textSecondary,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
         marginBottom: theme.spacing.sm,
+        // Sombras sutiles
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
     },
     cardRow: {
         flexDirection: "row",
