@@ -291,10 +291,10 @@ export default function Facturacion() {
                     onPress={() => setMetodoPago("mercadopago")}
                 >
                     <View style={styles.paymentOptionContent}>
-                        <MaterialIcons 
-                            name="account-balance-wallet" 
-                            size={24} 
-                            color={metodoPago === "mercadopago" ? theme.colors.surface : theme.colors.primary} 
+                        <Image 
+                            source={require('../../../assets/logoMP.png')}
+                            style={styles.paymentOptionImage}
+                            resizeMode="contain"
                         />
                         <Text style={[
                             styles.paymentOptionText,
@@ -447,7 +447,7 @@ export default function Facturacion() {
                     disabled={!isFormComplete()}
                 >
                     <Text style={globalStyles.buttonText}>
-                        {metodoPago === 'mercadopago' ? 'PAGAR CON MERCADO PAGO' : 'PAGAR $10,213.89'}
+                        PAGAR $10,213.89
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -688,5 +688,10 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: theme.spacing.md,
+    },
+    paymentOptionImage: {
+        width: 25,
+        height: 25,
+        marginRight: theme.spacing.sm,
     },
 });

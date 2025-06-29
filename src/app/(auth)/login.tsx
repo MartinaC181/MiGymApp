@@ -93,7 +93,7 @@ export default function Login() {
         {/* Logo */}
         <View style={{
           alignItems: "center",
-          marginBottom: theme.spacing.xl,
+          marginBottom: theme.spacing.lg,
         }}>
           <Image
             source={require("../../../assets/icon.png")}
@@ -121,7 +121,7 @@ export default function Login() {
           />
 
           {/* Contraseña */}
-          <Text style={globalStyles.label}>CONTRASEÑA</Text>
+          <Text style={[globalStyles.label, { marginTop: theme.spacing.sm }]}>CONTRASEÑA</Text>
           <TextInput
             style={globalStyles.input}
             placeholder="********"
@@ -135,14 +135,14 @@ export default function Login() {
 
           {/* Mensaje de error */}
           {error !== "" && (
-            <Text style={[globalStyles.errorText, { marginBottom: theme.spacing.md }]}>
+            <Text style={[globalStyles.errorText, { marginTop: theme.spacing.xs, marginBottom: theme.spacing.xs }]}>
               {error}
             </Text>
           )}
 
           {/* Botón de iniciar sesión */}
           <TouchableOpacity
-            style={isButtonDisabled ? globalStyles.LoginButtonDisabled : globalStyles.LoginButton}
+            style={[isButtonDisabled ? globalStyles.LoginButtonDisabled : globalStyles.LoginButton, { marginTop: theme.spacing.md }]}
             onPress={handleLogin}
             disabled={isButtonDisabled}
           >
@@ -157,10 +157,11 @@ export default function Login() {
           <TouchableOpacity 
             onPress={() => router.push("/forgot-password")}
             style={{
-              paddingVertical: theme.spacing.md,
+              paddingVertical: theme.spacing.xs,
               paddingHorizontal: theme.spacing.lg,
               alignItems: 'center',
               width: '100%',
+              marginTop: theme.spacing.xs,
             }}
           >
             <Text style={{
@@ -174,22 +175,15 @@ export default function Login() {
             </Text>
           </TouchableOpacity>
 
-          {/* Separador */}
-          <View style={{
-            height: 1,
-            backgroundColor: '#E0E0E0',
-            width: '100%',
-            marginVertical: theme.spacing.lg,
-          }} />
-
           {/* ¿No estás registrado? */}
           <TouchableOpacity 
             onPress={() => router.push("/user-type-selection")}
             style={{
-              paddingVertical: theme.spacing.md,
+              paddingVertical: theme.spacing.xs,
               paddingHorizontal: theme.spacing.lg,
               alignItems: 'center',
-              marginBottom: theme.spacing.lg,
+              marginTop: theme.spacing.sm,
+              marginBottom: theme.spacing.md,
               width: '100%',
             }}
           >
@@ -212,7 +206,7 @@ export default function Login() {
           </TouchableOpacity>
 
           {/* Botones de redes sociales */}
-          <TouchableOpacity style={[globalStyles.socialButton, { marginBottom: theme.spacing.md }]}>
+          <TouchableOpacity style={[globalStyles.socialButton, { marginBottom: theme.spacing.sm }]}>
             <MaterialCommunityIcons name="google" size={24} color="#DB4437" />
             <Text style={globalStyles.socialText}>Iniciar sesión con Google</Text>
           </TouchableOpacity>

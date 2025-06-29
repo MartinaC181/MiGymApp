@@ -7,10 +7,10 @@ export const handleIntegrationMercadoPago = async () => {
                 "id": "Sound system",
                 "title": "Cuota mensual",
                 "description": "Cuota mensual",
-                "picture_url": "https://www.myapp.com/myimage.jpg",
+                "picture_url": "https://i.imgur.com/77AE5KG.png",
                 "category_id": "other",
                 "quantity": 1,
-                "currency_id": "$",
+                "currency_id": "ARS",
                 "unit_price": 10000
             }
         ]
