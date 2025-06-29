@@ -5,8 +5,8 @@ const colors = {
   textPrimary: '#111111',
   textSecondary: '#3E3E3E',
   surface: '#F4F4F4',
-  success: '#88DA62',
-  error: '#FF5A5F',
+  success: '#B8E6B8',
+  error: '#F5E6A8',
 };
 
 const spacing = {
