@@ -4,27 +4,118 @@ import {
     Text, 
     ScrollView, 
     TouchableOpacity,
-    StyleSheet
+    Alert
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import theme from '../../../constants/theme';
-import globalStyles from '../../../styles/global';
+import styles from '../../../styles/gestion-gimnasio';
 import { useAuth } from '../../../hooks/useAuth';
+import { ClientUser } from '../../../data/Usuario';
+import ClientFormModal from '../../../components/ClientFormModal';
+import { 
+    getGymClients,
+    updateGymClient,
+    deleteGymClient
+} from '../../../utils/storage';
 
 export default function GestionSocios() {
     const { user } = useAuth();
+    const [socios, setSocios] = useState<ClientUser[]>([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [editingClient, setEditingClient] = useState<ClientUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Simular carga inicial
+    // Cargar socios al montar
     useEffect(() => {
-        const timer = setTimeout(() => {
+        loadClientsFromStorage();
+    }, [user]);
+
+    const loadClientsFromStorage = async () => {
+        if (!user || user.role !== 'gym') {
             setIsLoading(false);
-        }, 1000);
+            return;
+        }
+        try {
+            const clients = await getGymClients(user.id);
+            setSocios(clients);
+        } catch (error) {
+            console.error('Error cargando socios:', error);
+            Alert.alert('Error', 'No se pudieron cargar los socios');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        return () => clearTimeout(timer);
-    }, []);
+    const abrirModalEditarSocio = (client: ClientUser) => {
+        setEditingClient(client);
+        setModalVisible(true);
+    };
 
-    // Mostrar indicador de carga
+    const cerrarModal = () => {
+        setModalVisible(false);
+        setEditingClient(null);
+    };
+
+    const guardarSocio = async (client: ClientUser) => {
+        if (!user || user.role !== 'gym') {
+            Alert.alert('Error', 'Usuario no autorizado');
+            return;
+        }
+
+        if (!editingClient) {
+            Alert.alert('Acción no permitida', 'No se pueden crear nuevos socios.');
+            cerrarModal();
+            return;
+        }
+
+        try {
+            const success = await updateGymClient(user.id, editingClient.id, client);
+            if (success) {
+                setSocios(prev => prev.map(c => c.id === editingClient.id ? client : c));
+            } else {
+                Alert.alert('Error', 'No se pudo actualizar el socio');
+            }
+        } catch (error) {
+            console.error('Error guardando socio:', error);
+            Alert.alert('Error', 'Ocurrió un error al guardar el socio');
+        }
+
+        cerrarModal();
+    };
+
+    const eliminarSocio = (client: ClientUser) => {
+        Alert.alert(
+            'Confirmar eliminación',
+            `¿Estás seguro que querés eliminar al socio "${client.name}"?`,
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                { 
+                    text: 'Eliminar', 
+                    style: 'destructive',
+                    onPress: async () => {
+                        if (!user || user.role !== 'gym') {
+                            Alert.alert('Error', 'Usuario no autorizado');
+                            return;
+                        }
+
+                        try {
+                            const success = await deleteGymClient(user.id, client.id);
+                            if (success) {
+                                setSocios(prev => prev.filter(s => s.id !== client.id));
+                                Alert.alert('Éxito', 'Socio eliminado correctamente');
+                            } else {
+                                Alert.alert('Error', 'No se pudo eliminar el socio');
+                            }
+                        } catch (error) {
+                            console.error('Error eliminando socio:', error);
+                            Alert.alert('Error', 'Ocurrió un error al eliminar el socio');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    // Indicador carga
     if (isLoading) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -33,7 +124,7 @@ export default function GestionSocios() {
         );
     }
 
-    // Verificar que el usuario sea de tipo gimnasio
+    // Verificar rol
     if (!user || user.role !== 'gym') {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -55,95 +146,64 @@ export default function GestionSocios() {
                     </Text>
                 </View>
 
-                <View style={styles.contentContainer}>
-                    {/* Estado vacío temporal */}
-                    <View style={styles.emptyStateContainer}>
-                        <MaterialIcons 
-                            name="people-outline" 
-                            size={64} 
-                            color="#E0E0E0" 
-                        />
-                        <Text style={styles.emptyStateTitle}>
-                            Próximamente
-                        </Text>
-                        <Text style={styles.emptyStateSubtitle}>
-                            La gestión de socios estará disponible pronto.{'\n'}
-                            Podrás ver, agregar y administrar todos los socios de tu gimnasio.
-                        </Text>
-                    </View>
+                <View style={styles.clasesContainer}>
+                    {socios.length === 0 ? (
+                        <View style={styles.emptyStateContainer}>
+                            <MaterialIcons 
+                                name="people-outline" 
+                                size={64} 
+                                color="#E0E0E0" 
+                            />
+                            <Text style={styles.emptyStateTitle}>
+                                No hay socios asociados todavía
+                            </Text>
+                            <Text style={styles.emptyStateSubtitle}>
+                                Los socios se crean cuando se registran en tu gimnasio.
+                            </Text>
+                        </View>
+                    ) : (
+                        socios.map(client => (
+                            <View key={client.id} style={styles.claseCard}>
+                                <View style={styles.claseHeader}>
+                                    <View style={styles.claseInfo}>
+                                        <Text style={styles.claseNombre}>{client.name}</Text>
+                                        <Text style={styles.claseDescripcion}>{client.email}</Text>
+                                        {client.membershipType && (
+                                            <Text style={styles.metadataText}>Membresía: {client.membershipType}</Text>
+                                        )}
+                                    </View>
+                                </View>
+
+                                <View style={styles.accionesContainer}>
+                                    <TouchableOpacity 
+                                        style={[styles.accionButton, styles.editarButton]}
+                                        onPress={() => abrirModalEditarSocio(client)}
+                                    >
+                                        <MaterialIcons name="edit" size={20} color="#FFFFFF" />
+                                        <Text style={styles.accionButtonText}>Editar</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity 
+                                        style={[styles.accionButton, styles.eliminarButton]}
+                                        onPress={() => eliminarSocio(client)}
+                                    >
+                                        <MaterialIcons name="delete" size={20} color="#FFFFFF" />
+                                        <Text style={styles.accionButtonText}>Eliminar</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        ))
+                    )}
                 </View>
             </ScrollView>
 
-            {/* Botón flotante placeholder para futuras funcionalidades */}
-            <TouchableOpacity style={styles.fabButton} disabled>
-                <MaterialIcons name="person-add" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
+            {/* Modal */}
+            <ClientFormModal 
+                visible={modalVisible}
+                onClose={cerrarModal}
+                onSave={guardarSocio}
+                editingClient={editingClient}
+            />
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.surface,
-    },
-    scrollView: {
-        flex: 1,
-    },
-    headerSection: {
-        padding: theme.spacing.lg,
-        paddingBottom: theme.spacing.md,
-    },
-    sectionTitle: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-        marginBottom: theme.spacing.xs,
-    },
-    sectionSubtitle: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
-    },
-    contentContainer: {
-        paddingHorizontal: theme.spacing.lg,
-        paddingBottom: 120, 
-    },
-    emptyStateContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: theme.spacing.xl * 2,
-        paddingHorizontal: theme.spacing.lg,
-    },
-    emptyStateTitle: {
-        fontSize: theme.typography.fontSize.large,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textSecondary,
-        marginTop: theme.spacing.lg,
-        marginBottom: theme.spacing.sm,
-        textAlign: 'center',
-    },
-    emptyStateSubtitle: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
-        textAlign: 'center',
-        lineHeight: 22,
-    },
-    fabButton: {
-        position: 'absolute',
-        bottom: 50, 
-        right: theme.spacing.lg,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: '#CCCCCC', // Gris para indicar que está deshabilitado
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-});

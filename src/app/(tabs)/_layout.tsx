@@ -40,6 +40,7 @@ export default function TabsLayout() {
     if (path.includes('/facturacion')) return 'Facturación';
     if (path.includes('/temporizador')) return 'Temporizador';
     if (path.includes('/gestion-clases')) return 'Gestión de Clases';
+    if (path.includes('/gestion-socios')) return 'Gestión de Socios';
     if (path.includes('/socios')) return 'Socios';
     if (path.includes('/calculadora-rpm')) return 'Calculadora 1RM';
 

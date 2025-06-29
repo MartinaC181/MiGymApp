@@ -14,7 +14,7 @@ type HeaderProps = {
 const Header = ({ title, showBack = false }: HeaderProps) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname.includes('/home');
+  const isHome = pathname.includes('/home') || pathname.includes('/gestion-socios');
   const { theme, isDarkMode } = useTheme();
 
   const handleBackPress = () => {

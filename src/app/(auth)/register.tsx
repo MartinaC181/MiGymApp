@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserRole, ClientUser, GymUser } from "../../data/Usuario";
 import BirthDateWheel from "../../components/BirthDateWheel";
-import { saveUser, saveSession, getGymNames } from "../../utils/storage";
+import { saveUser, saveSession, getGymNames, getGymUserByBusinessName, addGymClient } from "../../utils/storage";
 
 function isValidEmail(email: string) {
   // Simple email regex
@@ -158,6 +158,21 @@ export default function Register() {
         };
         
         await saveUser(newClientUser);
+        if (selectedOption) {
+          // Asociar cliente al gimnasio
+          const gym = await getGymUserByBusinessName(selectedOption);
+          if (gym) {
+            // Actualizar lista de IDs en el usuario gym
+            const updatedGym: GymUser = {
+              ...gym,
+              clients: [...(gym.clients || []), newClientUser.id],
+            };
+            await saveUser(updatedGym);
+
+            // Guardar datos completos del cliente en la lista de clientes del gimnasio
+            await addGymClient(gym.id, newClientUser);
+          }
+        }
         await saveSession(newClientUser);
       }
       

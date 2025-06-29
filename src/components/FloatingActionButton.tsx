@@ -18,7 +18,7 @@ interface FloatingActionButtonProps {
 export default function FloatingActionButton({
     onPress,
     icon = 'library-add',
-    size = 28,
+    size = 30,
     backgroundColor = theme.colors.primary,
     iconColor = '#FFFFFF',
     bottom = 50,

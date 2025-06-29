@@ -614,3 +614,73 @@ export const deleteGymClass = async (gymUserId: string, classId: number) => {
     return false;
   }
 };
+
+// === FUNCIONES DE CLIENTES (SOCIOS) DE GIMNASIO ===
+
+export const saveGymClients = async (gymUserId: string, clients: any[]) => {
+  try {
+    const key = `@MiGymApp:gymClients:${gymUserId}`;
+    await AsyncStorage.setItem(key, JSON.stringify(clients));
+    return true;
+  } catch (error) {
+    console.error("Error guardando clientes del gimnasio:", error);
+    return false;
+  }
+};
+
+export const getGymClients = async (gymUserId: string) => {
+  try {
+    const key = `@MiGymApp:gymClients:${gymUserId}`;
+    const clients = await AsyncStorage.getItem(key);
+    return clients ? JSON.parse(clients) : [];
+  } catch (error) {
+    console.error("Error obteniendo clientes del gimnasio:", error);
+    return [];
+  }
+};
+
+export const addGymClient = async (gymUserId: string, newClient: any) => {
+  try {
+    const existingClients = await getGymClients(gymUserId);
+    const updatedClients = [...existingClients, newClient];
+    return await saveGymClients(gymUserId, updatedClients);
+  } catch (error) {
+    console.error("Error agregando cliente del gimnasio:", error);
+    return false;
+  }
+};
+
+export const updateGymClient = async (gymUserId: string, clientId: string, updatedClient: any) => {
+  try {
+    const existingClients = await getGymClients(gymUserId);
+    const updatedClients = existingClients.map((client: any) =>
+      client.id === clientId ? updatedClient : client
+    );
+    return await saveGymClients(gymUserId, updatedClients);
+  } catch (error) {
+    console.error("Error actualizando cliente del gimnasio:", error);
+    return false;
+  }
+};
+
+export const deleteGymClient = async (gymUserId: string, clientId: string) => {
+  try {
+    const existingClients = await getGymClients(gymUserId);
+    const updatedClients = existingClients.filter((client: any) => client.id !== clientId);
+    return await saveGymClients(gymUserId, updatedClients);
+  } catch (error) {
+    console.error("Error eliminando cliente del gimnasio:", error);
+    return false;
+  }
+};
+
+export const getGymUserByBusinessName = async (businessName: string): Promise<GymUser | null> => {
+  try {
+    const usersDB = await getUsersDB();
+    const gym = Object.values(usersDB).find(u => (u as GymUser).role === 'gym' && (u as GymUser).businessName === businessName) as GymUser | undefined;
+    return gym || null;
+  } catch (error) {
+    console.error('Error buscando gimnasio por nombre:', error);
+    return null;
+  }
+};
