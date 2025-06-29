@@ -1,5 +1,4 @@
-
-const colors = {
+const lightColors = {
   primary: '#00BFFF',
   background: '#ffffff',
   textPrimary: '#111111',
@@ -7,6 +6,20 @@ const colors = {
   surface: '#F4F4F4',
   success: '#88DA62',
   error: '#FF5A5F',
+  card: '#ffffff',
+  border: '#E0E0E0',
+};
+
+const darkColors = {
+  primary: '#00BFFF',
+  background: '#121212',
+  textPrimary: '#ffffff',
+  textSecondary: '#B0B0B0',
+  surface: '#1E1E1E',
+  success: '#88DA62',
+  error: '#FF5A5F',
+  card: '#1E1E1E',
+  border: '#2C2C2C',
 };
 
 const spacing = {
@@ -39,11 +52,21 @@ const typography = {
   },
 };
 
-const theme = {
-  colors,
+export const lightTheme = {
+  colors: lightColors,
   spacing,
   borderRadius,
   typography,
 };
+
+export const darkTheme = {
+  colors: darkColors,
+  spacing,
+  borderRadius,
+  typography,
+};
+
+// Tema por defecto (modo claro)
+const theme = lightTheme;
 
 export default theme;

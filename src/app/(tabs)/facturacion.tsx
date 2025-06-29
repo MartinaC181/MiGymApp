@@ -116,7 +116,6 @@ export default function Facturacion() {
      // Función para manejar el pago con Mercado Pago
      const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
-        console.log("Procesando pago con Mercado Pago...");
         const data = await handleIntegrationMercadoPago();
 
         if (!data) {

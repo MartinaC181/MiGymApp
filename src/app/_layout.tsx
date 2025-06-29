@@ -11,15 +11,16 @@ import {
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
 
-import theme from "../constants/theme";
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function AppContent() {
+  const { theme, isDarkMode } = useTheme();
   const [fontsLoaded] = useFonts({
-    [theme.typography.fontFamily.regular]: Roboto_400Regular,
-    [theme.typography.fontFamily.medium]: Roboto_500Medium,
-    [theme.typography.fontFamily.bold]: Roboto_700Bold,
+    'Roboto-Regular': Roboto_400Regular,
+    'Roboto-Medium': Roboto_500Medium,
+    'Roboto-Bold': Roboto_700Bold,
   });
 
   useEffect(() => {
@@ -28,27 +29,40 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-
   if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider>
       <StatusBar 
-        barStyle="light-content" 
-        backgroundColor={theme.colors.primary} 
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor={isDarkMode ? '#0066CC' : theme.colors.primary} 
         translucent={true}
       />
-      <View style={styles.container}>
+      <View style={[
+        styles.container, 
+        { 
+          backgroundColor: theme.colors.background,
+          paddingTop: isDarkMode ? 0 : 0,
+          paddingBottom: isDarkMode ? 0 : 0
+        }
+      ]}>
         <Slot />
       </View>
     </SafeAreaProvider>
   );
 }
 
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
 });
 

@@ -3,13 +3,15 @@ import { View, Pressable, Text, Keyboard } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../styles/navigation';
-import theme from '../constants/theme';
+import useNavigationStyles from '../styles/navigation';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const styles = useNavigationStyles();
+  const { theme, isDarkMode } = useTheme();
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -49,7 +51,7 @@ export default function Navigation() {
           <MaterialCommunityIcons
             name={iconName}
             size={36}
-            color={theme.colors.primary}
+            color={isDarkMode ? '#000000' : theme.colors.primary}
           />
         </Pressable>
         <Text style={styles.iconText}>
