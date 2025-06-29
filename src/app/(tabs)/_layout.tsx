@@ -5,11 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import useTabsLayoutStyles from '../../styles/tabsLayout';
 import Navigation from '../../components/Navigation';
 import Header from '../../components/Header';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function TabsLayout() {
   const pathname = usePathname();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const styles = useTabsLayoutStyles();
+  const { timerState, setTimerState } = useTheme();
   
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -27,6 +29,13 @@ export default function TabsLayout() {
 
   // Función para obtener el título basado en la ruta actual
   const getHeaderTitle = (path: string) => {
+    // Si estamos en temporizador, mostrar título dinámico según el estado
+    if (path.includes('/temporizador')) {
+      if (timerState === 'timer') return 'Temporizador';
+      if (timerState === 'stopwatch') return 'Cronómetro';
+      return 'Reloj';
+    }
+    
     if (path.includes('/home')) return 'Inicio';
     if (path.includes('/clases')) return 'Clases';
     if (path.includes('/rutina')) return 'Rutina';
@@ -39,7 +48,6 @@ export default function TabsLayout() {
     if (path.includes('/Settings')) return 'Configuración';
     if (path.includes('/GrupoDetalle')) return 'Editar Rutina';
     if (path.includes('/facturacion')) return 'Facturación';
-    if (path.includes('/temporizador')) return 'Temporizador';
     if (path.includes('/gestion-clases')) return 'Gestión de Clases';
     if (path.includes('/gestion-socios')) return 'Gestión de Socios';
     if (path.includes('/socios')) return 'Socios';
@@ -48,9 +56,24 @@ export default function TabsLayout() {
     return 'Mi Gym App';
   };
 
+  // Función para manejar el botón de volver
+  const handleBack = () => {
+    // Si estamos en temporizador y hay una herramienta activa, volver a la selección
+    if (pathname.includes('/temporizador') && timerState !== 'selection') {
+      setTimerState('selection');
+      return;
+    }
+    // Comportamiento normal para otras pantallas
+    return null; // Esto permitirá que el Header maneje la navegación normal
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <Header title={getHeaderTitle(pathname)} showBack />
+      <Header 
+        title={getHeaderTitle(pathname)} 
+        showBack 
+        onBackPress={handleBack}
+      />
       <View style={styles.content}>
         <Slot />
       </View>

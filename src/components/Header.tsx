@@ -9,15 +9,26 @@ import { useTheme } from "../context/ThemeContext";
 type HeaderProps = {
   title: string;
   showBack?: boolean;
+  onBackPress?: () => void | null;
 };
 
-const Header = ({ title, showBack = false }: HeaderProps) => {
+const Header = ({ title, showBack = false, onBackPress }: HeaderProps) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
   const isHome = pathname.includes('/home') || pathname.includes('/gestion-socios');
   const { theme, isDarkMode } = useTheme();
 
   const handleBackPress = () => {
+    // Si hay una función personalizada de back, usarla primero
+    if (onBackPress) {
+      const result = onBackPress();
+      // Si la función personalizada devuelve algo (no null), no continuar con la lógica normal
+      if (result !== null) {
+        return;
+      }
+    }
+    
+    // Lógica normal del back
     if (isHome) {
       // Si estamos en home, mostrar modal de confirmación
       setShowLogoutModal(true);
