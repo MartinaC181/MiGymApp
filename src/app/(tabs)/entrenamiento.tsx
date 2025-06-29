@@ -66,7 +66,6 @@ export default function Entrenamiento() {
       router.push(option.route);
     } else {
       // TODO: Implementar navegación para otras opciones
-      console.log(`Navegando a ${option.title}`);
     }
   };
 

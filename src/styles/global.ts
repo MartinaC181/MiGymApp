@@ -1,14 +1,15 @@
 import { StyleSheet } from "react-native";
-import theme from "../constants/theme";
+import { lightTheme } from "../constants/theme";
 
-const globalStyles = StyleSheet.create({
+// Función para crear estilos dinámicos basados en el tema
+export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.background,
     padding: theme.spacing.lg,
     justifyContent: "center",
     alignItems: "center",
@@ -54,7 +55,7 @@ const globalStyles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#D9D9D9",
+    borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
     height: 45,
     width: "100%",
@@ -62,6 +63,7 @@ const globalStyles = StyleSheet.create({
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.regular,
     backgroundColor: theme.colors.background,
+    color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
   },
   LoginButton: {
@@ -134,14 +136,14 @@ const globalStyles = StyleSheet.create({
   socialButton: {
     borderWidth: 1,
     width: "100%",
-    borderColor: "#D9D9D9",
+    borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.card,
     marginTop: theme.spacing.md,
   },
   socialText: {
@@ -191,14 +193,13 @@ const globalStyles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.regular,
     fontWeight: "bold",
     marginBottom: theme.spacing.sm,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textPrimary,
   },
   modalText: {
     fontSize: theme.typography.fontSize.small,
     fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.textSecondary,
     textAlign: "center",
-    marginBottom: theme.spacing.md,
   },
   pickerContainer: {
     flexDirection: "row",
@@ -708,5 +709,8 @@ const globalStyles = StyleSheet.create({
     flex: 1,
   },
 });
+
+// Estilos por defecto para compatibilidad con código existente
+const globalStyles = createGlobalStyles(lightTheme);
 
 export default globalStyles;
