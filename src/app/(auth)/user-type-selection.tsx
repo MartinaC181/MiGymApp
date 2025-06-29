@@ -2,11 +2,13 @@ import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import globalStyles from "../../styles/global";
-import theme from "../../constants/theme";
+import { useTheme } from "../../context/ThemeContext";
+import { createGlobalStyles } from "../../styles/global";
 
 export default function UserTypeSelection() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const globalStyles = createGlobalStyles(theme);
 
   const handleUserTypeSelection = (userType: 'gym' | 'client') => {
     router.push(`/register?userType=${userType}`);

@@ -18,13 +18,14 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import globalStyles from '../../styles/global';
-import theme from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 import { exerciseAPI, Exercise, ExerciseFilter, getAvailableMuscleGroups, getCommonEquipment } from '../../utils/ExerciseAPI';
 
 const { width } = Dimensions.get('window');
 
 export default function BibliotecaEjercicios() {
   const router = useRouter();
+  const { theme, isDarkMode } = useTheme();
   
   // Estados existentes
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
@@ -257,7 +258,11 @@ export default function BibliotecaEjercicios() {
         style={[
           styles.exerciseCard,
           isGrid ? styles.gridCard : styles.listCard,
-          { marginRight: isGrid && index % 2 === 0 ? 8 : 0 }
+          { 
+            marginRight: isGrid && index % 2 === 0 ? 8 : 0,
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.colors.textPrimary
+          }
         ]}
         onPress={() => showExerciseDetails(ejercicio)}
         activeOpacity={0.9}
@@ -287,27 +292,27 @@ export default function BibliotecaEjercicios() {
         </View>
         
         <View style={[styles.cardContent, isGrid && styles.gridCardContent]}>
-          <Text style={[styles.exerciseName, isGrid && styles.gridExerciseName]} numberOfLines={isGrid ? 2 : 1}>
+          <Text style={[styles.exerciseName, isGrid && styles.gridExerciseName, { color: theme.colors.textPrimary }]} numberOfLines={isGrid ? 2 : 1}>
             {ejercicio.name}
           </Text>
           
           <View style={styles.exerciseMetadata}>
             <View style={styles.metadataItem}>
               <MaterialCommunityIcons name="target" size={12} color={theme.colors.primary} />
-              <Text style={styles.metadataText}>{ejercicio.target}</Text>
+              <Text style={[styles.metadataText, { color: theme.colors.textSecondary }]}>{ejercicio.target}</Text>
             </View>
             
             {!isGrid && (
               <View style={styles.metadataItem}>
                 <MaterialCommunityIcons name="dumbbell" size={12} color={theme.colors.primary} />
-                <Text style={styles.metadataText}>{ejercicio.equipment}</Text>
+                <Text style={[styles.metadataText, { color: theme.colors.textSecondary }]}>{ejercicio.equipment}</Text>
               </View>
             )}
           </View>
           
           <View style={styles.cardActions}>
             <TouchableOpacity
-              style={styles.addBtn}
+              style={[styles.addBtn, { backgroundColor: theme.colors.primary }]}
               onPress={() => addToRoutine(ejercicio)}
             >
               <MaterialIcons name="add" size={14} color="white" />
@@ -336,6 +341,634 @@ export default function BibliotecaEjercicios() {
       </LinearGradient>
     </TouchableOpacity>
   );
+
+  // Función para generar estilos dinámicos
+  const getDynamicStyles = () => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    
+    // Header mejorado
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      backgroundColor: theme.colors.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    backBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: isDarkMode ? '#2A2A2A' : '#F1F5F9',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerCenter: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+    },
+    headerSubtitle: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    viewModeBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: isDarkMode ? '#2A2A2A' : '#F1F5F9',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    filterBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: isDarkMode ? '#2A2A2A' : '#F1F5F9',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    // Búsqueda mejorada
+    searchSection: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      backgroundColor: theme.colors.card,
+      gap: 12,
+    },
+    searchContainer: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDarkMode ? '#1A1A1A' : '#F8FAFC',
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      height: 48,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 16,
+      color: theme.colors.textPrimary,
+    },
+    clearBtn: {
+      padding: 4,
+    },
+    searchBtn: {
+      width: 48,
+      height: 48,
+      borderRadius: 12,
+      backgroundColor: theme.colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    // Categorías
+    categoriesSection: {
+      backgroundColor: theme.colors.card,
+      paddingVertical: 16,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: 12,
+      paddingHorizontal: 20,
+    },
+    categoriesContainer: {
+      paddingHorizontal: 16,
+    },
+    categoryCard: {
+      width: 80,
+      height: 80,
+      marginHorizontal: 4,
+      borderRadius: 16,
+      overflow: 'hidden',
+    },
+    categoryGradient: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+    },
+    categoryText: {
+      fontSize: 11,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: 'white',
+      textAlign: 'center',
+    },
+
+    // Filtros activos
+    activeFilters: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingBottom: 12,
+      flexWrap: 'wrap',
+      backgroundColor: theme.colors.card,
+    },
+    filterChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDarkMode ? '#1A3A5F' : '#EBF4FF',
+      borderRadius: 20,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      marginRight: 8,
+      marginBottom: 4,
+    },
+    filterChipText: {
+      color: theme.colors.primary,
+      fontSize: 12,
+      fontFamily: theme.typography.fontFamily.medium,
+      marginRight: 4,
+    },
+    clearFiltersBtn: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+    clearFiltersText: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+      textDecorationLine: 'underline',
+    },
+
+    // Ejercicios
+    exercisesSection: {
+      flex: 1,
+      backgroundColor: isDarkMode ? '#0A0A0A' : '#F8FAFC',
+      paddingTop: 16,
+    },
+    exercisesHeader: {
+      paddingHorizontal: 20,
+      marginBottom: 16,
+    },
+    exercisesList: {
+      paddingHorizontal: 16,
+      paddingBottom: 100,
+    },
+
+    // Cards de ejercicios
+    exerciseCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 16,
+      marginBottom: 16,
+      shadowColor: theme.colors.textPrimary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    gridCard: {
+      width: (width - 48) / 2,
+    },
+    listCard: {
+      width: '100%',
+      flexDirection: 'row',
+    },
+    cardImageContainer: {
+      height: 120,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      overflow: 'hidden',
+      position: 'relative',
+    },
+    gridImageContainer: {
+      height: 100,
+    },
+    exerciseImage: {
+      width: '100%',
+      height: '100%',
+    },
+    placeholderGradient: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    favoriteBtn: {
+      position: 'absolute',
+      top: 8,
+      right: 8,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    cardContent: {
+      padding: 12,
+    },
+    gridCardContent: {
+      padding: 10,
+    },
+    exerciseName: {
+      fontSize: 14,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: 6,
+    },
+    gridExerciseName: {
+      fontSize: 13,
+      lineHeight: 16,
+    },
+    exerciseMetadata: {
+      marginBottom: 8,
+    },
+    metadataItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 2,
+    },
+    metadataText: {
+      fontSize: 11,
+      color: theme.colors.textSecondary,
+      marginLeft: 4,
+      flex: 1,
+    },
+    cardActions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+    },
+    addBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      gap: 2,
+    },
+    addBtnText: {
+      fontSize: 10,
+      color: 'white',
+      fontFamily: theme.typography.fontFamily.bold,
+    },
+
+    // Estados de carga y vacío
+    loadingContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 40,
+    },
+    loadingText: {
+      marginTop: 12,
+      color: theme.colors.textSecondary,
+      fontSize: 14,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 60,
+    },
+    emptyText: {
+      fontSize: 18,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textSecondary,
+      marginTop: 16,
+      textAlign: 'center',
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginTop: 8,
+      textAlign: 'center',
+    },
+
+    // Modales
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalBackdrop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'transparent',
+    },
+    filterModal: {
+      backgroundColor: theme.colors.card,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      minHeight: '60%',
+      maxHeight: '85%',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 10,
+      elevation: 5,
+      flex: 1,
+    },
+    closeButton: {
+      padding: 8,
+      borderRadius: 20,
+      backgroundColor: isDarkMode ? '#2A2A2A' : '#F1F5F9',
+    },
+    exerciseModal: {
+      backgroundColor: theme.colors.card,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      maxHeight: '90%',
+      flex: 1,
+      marginTop: 80,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+    },
+    filterContent: {
+      flex: 1,
+      paddingHorizontal: 20,
+      paddingTop: 20,
+      paddingBottom: 10,
+    },
+    filterSection: {
+      marginBottom: 28,
+    },
+    filterSectionTitle: {
+      fontSize: 18,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: 16,
+      fontWeight: '700',
+    },
+    filterOptions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      paddingVertical: 4,
+    },
+    filterOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.card,
+      borderRadius: 20,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      minWidth: 70,
+      minHeight: 40,
+      shadowColor: theme.colors.textPrimary,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+      marginBottom: 4,
+    },
+    filterOptionSelected: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+      shadowColor: theme.colors.primary,
+      shadowOpacity: 0.3,
+      elevation: 4,
+    },
+    filterOptionText: {
+      fontSize: 14,
+      color: theme.colors.textPrimary,
+      textAlign: 'center',
+      fontFamily: theme.typography.fontFamily.medium,
+      fontWeight: '600',
+      paddingHorizontal: 2,
+      flexShrink: 1,
+    },
+    filterOptionTextSelected: {
+      color: '#FFFFFF',
+      fontFamily: theme.typography.fontFamily.bold,
+      fontWeight: '700',
+    },
+    modalActions: {
+      flexDirection: 'row',
+      padding: 20,
+      gap: 12,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+    },
+    clearBtn2: {
+      flex: 1,
+      backgroundColor: isDarkMode ? '#1A1A1A' : '#F9FAFB',
+      borderRadius: 12,
+      paddingVertical: 18,
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    clearBtnText: {
+      fontSize: 17,
+      color: theme.colors.textPrimary,
+      fontFamily: theme.typography.fontFamily.bold,
+      fontWeight: '600',
+    },
+    applyBtn: {
+      flex: 1,
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      paddingVertical: 18,
+      alignItems: 'center',
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    applyBtnText: {
+      fontSize: 17,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+
+    // Modal de ejercicio
+    exerciseModalHeader: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 20,
+      zIndex: 1,
+    },
+    closeModalBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    favoriteModalBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    exerciseDetails: {
+      flex: 1,
+    },
+    exerciseImageModal: {
+      height: 250,
+      backgroundColor: isDarkMode ? '#1A1A1A' : '#F8FAFC',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    exerciseDetailImage: {
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+    },
+    exerciseInfo: {
+      padding: 20,
+    },
+    exerciseModalTitle: {
+      fontSize: 24,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    exerciseMetrics: {
+      flexDirection: 'row',
+      gap: 12,
+      marginBottom: 24,
+    },
+    metricCard: {
+      flex: 1,
+      backgroundColor: isDarkMode ? '#1A1A1A' : '#F8FAFC',
+      borderRadius: 12,
+      padding: 16,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    metricLabel: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: 4,
+      marginBottom: 2,
+    },
+    metricValue: {
+      fontSize: 12,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      textAlign: 'center',
+    },
+    detailSection: {
+      marginBottom: 24,
+    },
+    detailLabel: {
+      fontSize: 16,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: 12,
+    },
+    muscleChips: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    muscleChip: {
+      backgroundColor: isDarkMode ? '#1A3A5F' : '#EBF4FF',
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+    muscleChipText: {
+      fontSize: 12,
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.medium,
+    },
+    instructionsList: {
+      gap: 12,
+    },
+    instructionItem: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 12,
+    },
+    instructionNumber: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: theme.colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 2,
+    },
+    instructionNumberText: {
+      fontSize: 12,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: 'white',
+    },
+    instructionText: {
+      flex: 1,
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+    },
+    exerciseModalActions: {
+      padding: 20,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+    },
+    addToRoutineBtn: {
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    addToRoutineBtnGradient: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 16,
+      gap: 8,
+    },
+    addToRoutineBtnText: {
+      fontSize: 16,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: 'white',
+    },
+  });
+
+  const styles = getDynamicStyles();
 
   return (
     <View style={styles.container}>
@@ -371,18 +1004,18 @@ export default function BibliotecaEjercicios() {
       {/* Barra de búsqueda mejorada */}
       <View style={styles.searchSection}>
         <View style={styles.searchContainer}>
-          <MaterialIcons name="search" size={20} color="#999" style={styles.searchIcon} />
+          <MaterialIcons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Buscar ejercicios..."
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.colors.textSecondary}
             value={searchText}
             onChangeText={setSearchText}
             onSubmitEditing={handleSearch}
           />
           {searchText.length > 0 && (
             <TouchableOpacity onPress={() => setSearchText('')} style={styles.clearBtn}>
-              <MaterialIcons name="close" size={16} color="#999" />
+              <MaterialIcons name="close" size={16} color={theme.colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
@@ -524,14 +1157,26 @@ export default function BibliotecaEjercicios() {
                       key={muscle}
                       style={[
                         styles.filterOption,
-                        (selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && styles.filterOptionSelected
+                        { 
+                          backgroundColor: theme.colors.card,
+                          borderColor: theme.colors.border,
+                          shadowColor: theme.colors.textPrimary
+                        },
+                        (selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && {
+                          backgroundColor: theme.colors.primary,
+                          borderColor: theme.colors.primary,
+                          shadowColor: theme.colors.primary
+                        }
                       ]}
                       onPress={() => setSelectedMuscle(muscle === 'Todos' ? '' : muscle)}
                     >
                       <Text 
                         style={[
                           styles.filterOptionText,
-                          (selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && styles.filterOptionTextSelected
+                          { color: theme.colors.textPrimary },
+                          (selectedMuscle === muscle || (muscle === 'Todos' && !selectedMuscle)) && {
+                            color: '#FFFFFF'
+                          }
                         ]}
                       >
                         {muscle}
@@ -553,14 +1198,26 @@ export default function BibliotecaEjercicios() {
                       key={equipment}
                       style={[
                         styles.filterOption,
-                        (selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && styles.filterOptionSelected
+                        { 
+                          backgroundColor: theme.colors.card,
+                          borderColor: theme.colors.border,
+                          shadowColor: theme.colors.textPrimary
+                        },
+                        (selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && {
+                          backgroundColor: theme.colors.primary,
+                          borderColor: theme.colors.primary,
+                          shadowColor: theme.colors.primary
+                        }
                       ]}
                       onPress={() => setSelectedEquipment(equipment === 'Todos' ? '' : equipment)}
                     >
                       <Text 
                         style={[
                           styles.filterOptionText,
-                          (selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && styles.filterOptionTextSelected
+                          { color: theme.colors.textPrimary },
+                          (selectedEquipment === equipment || (equipment === 'Todos' && !selectedEquipment)) && {
+                            color: '#FFFFFF'
+                          }
                         ]}
                       >
                         {equipment}
@@ -690,630 +1347,4 @@ export default function BibliotecaEjercicios() {
       </Modal>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  
-  // Header mejorado
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginTop: 2,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  viewModeBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Búsqueda mejorada
-  searchSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: 'white',
-    gap: 12,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    height: 48,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: theme.colors.textPrimary,
-  },
-  clearBtn: {
-    padding: 4,
-  },
-  searchBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Categorías
-  categoriesSection: {
-    backgroundColor: 'white',
-    paddingVertical: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: 12,
-    paddingHorizontal: 20,
-  },
-  categoriesContainer: {
-    paddingHorizontal: 16,
-  },
-  categoryCard: {
-    width: 80,
-    height: 80,
-    marginHorizontal: 4,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  categoryGradient: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  categoryText: {
-    fontSize: 11,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
-    textAlign: 'center',
-  },
-
-  // Filtros activos
-  activeFilters: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    flexWrap: 'wrap',
-    backgroundColor: 'white',
-  },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EBF4FF',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginRight: 8,
-    marginBottom: 4,
-  },
-  filterChipText: {
-    color: theme.colors.primary,
-    fontSize: 12,
-    fontFamily: theme.typography.fontFamily.medium,
-    marginRight: 4,
-  },
-  clearFiltersBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  clearFiltersText: {
-    color: theme.colors.textSecondary,
-    fontSize: 12,
-    textDecorationLine: 'underline',
-  },
-
-  // Ejercicios
-  exercisesSection: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-    paddingTop: 16,
-  },
-  exercisesHeader: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  exercisesList: {
-    paddingHorizontal: 16,
-    paddingBottom: 100,
-  },
-
-  // Cards de ejercicios
-  exerciseCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  gridCard: {
-    width: (width - 48) / 2,
-  },
-  listCard: {
-    width: '100%',
-    flexDirection: 'row',
-  },
-  cardImageContainer: {
-    height: 120,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  gridImageContainer: {
-    height: 100,
-  },
-  exerciseImage: {
-    width: '100%',
-    height: '100%',
-  },
-  placeholderGradient: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteBtn: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardContent: {
-    padding: 12,
-  },
-  gridCardContent: {
-    padding: 10,
-  },
-  exerciseName: {
-    fontSize: 14,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: 6,
-  },
-  gridExerciseName: {
-    fontSize: 13,
-    lineHeight: 16,
-  },
-  exerciseMetadata: {
-    marginBottom: 8,
-  },
-  metadataItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  metadataText: {
-    fontSize: 11,
-    color: theme.colors.textSecondary,
-    marginLeft: 4,
-    flex: 1,
-  },
-  cardActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    gap: 2,
-  },
-  addBtnText: {
-    fontSize: 10,
-    color: 'white',
-    fontFamily: theme.typography.fontFamily.bold,
-  },
-
-  // Estados de carga y vacío
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  loadingText: {
-    marginTop: 12,
-    color: theme.colors.textSecondary,
-    fontSize: 14,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textSecondary,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-
-  // Modales
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'transparent',
-  },
-  filterModal: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    minHeight: '60%',
-    maxHeight: '85%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
-    flex: 1,
-  },
-  closeButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-  },
-  exerciseModal: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '90%',
-    flex: 1,
-    marginTop: 80,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-  },
-  filterContent: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  filterSection: {
-    marginBottom: 28,
-  },
-  filterSectionTitle: {
-    fontSize: 18,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: '#111827',
-    marginBottom: 16,
-    fontWeight: '700',
-  },
-  filterOptions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    paddingVertical: 4,
-  },
-  filterOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 2,
-    borderColor: '#E2E8F0',
-    minWidth: 70,
-    minHeight: 40,
-    // Se removió maxWidth para permitir que se adapte al contenido
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-    marginBottom: 4,
-  },
-  filterOptionSelected: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-    shadowColor: theme.colors.primary,
-    shadowOpacity: 0.3,
-    elevation: 4,
-  },
-  filterOptionText: {
-    fontSize: 14,
-    color: '#1F2937',
-    textAlign: 'center',
-    fontFamily: theme.typography.fontFamily.medium,
-    fontWeight: '600',
-    paddingHorizontal: 2,
-    flexShrink: 1,
-  },
-  filterOptionTextSelected: {
-    color: '#FFFFFF',
-    fontFamily: theme.typography.fontFamily.bold,
-    fontWeight: '700',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    padding: 20,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-  },
-  clearBtn2: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    paddingVertical: 18,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-  },
-  clearBtnText: {
-    fontSize: 17,
-    color: '#374151',
-    fontFamily: theme.typography.fontFamily.bold,
-    fontWeight: '600',
-  },
-  applyBtn: {
-    flex: 1,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    paddingVertical: 18,
-    alignItems: 'center',
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  applyBtnText: {
-    fontSize: 17,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-
-  // Modal de ejercicio
-  exerciseModalHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
-    zIndex: 1,
-  },
-  closeModalBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteModalBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  exerciseDetails: {
-    flex: 1,
-  },
-  exerciseImageModal: {
-    height: 250,
-    backgroundColor: '#F8FAFC',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  exerciseDetailImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  exerciseInfo: {
-    padding: 20,
-  },
-  exerciseModalTitle: {
-    fontSize: 24,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  exerciseMetrics: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
-  metricCard: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  metricLabel: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginTop: 4,
-    marginBottom: 2,
-  },
-  metricValue: {
-    fontSize: 12,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
-  },
-  detailSection: {
-    marginBottom: 24,
-  },
-  detailLabel: {
-    fontSize: 16,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: 12,
-  },
-  muscleChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  muscleChip: {
-    backgroundColor: '#EBF4FF',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  muscleChipText: {
-    fontSize: 12,
-    color: theme.colors.primary,
-    fontFamily: theme.typography.fontFamily.medium,
-  },
-  instructionsList: {
-    gap: 12,
-  },
-  instructionItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  instructionNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-  instructionNumberText: {
-    fontSize: 12,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
-  },
-  instructionText: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    lineHeight: 20,
-  },
-  exerciseModalActions: {
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-  },
-  addToRoutineBtn: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  addToRoutineBtnGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    gap: 8,
-  },
-  addToRoutineBtnText: {
-    fontSize: 16,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
-  },
-}); 
+} 

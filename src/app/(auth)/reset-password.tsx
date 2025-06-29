@@ -9,12 +9,15 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
-import globalStyles from "../../styles/global";
+import { createGlobalStyles } from "../../styles/global";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import theme from "../../constants/theme";
+import { useTheme } from "../../context/ThemeContext";
 import React from "react";
 
 export default function ResetPassword() {
+  const { theme } = useTheme();
+  const globalStyles = createGlobalStyles(theme);
+  
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -99,7 +102,7 @@ export default function ResetPassword() {
             />
 
             <TouchableOpacity>
-                <Text>Volver a <Text  style={globalStyles.successLink} onPress={() => router.replace("/login")}>iniciar sesión.</Text></Text>
+                <Text style={{ color: theme.colors.textPrimary }}>Volver a <Text  style={globalStyles.successLink} onPress={() => router.replace("/login")}>iniciar sesión.</Text></Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -1,12 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import globalStyles from '../../styles/global';
-import theme from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfile = ({navigation}: any) => {
+    const { theme, isDarkMode } = useTheme();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [weight, setWeight] = useState('');
@@ -85,54 +86,84 @@ const EditProfile = ({navigation}: any) => {
     };
 
     return (
-        <View style={globalStyles.safeArea}>
-            <View style={{padding: theme.spacing.lg}}>
-                <Text style={globalStyles.label}>Nombre y Apellido</Text>
+        <View style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
+            <View style={{padding: 24}}>
+                <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Nombre y Apellido</Text>
                 <TextInput
-                    style={globalStyles.input}
+                    style={[globalStyles.input, { 
+                        backgroundColor: theme.colors.surface,
+                        color: theme.colors.textPrimary,
+                        borderColor: theme.colors.border
+                    }]}
                     value={name}
                     onChangeText={setName}
-                    placeholder="Nombre y Apellido"/>
+                    placeholder="Nombre y Apellido"
+                    placeholderTextColor={theme.colors.textSecondary}/>
                 {nameError ? <Text style={globalStyles.errorText}>{nameError}</Text> : null}
 
-                <Text style={globalStyles.label}>Email</Text>
+                <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Email</Text>
                 <TextInput
-                    style={globalStyles.input}
+                    style={[globalStyles.input, { 
+                        backgroundColor: theme.colors.surface,
+                        color: theme.colors.textPrimary,
+                        borderColor: theme.colors.border
+                    }]}
                     value={email}
                     onChangeText={setEmail}
                     placeholder="Email"
+                    placeholderTextColor={theme.colors.textSecondary}
                     keyboardType="email-address"/>
                 {emailError ? <Text style={globalStyles.errorText}>{emailError}</Text> : null}
 
-                <Text style={globalStyles.label}>Peso actual (Kg)</Text>
+                <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Peso actual (Kg)</Text>
                 <TextInput
-                    style={globalStyles.input}
+                    style={[globalStyles.input, { 
+                        backgroundColor: theme.colors.surface,
+                        color: theme.colors.textPrimary,
+                        borderColor: theme.colors.border
+                    }]}
                     value={weight}
                     onChangeText={setWeight}
                     placeholder="Kg"
+                    placeholderTextColor={theme.colors.textSecondary}
                     keyboardType="decimal-pad"/>
                 {weightError ? <Text style={globalStyles.errorText}>{weightError}</Text> : null}
 
-                <Text style={globalStyles.label}>Peso ideal</Text>
+                <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Peso ideal</Text>
                 <TextInput
-                    style={globalStyles.input}
+                    style={[globalStyles.input, { 
+                        backgroundColor: theme.colors.surface,
+                        color: theme.colors.textPrimary,
+                        borderColor: theme.colors.border
+                    }]}
                     value={idealWeight}
                     onChangeText={setIdealWeight}
                     placeholder="Kg"
+                    placeholderTextColor={theme.colors.textSecondary}
                     keyboardType="decimal-pad"/>
                 {idealWeightError ? <Text style={globalStyles.errorText}>{idealWeightError}</Text> : null}
 
-                <Text style={globalStyles.label}>Altura (Cm)</Text>
+                <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Altura (Cm)</Text>
                 <TextInput
-                    style={globalStyles.input}
+                    style={[globalStyles.input, { 
+                        backgroundColor: theme.colors.surface,
+                        color: theme.colors.textPrimary,
+                        borderColor: theme.colors.border
+                    }]}
                     value={height}
                     onChangeText={setHeight}
                     placeholder="cm"
+                    placeholderTextColor={theme.colors.textSecondary}
                     keyboardType="decimal-pad"/>
                 {heightError ? <Text style={globalStyles.errorText}>{heightError}</Text> : null}
 
-                <TouchableOpacity style={globalStyles.LoginButton} onPress={handleSave} disabled={isLoading}>
-                    <Text style={globalStyles.buttonText}>Guardar cambios</Text>
+                <TouchableOpacity 
+                    style={[globalStyles.LoginButton, { backgroundColor: theme.colors.primary }]} 
+                    onPress={handleSave} 
+                    disabled={isLoading}>
+                    <Text style={[globalStyles.buttonText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>
+                        Guardar cambios
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>

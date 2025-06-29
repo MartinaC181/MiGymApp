@@ -23,7 +23,7 @@ export default function useClasesStyles() {
         classTitle: {
             fontSize: 28,
             fontFamily: theme.typography.fontFamily.bold,
-            color: '#FFFFFF',
+            color: isDarkMode ? '#E0E0E0' : theme.colors.background,
             textAlign: 'center',
             marginBottom: theme.spacing.sm,
         },

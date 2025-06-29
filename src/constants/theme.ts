@@ -8,6 +8,10 @@ const lightColors = {
   error: '#FF5A5F',
   card: '#ffffff',
   border: '#E0E0E0',
+  inputBackground: '#ffffff',
+  buttonBackground: '#00BFFF',
+  socialButtonBackground: '#ffffff',
+  shadowColor: '#000000',
 };
 
 const darkColors = {
@@ -15,11 +19,15 @@ const darkColors = {
   background: '#0A0A0A',
   textPrimary: '#FFFFFF',
   textSecondary: '#CCCCCC',
-  surface: '#1A1A1A',
+  surface: '#2A2A2A',
   success: '#4CAF50',
   error: '#FF5252',
-  card: '#2A2A2A',
+  card: '#1E1E1E',
   border: '#404040',
+  inputBackground: '#1A1A1A',
+  buttonBackground: '#00BFFF',
+  socialButtonBackground: '#2A2A2A',
+  shadowColor: '#000000',
 };
 
 const spacing = {

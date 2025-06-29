@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import globalStyles from '../../styles/global';
-import theme from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,10 +38,12 @@ const grupos = [
 ];
 
 export default function Rutina() {
+  const { theme, isDarkMode } = useTheme();
+
   const renderGrupoCard = (grupo: any, index: number) => (
     <TouchableOpacity
       key={grupo.nombre}
-      style={styles.grupoCard}
+      style={[styles.grupoCard, { backgroundColor: theme.colors.card }]}
       onPress={() => {
         router.push({
           pathname: '/GrupoDetalle',  
@@ -98,10 +100,10 @@ export default function Rutina() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Mis Rutinas</Text>
-        <Text style={styles.subtitle}>Selecciona el grupo muscular a entrenar</Text>
+        <Text style={[styles.title, { color: theme.colors.textPrimary }]}>Mis Rutinas</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Selecciona el grupo muscular a entrenar</Text>
       </View>
       
       <ScrollView 
@@ -112,13 +114,16 @@ export default function Rutina() {
           {grupos.map((grupo, index) => renderGrupoCard(grupo, index))}
         </View>
         
-        <TouchableOpacity style={styles.addRoutineButton}>
+        <TouchableOpacity style={[styles.addRoutineButton, { backgroundColor: theme.colors.surface }]}>
           <LinearGradient
-            colors={['rgba(0, 191, 255, 0.1)', 'rgba(0, 191, 255, 0.05)']}
+            colors={isDarkMode 
+              ? ['rgba(0, 191, 255, 0.2)', 'rgba(0, 191, 255, 0.1)'] 
+              : ['rgba(0, 191, 255, 0.1)', 'rgba(0, 191, 255, 0.05)']
+            }
             style={styles.addButtonGradient}
           >
             <MaterialIcons name="add" size={24} color={theme.colors.primary} />
-            <Text style={styles.addButtonText}>Crear rutina personalizada</Text>
+            <Text style={[styles.addButtonText, { color: theme.colors.primary }]}>Crear rutina personalizada</Text>
           </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
@@ -129,39 +134,36 @@ export default function Rutina() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   headerContainer: {
-    padding: theme.spacing.md,
+    padding: 16,
   },
   title: {
-    fontSize: theme.typography.fontSize.large,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
+    fontSize: 20,
+    fontFamily: 'Roboto-Bold',
   },
   subtitle: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
   },
   scrollContent: {
     width: '100%',
     alignItems: 'center',
-    paddingBottom: theme.spacing.xl,
+    paddingBottom: 32,
   },
   gruposContainer: {
     width: '100%',
-    padding: theme.spacing.md,
+    padding: 16,
   },
   grupoCard: {
     width: '100%',
-    borderRadius: theme.borderRadius.lg,
-    marginBottom: theme.spacing.md,
+    borderRadius: 16,
+    marginBottom: 16,
   },
   cardGradient: {
     flex: 1,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
+    borderRadius: 16,
+    padding: 16,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -175,65 +177,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    padding: theme.spacing.sm,
+    padding: 8,
   },
   cardContent: {
-    marginTop: theme.spacing.md,
+    marginTop: 16,
   },
   grupoNombre: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Roboto-Bold',
+    color: 'white',
   },
   grupoDescripcion: {
-    fontSize: theme.typography.fontSize.small,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    fontSize: 12,
+    fontFamily: 'Roboto-Medium',
+    color: 'rgba(255,255,255,0.8)',
   },
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: theme.spacing.md,
+    marginTop: 16,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: theme.spacing.md,
+    marginRight: 16,
   },
   statText: {
-    fontSize: theme.typography.fontSize.small,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    fontSize: 12,
+    fontFamily: 'Roboto-Medium',
+    color: 'rgba(255,255,255,0.8)',
   },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: theme.spacing.md,
+    marginTop: 16,
   },
   verMasText: {
-    fontSize: theme.typography.fontSize.small,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    fontSize: 12,
+    fontFamily: 'Roboto-Medium',
+    color: 'rgba(255,255,255,0.8)',
   },
   addRoutineButton: {
     width: '100%',
-    padding: theme.spacing.md,
-    borderRadius: theme.borderRadius.lg,
-    backgroundColor: theme.colors.background,
-    marginTop: theme.spacing.md,
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 16,
   },
   addButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: theme.spacing.md,
-    borderRadius: theme.borderRadius.lg,
+    padding: 16,
+    borderRadius: 16,
   },
   addButtonText: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.primary,
-    marginLeft: theme.spacing.sm,
+    fontSize: 14,
+    fontFamily: 'Roboto-Bold',
+    marginLeft: 8,
   },
 });

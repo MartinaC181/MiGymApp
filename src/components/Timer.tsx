@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity, Vibration, StyleSheet, TextInput, Modal, Animated, Easing } from "react-native";
 import globalStyles from "../styles/global";
-import theme from "../constants/theme";
+import { useTheme } from "../context/ThemeContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface TimerProps {
@@ -17,6 +17,8 @@ const Timer: React.FC<TimerProps> = ({
   initialMinutes = 1,
   initialSeconds = 0,
 }) => {
+  const { theme, isDarkMode } = useTheme();
+  
   const [secondsLeft, setSecondsLeft] = useState(
     initialHours * 3600 + initialMinutes * 60 + initialSeconds
   );
@@ -118,58 +120,230 @@ const Timer: React.FC<TimerProps> = ({
   const minutes = Math.floor((secondsLeft % 3600) / 60);
   const seconds = secondsLeft % 60;
 
+  // Estilos dinámicos basados en el tema
+  const dynamicStyles = StyleSheet.create({
+    timerContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.background,
+      borderRadius: 16,
+      borderWidth: isDarkMode ? 1 : 0,
+      borderColor: isDarkMode ? theme.colors.border : 'transparent',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: isDarkMode ? 4 : 1 },
+      shadowOpacity: isDarkMode ? 0.3 : 0.05,
+      shadowRadius: isDarkMode ? 8 : 3,
+      elevation: isDarkMode ? 8 : 2,
+    },
+    timerText: {
+      fontSize: 48,
+      marginBottom: theme.spacing.lg,
+      color: theme.colors.primary,
+      fontWeight: 'bold',
+      textShadowColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.05)',
+      textShadowOffset: { width: 0, height: isDarkMode ? 2 : 0 },
+      textShadowRadius: isDarkMode ? 4 : 1,
+    },
+    finishedText: {
+      color: theme.colors.error,
+      textShadowColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.05)',
+      textShadowOffset: { width: 0, height: isDarkMode ? 2 : 0 },
+      textShadowRadius: isDarkMode ? 4 : 1,
+    },
+    alarmText: {
+      color: theme.colors.error,
+      fontSize: 18,
+      marginBottom: theme.spacing.md,
+      fontWeight: "bold",
+      textShadowColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.05)',
+      textShadowOffset: { width: 0, height: isDarkMode ? 2 : 0 },
+      textShadowRadius: isDarkMode ? 4 : 1,
+    },
+    buttonRow: {
+      flexDirection: "row",
+      marginTop: theme.spacing.lg,
+      justifyContent: "center",
+      alignItems: "center",
+      flexWrap: "nowrap",
+      gap: undefined,
+    },
+    timerButton: {
+      minWidth: 100,
+      maxWidth: 120,
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 8,
+      marginRight: 8,
+      borderRadius: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: isDarkMode ? 3 : 1 },
+      shadowOpacity: isDarkMode ? 0.4 : 0.1,
+      shadowRadius: isDarkMode ? 6 : 3,
+      elevation: isDarkMode ? 6 : 2,
+    },
+    inputRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: theme.spacing.lg,
+      backgroundColor: isDarkMode ? theme.colors.surface : 'transparent',
+      borderRadius: isDarkMode ? 12 : 0,
+      padding: isDarkMode ? theme.spacing.md : 0,
+      borderWidth: 0,
+      borderColor: 'transparent',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: isDarkMode ? 2 : 0 },
+      shadowOpacity: isDarkMode ? 0.2 : 0,
+      shadowRadius: isDarkMode ? 4 : 0,
+      elevation: isDarkMode ? 4 : 0,
+    },
+    inputContainer: {
+      alignItems: 'center',
+      marginHorizontal: theme.spacing.sm,
+      flex: 1,
+    },
+    pickerLabel: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginBottom: 8,
+      fontWeight: '600',
+      textShadowColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.02)',
+      textShadowOffset: { width: 0, height: isDarkMode ? 1 : 0 },
+      textShadowRadius: isDarkMode ? 2 : 0.5,
+    },
+    timeInput: {
+      width: 60,
+      height: 50,
+      borderWidth: isDarkMode ? 2 : 1,
+      borderColor: theme.colors.primary,
+      borderRadius: 12,
+      textAlign: 'center',
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.colors.textPrimary,
+      backgroundColor: isDarkMode ? theme.colors.card : theme.colors.surface,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: isDarkMode ? 2 : 1 },
+      shadowOpacity: isDarkMode ? 0.3 : 0.08,
+      shadowRadius: isDarkMode ? 4 : 2,
+      elevation: isDarkMode ? 4 : 1,
+    },
+    startButton: {
+      backgroundColor: '#43A047',
+      borderColor: '#43A047',
+      borderWidth: isDarkMode ? 2 : 1,
+    },
+    pauseButton: {
+      backgroundColor: '#FFD600',
+      borderColor: '#FFD600',
+      borderWidth: isDarkMode ? 2 : 1,
+    },
+    resetButton: {
+      backgroundColor: '#E53935',
+      borderColor: '#E53935',
+      borderWidth: isDarkMode ? 2 : 1,
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: isDarkMode ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.7)',
+    },
+    modalContent: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 24,
+      padding: 32,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOpacity: isDarkMode ? 0.6 : 0.15,
+      shadowRadius: isDarkMode ? 20 : 12,
+      elevation: isDarkMode ? 12 : 6,
+      minWidth: 300,
+      maxWidth: '90%',
+      borderWidth: isDarkMode ? 2 : 1,
+      borderColor: isDarkMode ? theme.colors.primary : theme.colors.border,
+    },
+    modalTitle: {
+      fontSize: 36,
+      color: theme.colors.primary,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 16,
+      textTransform: 'uppercase',
+      textShadowColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.05)',
+      textShadowOffset: { width: 0, height: isDarkMode ? 2 : 0 },
+      textShadowRadius: isDarkMode ? 4 : 1,
+    },
+    modalSubtitle: {
+      fontSize: 18,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 8,
+      textShadowColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.02)',
+      textShadowOffset: { width: 0, height: isDarkMode ? 1 : 0 },
+      textShadowRadius: isDarkMode ? 2 : 0.5,
+    },
+  });
+
   return (
-    <View style={[globalStyles.container, styles.timerContainer]}>
+    <View style={[globalStyles.container, dynamicStyles.timerContainer]}>
       {/* Inputs para setear el tiempo solo si no está corriendo ni finalizado */}
       {!isRunning && !isFinished && (
-        <View style={styles.inputRow}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.pickerLabel}>Horas</Text>
+        <View style={dynamicStyles.inputRow}>
+          <View style={dynamicStyles.inputContainer}>
+            <Text style={dynamicStyles.pickerLabel}>Horas</Text>
             <TextInput
-              style={styles.timeInput}
+              style={dynamicStyles.timeInput}
               keyboardType="numeric"
               maxLength={2}
               value={inputHours}
               onChangeText={text => setInputHours(text.replace(/[^0-9]/g, ""))}
               placeholder="0"
+              placeholderTextColor={theme.colors.textSecondary}
             />
           </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.pickerLabel}>Minutos</Text>
+          <View style={dynamicStyles.inputContainer}>
+            <Text style={dynamicStyles.pickerLabel}>Minutos</Text>
             <TextInput
-              style={styles.timeInput}
+              style={dynamicStyles.timeInput}
               keyboardType="numeric"
               maxLength={2}
               value={inputMinutes}
               onChangeText={text => setInputMinutes(text.replace(/[^0-9]/g, ""))}
               placeholder="0"
+              placeholderTextColor={theme.colors.textSecondary}
             />
           </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.pickerLabel}>Segundos</Text>
+          <View style={dynamicStyles.inputContainer}>
+            <Text style={dynamicStyles.pickerLabel}>Segundos</Text>
             <TextInput
-              style={styles.timeInput}
+              style={dynamicStyles.timeInput}
               keyboardType="numeric"
               maxLength={2}
               value={inputSeconds}
               onChangeText={text => setInputSeconds(text.replace(/[^0-9]/g, ""))}
               placeholder="0"
+              placeholderTextColor={theme.colors.textSecondary}
             />
           </View>
         </View>
       )}
-      <Text style={[globalStyles.title, styles.timerText, isFinished && styles.finishedText]}>
+      <Text style={[globalStyles.title, dynamicStyles.timerText, isFinished && dynamicStyles.finishedText]}>
         {formatTime(hours)}:{formatTime(minutes)}:{formatTime(seconds)}
       </Text>
       {isFinished && (
-        <Text style={styles.alarmText}>¡Tiempo finalizado!</Text>
+        <Text style={dynamicStyles.alarmText}>¡Tiempo finalizado!</Text>
       )}
-      <View style={styles.buttonRow}>
+      <View style={dynamicStyles.buttonRow}>
         <TouchableOpacity
           style={[
             globalStyles.LoginButton,
-            styles.timerButton,
-            isRunning ? styles.pauseButton : styles.startButton
+            dynamicStyles.timerButton,
+            isRunning ? dynamicStyles.pauseButton : dynamicStyles.startButton
           ]}
           onPress={handlePauseResume}
           disabled={isFinished}
@@ -186,8 +360,8 @@ const Timer: React.FC<TimerProps> = ({
         <TouchableOpacity
           style={[
             globalStyles.LoginButton,
-            styles.timerButton,
-            styles.resetButton,
+            dynamicStyles.timerButton,
+            dynamicStyles.resetButton,
             { marginLeft: theme.spacing.md }
           ]}
           onPress={handleRestart}
@@ -203,17 +377,20 @@ const Timer: React.FC<TimerProps> = ({
         onRequestClose={() => setShowModal(false)}
       >
         <Animated.View style={[
-          styles.modalOverlay,
+          dynamicStyles.modalOverlay,
           { backgroundColor: flashAnim.interpolate({
               inputRange: [0, 1],
-              outputRange: ["rgba(0,0,0,0.7)", "#fff"]
+              outputRange: [
+                isDarkMode ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.7)", 
+                theme.colors.card
+              ]
             }) }
         ]}>
-          <View style={styles.modalContent}>
+          <View style={dynamicStyles.modalContent}>
             <MaterialCommunityIcons name="alarm-light" size={80} color={theme.colors.primary} style={{ marginBottom: 24 }} />
-            <Text style={[styles.modalTitle, { color: theme.colors.primary }]}>¡TIEMPO FINALIZADO!</Text>
-            <Text style={styles.modalSubtitle}>Presiona reiniciar o ajusta el tiempo para volver a usar el temporizador.</Text>
-            <TouchableOpacity style={[globalStyles.LoginButton, styles.resetButton, { marginTop: 32 }]} onPress={handleRestart}>
+            <Text style={dynamicStyles.modalTitle}>¡TIEMPO FINALIZADO!</Text>
+            <Text style={dynamicStyles.modalSubtitle}>Presiona reiniciar o ajusta el tiempo para volver a usar el temporizador.</Text>
+            <TouchableOpacity style={[globalStyles.LoginButton, dynamicStyles.resetButton, { marginTop: 32 }]} onPress={handleRestart}>
               <MaterialCommunityIcons name="restart" size={28} color="#fff" />
               <Text style={globalStyles.buttonText}>Reiniciar</Text>
             </TouchableOpacity>
@@ -223,117 +400,5 @@ const Timer: React.FC<TimerProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  timerContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: theme.spacing.lg,
-  },
-  timerText: {
-    fontSize: 48,
-    marginBottom: theme.spacing.lg,
-    color: theme.colors.primary,
-  },
-  finishedText: {
-    color: theme.colors.error,
-  },
-  alarmText: {
-    color: theme.colors.error,
-    fontSize: 18,
-    marginBottom: theme.spacing.md,
-    fontWeight: "bold",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    marginTop: theme.spacing.lg,
-    justifyContent: "center",
-    alignItems: "center",
-    flexWrap: "nowrap",
-    gap: undefined, // Elimina gap para compatibilidad RN
-  },
-  timerButton: {
-    minWidth: 100,
-    maxWidth: 120,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
-    marginRight: 8,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing.lg,
-  },
-  inputContainer: {
-    alignItems: 'center',
-    marginHorizontal: theme.spacing.sm,
-    flex: 1,
-  },
-  pickerLabel: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    marginBottom: 2,
-  },
-  timeInput: {
-    width: 50,
-    height: 40,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-    borderRadius: 8,
-    textAlign: 'center',
-    fontSize: 18,
-    color: theme.colors.textPrimary,
-    backgroundColor: theme.colors.surface,
-  },
-  startButton: {
-    backgroundColor: '#43A047', // verde
-    borderColor: '#43A047',
-  },
-  pauseButton: {
-    backgroundColor: '#FFD600', // amarillo
-    borderColor: '#FFD600',
-  },
-  resetButton: {
-    backgroundColor: '#E53935', // rojo
-    borderColor: '#E53935',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 32,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-    minWidth: 300,
-    maxWidth: '90%',
-  },
-  modalTitle: {
-    fontSize: 36,
-    // color: theme.colors.error, // Se reemplaza por theme.colors.primary en el componente
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-    textTransform: 'uppercase',
-  },
-  modalSubtitle: {
-    fontSize: 18,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-});
 
 export default Timer;

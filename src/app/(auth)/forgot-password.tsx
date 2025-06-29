@@ -8,9 +8,10 @@ import {
   Modal,
 } from "react-native";
 import { useState } from "react";
-import globalStyles from "../../styles/global";
+import { createGlobalStyles } from "../../styles/global";
 import { router } from "expo-router";
 import React from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 function isValidEmail(email: string) {
   // Simple email regex
@@ -18,6 +19,9 @@ function isValidEmail(email: string) {
 }
 
 export default function ForgotPassword() {
+  const { theme } = useTheme();
+  const globalStyles = createGlobalStyles(theme);
+  
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -51,14 +55,14 @@ export default function ForgotPassword() {
         <TextInput
           style={globalStyles.input}
           placeholder="prueba@canvaprog.com"
-          placeholderTextColor="#999"
+          placeholderTextColor={theme.colors.textSecondary}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
         />
         {error ? (
-          <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+          <Text style={[globalStyles.errorText, { marginBottom: 8 }]}>{error}</Text>
         ) : null}
 
         {/* Botón Enviar */}

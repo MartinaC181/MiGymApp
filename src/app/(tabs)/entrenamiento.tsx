@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import globalStyles from '../../styles/global';
 import homeStyles from '../../styles/home';
-import theme from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -21,12 +21,16 @@ interface MenuOption {
   title: string;
   description: string;
   icon: string;
-  colors: [string, string];
+  colors: {
+    light: [string, string];
+    dark: [string, string];
+  };
   route?: string;
 }
 
 export default function Entrenamiento() {
   const router = useRouter();
+  const { theme, isDarkMode } = useTheme();
 
   const menuOptions: MenuOption[] = [
     {
@@ -34,7 +38,10 @@ export default function Entrenamiento() {
       title: 'Rutina',
       description: 'Crea y personaliza tus rutinas de entrenamiento',
       icon: 'fitness-center',
-      colors: ['#667eea', '#764ba2'],
+      colors: {
+        light: ['#667eea', '#764ba2'],
+        dark: ['#4a5568', '#2d3748']
+      },
       route: '/rutina'
     },
     {
@@ -42,7 +49,10 @@ export default function Entrenamiento() {
       title: 'Cronómetro',
       description: 'Controla el tiempo de tus series y descansos',
       icon: 'timer',
-      colors: ['#f093fb', '#f5576c'],
+      colors: {
+        light: ['#f093fb', '#f5576c'],
+        dark: ['#805ad5', '#553c9a']
+      },
       route: '/temporizador'
     },
     {
@@ -50,7 +60,10 @@ export default function Entrenamiento() {
       title: 'Biblioteca de Ejercicios',
       description: 'Explora más de 1300 ejercicios con videos',
       icon: 'menu-book',
-      colors: ['#4facfe', '#00f2fe'],
+      colors: {
+        light: ['#4facfe', '#00f2fe'],
+        dark: ['#3182ce', '#2c5282']
+      },
       route: '/biblioteca-ejercicios'
     },
     {
@@ -58,7 +71,10 @@ export default function Entrenamiento() {
       title: 'Calculadora RPM',
       description: 'Calcula tu ritmo y repeticiones máximas',
       icon: 'calculate',
-      colors: ['#43e97b', '#38f9d7'],
+      colors: {
+        light: ['#43e97b', '#38f9d7'],
+        dark: ['#38a169', '#2f855a']
+      },
       route: '/calculadora-rpm'
     }
   ];
@@ -71,49 +87,53 @@ export default function Entrenamiento() {
     }
   };
 
-  const renderMenuCard = (option: MenuOption, index: number) => (
-    <TouchableOpacity
-      key={option.id}
-      style={styles.menuCard}
-      onPress={() => handleMenuPress(option)}
-      activeOpacity={0.85}
-    >
-      <LinearGradient
-        colors={option.colors}
-        style={styles.cardGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+  const renderMenuCard = (option: MenuOption, index: number) => {
+    const currentColors = isDarkMode ? option.colors.dark : option.colors.light;
+    
+    return (
+      <TouchableOpacity
+        key={option.id}
+        style={[styles.menuCard, { backgroundColor: theme.colors.card }]}
+        onPress={() => handleMenuPress(option)}
+        activeOpacity={0.85}
       >
-        <View style={styles.cardContent}>
-          <View style={styles.iconContainer}>
-            <MaterialIcons 
-              name={option.icon as any} 
-              size={26} 
-              color="white" 
-            />
+        <LinearGradient
+          colors={currentColors}
+          style={styles.cardGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.cardContent}>
+            <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary }]}>
+              <MaterialIcons 
+                name={option.icon as any} 
+                size={26} 
+                color="white" 
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={[styles.cardTitle, { color: theme.colors.textPrimary }]}>
+                {option.title}
+              </Text>
+              <Text style={[styles.cardDescription, { color: theme.colors.textSecondary }]}>
+                {option.description}
+              </Text>
+            </View>
+            <View style={styles.arrowContainer}>
+              <MaterialIcons 
+                name="keyboard-arrow-right" 
+                size={24} 
+                color="rgba(255,255,255,0.8)" 
+              />
+            </View>
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.cardTitle}>
-              {option.title}
-            </Text>
-            <Text style={styles.cardDescription}>
-              {option.description}
-            </Text>
-          </View>
-          <View style={styles.arrowContainer}>
-            <MaterialIcons 
-              name="keyboard-arrow-right" 
-              size={24} 
-              color="rgba(255,255,255,0.8)" 
-            />
-          </View>
-        </View>
-      </LinearGradient>
-    </TouchableOpacity>
-  );
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <View style={[globalStyles.safeArea, styles.container]}>
+    <View style={[globalStyles.safeArea, styles.container, { backgroundColor: theme.colors.surface }]}>
         <ScrollView 
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -124,7 +144,7 @@ export default function Entrenamiento() {
             <Text style={homeStyles.greeting}>
               ¡Hora de entrenar!
             </Text>
-            <Text style={homeStyles.subGreeting}>
+            <Text style={[homeStyles.subGreeting, { color: theme.colors.textSecondary }]}>
               Elige tu herramienta de entrenamiento
             </Text>
           </View>
@@ -141,28 +161,27 @@ export default function Entrenamiento() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: theme.spacing.xl,
+    paddingBottom: 32,
   },
 
   menuContainer: {
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.md,
+    paddingHorizontal: 24,
+    gap: 16,
   },
   menuCard: {
-    borderRadius: theme.borderRadius.md,
+    borderRadius: 8,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: theme.spacing.sm,
+    marginBottom: 8,
     height: 75, // Altura un poco mayor
   },
   cardGradient: {
@@ -172,8 +191,8 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingVertical: 16,
     flex: 1,
     height: 75, // Altura un poco mayor
   },
@@ -181,25 +200,22 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: theme.spacing.md,
+    marginRight: 16,
   },
   textContainer: {
     flex: 1,
-    paddingRight: theme.spacing.sm,
+    paddingRight: 8,
   },
   cardTitle: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Roboto-Bold',
     marginBottom: 2,
   },
   cardDescription: {
     fontSize: 11,
-    fontFamily: theme.typography.fontFamily.regular,
-    color: theme.colors.textSecondary,
+    fontFamily: 'Roboto-Regular',
     lineHeight: 14,
   },
   arrowContainer: {

@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import globalStyles from '../../styles/global';
-import theme from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 
 // Fórmulas de 1RM más utilizadas
 const calcularBrzycki = (peso: number, reps: number) => peso / (1.0278 - 0.0278 * reps);
@@ -28,6 +28,7 @@ interface FormulaResult {
 }
 
 export default function CalculadoraRPM() {
+  const { theme, isDarkMode } = useTheme();
   const [peso, setPeso] = useState('');
   const [repeticiones, setRepeticiones] = useState('');
   const [resultados, setResultados] = useState<FormulaResult[]>([]);
@@ -125,6 +126,265 @@ export default function CalculadoraRPM() {
       setRefreshing(false);
     }, 800);
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.surface,
+    },
+    scrollContent: {
+      padding: theme.spacing.lg,
+      paddingBottom: 100,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: theme.spacing.xl,
+    },
+    headerTitle: {
+      fontSize: theme.typography.fontSize.title,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginTop: theme.spacing.sm,
+    },
+    headerSubtitle: {
+      fontSize: theme.typography.fontSize.medium,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginTop: theme.spacing.xs,
+    },
+    inputSection: {
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    inputContainer: {
+      marginBottom: theme.spacing.lg,
+    },
+    inputLabel: {
+      fontSize: theme.typography.fontSize.small,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.sm,
+    },
+    inputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.md,
+      backgroundColor: theme.colors.surface,
+    },
+    input: {
+      flex: 1,
+      height: 50,
+      paddingHorizontal: theme.spacing.md,
+      fontSize: theme.typography.fontSize.large,
+      fontFamily: theme.typography.fontFamily.medium,
+      color: theme.colors.textPrimary,
+    },
+    inputUnit: {
+      paddingHorizontal: theme.spacing.md,
+      fontSize: theme.typography.fontSize.medium,
+      color: theme.colors.textSecondary,
+      fontFamily: theme.typography.fontFamily.medium,
+    },
+    clearButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: theme.spacing.sm,
+      gap: theme.spacing.xs,
+    },
+    clearButtonText: {
+      color: theme.colors.textSecondary,
+      fontSize: theme.typography.fontSize.medium,
+    },
+    averageSection: {
+      marginBottom: theme.spacing.lg,
+    },
+    averageGradient: {
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.md,
+      alignItems: 'center',
+      shadowColor: '#667eea',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
+      minHeight: 140,
+    },
+    averageLabel: {
+      color: 'white',
+      fontSize: theme.typography.fontSize.medium,
+      fontFamily: theme.typography.fontFamily.medium,
+      marginTop: theme.spacing.sm,
+    },
+    averageValue: {
+      color: 'white',
+      fontSize: 36,
+      fontFamily: theme.typography.fontFamily.bold,
+      marginTop: theme.spacing.xs,
+    },
+    averageNote: {
+      color: 'rgba(255,255,255,0.9)',
+      fontSize: theme.typography.fontSize.small,
+      marginTop: theme.spacing.xs,
+      textAlign: 'center',
+      paddingHorizontal: 4,
+      width: '100%',
+      flexWrap: 'wrap',
+    },
+    resultsSection: {
+      marginBottom: theme.spacing.lg,
+    },
+    sectionTitle: {
+      fontSize: theme.typography.fontSize.large,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.md,
+    },
+    formulaCard: {
+      flexDirection: 'row',
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.borderRadius.md,
+      marginBottom: theme.spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    formulaIndicator: {
+      width: 4,
+      borderTopLeftRadius: theme.borderRadius.md,
+      borderBottomLeftRadius: theme.borderRadius.md,
+    },
+    formulaContent: {
+      flex: 1,
+      padding: theme.spacing.md,
+    },
+    formulaHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.xs,
+    },
+    formulaName: {
+      fontSize: theme.typography.fontSize.medium,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+    },
+    formulaValue: {
+      fontSize: theme.typography.fontSize.large,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.primary,
+    },
+    formulaDescription: {
+      fontSize: theme.typography.fontSize.small,
+      color: theme.colors.textSecondary,
+    },
+    intensitySection: {
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    intensitySubtitle: {
+      fontSize: theme.typography.fontSize.small,
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.md,
+    },
+    tableHeader: {
+      flexDirection: 'row',
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.sm,
+      padding: theme.spacing.sm,
+      marginBottom: theme.spacing.xs,
+    },
+    tableHeaderText: {
+      flex: 1,
+      textAlign: 'center',
+      color: 'white',
+      fontSize: theme.typography.fontSize.small,
+      fontFamily: theme.typography.fontFamily.bold,
+    },
+    tableRow: {
+      flexDirection: 'row',
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.xs,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.surface,
+    },
+    tableCellBold: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: theme.typography.fontSize.small,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+    },
+    tableCell: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: theme.typography.fontSize.small,
+      color: theme.colors.textSecondary,
+    },
+    notesSection: {
+      marginBottom: theme.spacing.lg,
+    },
+    noteCard: {
+      flexDirection: 'row',
+      backgroundColor: isDarkMode ? '#2D2D00' : '#FFF3CD',
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: isDarkMode ? '#4D4D00' : '#FFE69C',
+    },
+    noteContent: {
+      flex: 1,
+      marginLeft: theme.spacing.sm,
+    },
+    noteTitle: {
+      fontSize: theme.typography.fontSize.medium,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: isDarkMode ? '#FFFF99' : '#856404',
+      marginBottom: theme.spacing.xs,
+    },
+    noteText: {
+      fontSize: theme.typography.fontSize.small,
+      color: isDarkMode ? '#FFFF99' : '#856404',
+      lineHeight: 18,
+    },
+    infoSection: {
+      alignItems: 'center',
+      padding: theme.spacing.xl,
+    },
+    infoTitle: {
+      fontSize: theme.typography.fontSize.large,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.textPrimary,
+      marginTop: theme.spacing.md,
+      marginBottom: theme.spacing.sm,
+      textAlign: 'center',
+    },
+    infoText: {
+      fontSize: theme.typography.fontSize.medium,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -296,263 +556,4 @@ export default function CalculadoraRPM() {
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-  },
-  scrollContent: {
-    padding: theme.spacing.lg,
-    paddingBottom: 100,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: theme.spacing.xl,
-  },
-  headerTitle: {
-    fontSize: theme.typography.fontSize.title,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginTop: theme.spacing.sm,
-  },
-  headerSubtitle: {
-    fontSize: theme.typography.fontSize.medium,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginTop: theme.spacing.xs,
-  },
-  inputSection: {
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  inputContainer: {
-    marginBottom: theme.spacing.lg,
-  },
-  inputLabel: {
-    fontSize: theme.typography.fontSize.small,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.sm,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    paddingHorizontal: theme.spacing.md,
-    fontSize: theme.typography.fontSize.large,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textPrimary,
-  },
-  inputUnit: {
-    paddingHorizontal: theme.spacing.md,
-    fontSize: theme.typography.fontSize.medium,
-    color: theme.colors.textSecondary,
-    fontFamily: theme.typography.fontFamily.medium,
-  },
-  clearButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: theme.spacing.sm,
-    gap: theme.spacing.xs,
-  },
-  clearButtonText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.fontSize.medium,
-  },
-  averageSection: {
-    marginBottom: theme.spacing.lg,
-  },
-  averageGradient: {
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.md,
-    alignItems: 'center',
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-    minHeight: 140,
-  },
-  averageLabel: {
-    color: 'white',
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.medium,
-    marginTop: theme.spacing.sm,
-  },
-  averageValue: {
-    color: 'white',
-    fontSize: 36,
-    fontFamily: theme.typography.fontFamily.bold,
-    marginTop: theme.spacing.xs,
-  },
-  averageNote: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: theme.typography.fontSize.small,
-    marginTop: theme.spacing.xs,
-    textAlign: 'center',
-    paddingHorizontal: 4,
-    width: '100%',
-    flexWrap: 'wrap',
-  },
-  resultsSection: {
-    marginBottom: theme.spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: theme.typography.fontSize.large,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.md,
-  },
-  formulaCard: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    marginBottom: theme.spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  formulaIndicator: {
-    width: 4,
-    borderTopLeftRadius: theme.borderRadius.md,
-    borderBottomLeftRadius: theme.borderRadius.md,
-  },
-  formulaContent: {
-    flex: 1,
-    padding: theme.spacing.md,
-  },
-  formulaHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  formulaName: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-  },
-  formulaValue: {
-    fontSize: theme.typography.fontSize.large,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.primary,
-  },
-  formulaDescription: {
-    fontSize: theme.typography.fontSize.small,
-    color: theme.colors.textSecondary,
-  },
-  intensitySection: {
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  intensitySubtitle: {
-    fontSize: theme.typography.fontSize.small,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.md,
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.sm,
-    padding: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
-  },
-  tableHeaderText: {
-    flex: 1,
-    textAlign: 'center',
-    color: 'white',
-    fontSize: theme.typography.fontSize.small,
-    fontFamily: theme.typography.fontFamily.bold,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surface,
-  },
-  tableCellBold: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: theme.typography.fontSize.small,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-  },
-  tableCell: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: theme.typography.fontSize.small,
-    color: theme.colors.textSecondary,
-  },
-  notesSection: {
-    marginBottom: theme.spacing.lg,
-  },
-  noteCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF3CD',
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: '#FFE69C',
-  },
-  noteContent: {
-    flex: 1,
-    marginLeft: theme.spacing.sm,
-  },
-  noteTitle: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: '#856404',
-    marginBottom: theme.spacing.xs,
-  },
-  noteText: {
-    fontSize: theme.typography.fontSize.small,
-    color: '#856404',
-    lineHeight: 18,
-  },
-  infoSection: {
-    alignItems: 'center',
-    padding: theme.spacing.xl,
-  },
-  infoTitle: {
-    fontSize: theme.typography.fontSize.large,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-    textAlign: 'center',
-  },
-  infoText: {
-    fontSize: theme.typography.fontSize.medium,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-}); 
+} 

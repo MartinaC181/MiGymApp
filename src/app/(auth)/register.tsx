@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView, Modal } from "react-native";
-import globalStyles from "../../styles/global";
-import theme from "../../constants/theme";
+import { createGlobalStyles } from "../../styles/global";
+import { useTheme } from "../../context/ThemeContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +20,9 @@ function isValidPassword(password: string) {
 }
 
 export default function Register() {
+  const { theme } = useTheme();
+  const globalStyles = createGlobalStyles(theme);
+  
   const router = useRouter();
   const { userType } = useLocalSearchParams<{ userType?: 'gym' | 'client' }>();
   
@@ -297,7 +300,7 @@ export default function Register() {
   return (
     <SafeAreaView style={globalStyles.safeArea}>
       <ScrollView 
-        style={styles.scrollView}
+        style={[styles.scrollView, { backgroundColor: theme.colors.surface }]}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -484,7 +487,13 @@ export default function Register() {
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={globalStyles.buttonText}>Registrarse</Text>
+            <Text style={[
+              globalStyles.buttonText,
+              !isButtonDisabled && theme.colors.background === '#0A0A0A' && { color: '#FFFFFF' },
+              !isButtonDisabled && theme.colors.background === '#ffffff' && { color: '#333333' },
+              isButtonDisabled && theme.colors.background === '#0A0A0A' && { color: '#666666' },
+              isButtonDisabled && theme.colors.background === '#ffffff' && { color: '#999999' }
+            ]}>Registrarse</Text>
           )}
         </TouchableOpacity>
 
@@ -587,12 +596,11 @@ export default function Register() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
   },
   scrollContent: {
-    padding: theme.spacing.lg,
+    padding: 24,
     alignItems: "center",
-    paddingTop: theme.spacing.xl * 1.5, 
-    paddingBottom: theme.spacing.xl,
+    paddingTop: 48, 
+    paddingBottom: 32,
   },
 });
