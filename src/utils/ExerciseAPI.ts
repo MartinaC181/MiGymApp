@@ -136,21 +136,41 @@ class ExerciseDBService {
 
   async getFilteredExercises(filter: ExerciseFilter): Promise<Exercise[]> {
     try {
-      let endpoint = '/exercises';
+      let exercises: Exercise[] = [];
       
+      // Obtener ejercicios usando el filtro principal (preferimos bodyPart)
       if (filter.bodyPart) {
-        endpoint = `/exercises/bodyPart/${filter.bodyPart}`;
+        exercises = await this.makeRequest(`/exercises/bodyPart/${filter.bodyPart}`);
       } else if (filter.target) {
-        endpoint = `/exercises/target/${filter.target}`;
+        exercises = await this.makeRequest(`/exercises/target/${filter.target}`);
       } else if (filter.equipment) {
-        endpoint = `/exercises/equipment/${filter.equipment}`;
+        exercises = await this.makeRequest(`/exercises/equipment/${filter.equipment}`);
+      } else {
+        exercises = await this.makeRequest('/exercises?limit=100');
       }
 
-      const exercises = await this.makeRequest(endpoint);
-      
       if (exercises && Array.isArray(exercises)) {
+        let filteredExercises = exercises;
+
+        // Si el filtro principal fue bodyPart, aplicar filtros adicionales
+        if (filter.bodyPart) {
+          // Filtrar por equipamiento si se especificó
+          if (filter.equipment) {
+            filteredExercises = filteredExercises.filter(exercise => 
+              exercise.equipment.toLowerCase() === filter.equipment!.toLowerCase()
+            );
+          }
+          
+          // Filtrar por target si se especificó
+          if (filter.target) {
+            filteredExercises = filteredExercises.filter(exercise => 
+              exercise.target.toLowerCase() === filter.target!.toLowerCase()
+            );
+          }
+        }
+
         const limit = filter.limit || 50;
-        return exercises.slice(0, limit);
+        return filteredExercises.slice(0, limit);
       }
 
       return [];

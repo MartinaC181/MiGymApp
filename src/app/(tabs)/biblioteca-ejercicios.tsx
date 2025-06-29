@@ -11,7 +11,8 @@ import {
   Modal,
   Dimensions,
   Image,
-  FlatList
+  FlatList,
+  RefreshControl
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -34,6 +35,8 @@ export default function BibliotecaEjercicios() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
+  const [refreshingFilters, setRefreshingFilters] = useState(false);
+  const [refreshingExercises, setRefreshingExercises] = useState(false);
   
   // Nuevos estados para mejorar UX
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -166,6 +169,58 @@ export default function BibliotecaEjercicios() {
     setSelectedEquipment('');
     setSearchText('');
     loadPopularExercises();
+  };
+
+  const handleRefreshFilters = async () => {
+    setRefreshingFilters(true);
+    try {
+      // Simular una pequeña demora para mostrar el refresh
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Recargar ejercicios populares si no hay filtros activos
+      if (!selectedMuscle && !selectedEquipment && !searchText.trim()) {
+        await loadPopularExercises();
+      }
+      
+      // Aquí se podría agregar lógica adicional como:
+      // - Recargar listas de gimnasios disponibles
+      // - Actualizar categorías desde el servidor
+      // - Refrescar datos del usuario
+      
+    } catch (error) {
+      console.error('Error refrescando filtros:', error);
+    } finally {
+      setRefreshingFilters(false);
+    }
+  };
+
+  const handleRefreshExercises = async () => {
+    setRefreshingExercises(true);
+    try {
+      // Simular una pequeña demora para mostrar el refresh
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Recargar ejercicios según el estado actual
+      if (selectedMuscle) {
+        // Si hay músculo seleccionado, recargar por categoría
+        const exercises = await exerciseAPI.getExercisesByMuscleGroup(selectedMuscle);
+        setEjercicios(exercises.slice(0, 20));
+      } else if (searchText.trim()) {
+        // Si hay texto de búsqueda, rehacer la búsqueda
+        const results = await exerciseAPI.searchExercises(searchText);
+        setEjercicios(results);
+      } else {
+        // Si no hay filtros, recargar ejercicios populares
+        await loadPopularExercises();
+      }
+      
+    } catch (error) {
+      console.error('Error refrescando ejercicios:', error);
+      // Mostrar mensaje de error al usuario
+      Alert.alert('Error', 'No se pudieron actualizar los ejercicios');
+    } finally {
+      setRefreshingExercises(false);
+    }
   };
 
   const toggleFavorite = (exerciseId: string) => {
@@ -397,6 +452,16 @@ export default function BibliotecaEjercicios() {
             key={viewMode}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.exercisesList}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshingExercises}
+                onRefresh={handleRefreshExercises}
+                colors={[theme.colors.primary]}
+                tintColor={theme.colors.primary}
+                title="Actualizando ejercicios..."
+                titleColor={theme.colors.textSecondary}
+              />
+            }
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
                 <MaterialCommunityIcons name="dumbbell" size={64} color={theme.colors.textSecondary} />
@@ -438,7 +503,17 @@ export default function BibliotecaEjercicios() {
             <ScrollView 
               style={styles.filterContent} 
               showsVerticalScrollIndicator={false}
-              bounces={false}
+              bounces={true}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshingFilters}
+                  onRefresh={handleRefreshFilters}
+                  colors={[theme.colors.primary]}
+                  tintColor={theme.colors.primary}
+                  title="Actualizando filtros..."
+                  titleColor={theme.colors.textSecondary}
+                />
+              }
             >
               {/* Grupo Muscular */}
               <View style={styles.filterSection}>
