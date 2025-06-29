@@ -108,6 +108,10 @@ export default function Facturacion() {
 
     // Función para validar el formulario completo
     const validateForm = () => {
+        // Si se paga con Mercado Pago, no se validan campos de tarjeta
+        if (metodoPago === "mercadopago") {
+            return true;
+        }
         const cardNameValid = validateField('cardName', cardName);
         const cardNumberValid = validateField('cardNumber', cardNumber);
         const expiryValid = validateField('expiry', expiry);
@@ -159,8 +163,15 @@ export default function Facturacion() {
     };
 
     const handlePagar = async () => {
+        // Si es Mercado Pago, redirigir a integración y salir
+        if (metodoPago === "mercadopago") {
+            await handleMercadoPagoPayment();
+            return;
+        }
+
+        // Validar formulario de tarjeta
         if (!validateForm()) return;
-        
+
         setProcesando(true);
 
         try {
@@ -169,23 +180,22 @@ export default function Facturacion() {
                 metodo: 'Tarjeta de crédito',
                 tarjeta: `****${cardNumber.slice(-4)}`,
                 nombre: cardName,
-                monto: paymentInfo.monto
+                monto: paymentInfo?.monto ?? 0,
             };
 
-            // Procesar pago usando la función de storage
-            if (!currentUser || !paymentInfo) return;
+            if (!currentUser) throw new Error('Usuario no encontrado');
+
             const result = await processPayment(currentUser.id, paymentData);
-            
-            // Simular delay de procesamiento
+
+            // Simular delay
             setTimeout(() => {
                 setProcesando(false);
-                setResultado(result.success ? "exito" : "error");
+                setResultado(result.success ? 'exito' : 'error');
             }, 3000);
-            
         } catch (error) {
-            console.error("Error procesando pago:", error);
+            console.error('Error procesando pago:', error);
             setProcesando(false);
-            setResultado("error");
+            setResultado('error');
         }
     };
 
@@ -438,7 +448,7 @@ export default function Facturacion() {
                     disabled={!isFormComplete()}
                 >
                     <Text style={globalStyles.buttonText}>
-                        PAGAR $10,213.89
+                        {metodoPago === 'mercadopago' ? 'PAGAR CON MERCADO PAGO' : 'PAGAR $10,213.89'}
                     </Text>
                 </TouchableOpacity>
             </View>
