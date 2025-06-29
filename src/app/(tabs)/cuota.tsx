@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Modal, StatusBar, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Alert, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
-import theme from "../../constants/theme";
-import globalStyles from "../../styles/global";
+import { useTheme } from "../../context/ThemeContext";
+import { createGlobalStyles } from "../../styles/global";
 import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
 import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
@@ -29,6 +29,13 @@ function getCuotaInfo(pendiente: boolean) {
 }
 
 export default function Cuota() {
+    // Hook para el tema dinámico
+    const { theme } = useTheme();
+    
+    // Generar estilos dinámicamente basados en el tema actual
+    const styles = createStyles(theme);
+    const globalStyles = createGlobalStyles(theme);
+    
     // Estado para indicar si la cuota está pendiente o no
     const [pendiente, setPendiente] = useState<boolean>(true);
 
@@ -36,7 +43,6 @@ export default function Cuota() {
     const cuota = getCuotaInfo(pendiente);
 
     const router = useRouter();
-    const [showInvoiceModal, setShowInvoiceModal] = useState(false);
     const [cuotaData, setCuotaData] = useState(null);
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -92,21 +98,6 @@ export default function Cuota() {
         }
     };
 
-    // Efecto para cambiar el StatusBar cuando el modal esté abierto
-    useEffect(() => {
-        if (showInvoiceModal) {
-            // Hacer la barra de estado transparente cuando el modal esté abierto
-            StatusBar.setBarStyle('light-content');
-            StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.5)');
-            StatusBar.setTranslucent(true);
-        } else {
-            // Restaurar la barra de estado original
-            StatusBar.setBarStyle('light-content');
-            StatusBar.setBackgroundColor(theme.colors.primary);
-            StatusBar.setTranslucent(true);
-        }
-    }, [showInvoiceModal]);
-
     // Función para manejar el pago con Mercado Pago
     const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
@@ -120,16 +111,6 @@ export default function Cuota() {
         openBrowserAsync(data);
     };
 
-    // Función para manejar la vista de la factura
-    const handleViewInvoice = () => {
-        setShowInvoiceModal(true);
-    };
-
-    // Función para cerrar el modal
-    const closeInvoiceModal = () => {
-        setShowInvoiceModal(false);
-    };
-
     // Función para formatear fechas
     const formatDate = (dateString: string) => {
         if (!dateString) return "N/A";
@@ -141,7 +122,7 @@ export default function Cuota() {
         }
     };
 
-    // Datos mock para la factura en el modal
+    // Datos mock para la factura
     const factura = {
         numeroFactura: "0001-00000001",
         fechaEmision: formatDate("2024-01-15"),
@@ -149,7 +130,8 @@ export default function Cuota() {
         cliente: cuota.nombre,
         dni: cuota.dni,
         servicio: "Membresía Gimnasio",
-        total: cuota.monto
+        total: cuota.monto,
+        periodo: "Enero 2024"
     };
 
     if (isLoading) {
@@ -174,148 +156,176 @@ export default function Cuota() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                {/* Botón provisorio para cambiar estado */}
-                <View style={styles.devContainer}>
-                    <Text style={styles.devLabel}>🔧 DESARROLLO</Text>
-                    <TouchableOpacity 
-                        style={styles.toggleButton}
-                        onPress={() => setPendiente(!pendiente)}
-                    >
-                        <Text style={styles.toggleButtonText}>
-                            {pendiente ? "Cambiar a PAGADO" : "Cambiar a PENDIENTE"}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+            <ScrollView 
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.container}>
+                    {/* Botón provisorio para cambiar estado */}
+                    <View style={styles.devContainer}>
+                        <Text style={styles.devLabel}>🔧 DESARROLLO</Text>
+                        <TouchableOpacity 
+                            style={styles.toggleButton}
+                            onPress={() => setPendiente(!pendiente)}
+                        >
+                            <Text style={styles.toggleButtonText}>
+                                {pendiente ? "Cambiar a PAGADO" : "Cambiar a PENDIENTE"}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
 
-                {/* Si hay cuota pendiente */}
-                {cuota.pendiente ? (
-                    <>
-                        <View style={globalStyles.card}>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                                <Text style={styles.label}>Pago pendiente </Text>
-                                <MaterialIcons name="error-outline" size={18} color={theme.colors.error} />
-                            </View>
-                            <Text style={styles.amount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
-                            
-                            {/* Botones de pago */}
-                            <View style={styles.paymentButtonsContainer}>
-                            <TouchableOpacity
-                                style={styles.payButton}
-                                onPress={() => router.push("/MetodoDePago")}
-                            >
-                                <Text style={globalStyles.buttonText}>Pagar</Text>
-                            </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View style={globalStyles.card}>
-                            <Text style={styles.invoiceTitle}>Factura asociada a</Text>
-                            <Text style={styles.invoiceText}><Text style={styles.bold}>Nombre:</Text> {cuota.nombre}</Text>
-                            <Text style={styles.invoiceText}><Text style={styles.bold}>DNI:</Text> {cuota.dni}</Text>
-                            <TouchableOpacity 
-                                style={styles.invoiceButton}
-                                onPress={() => handleViewInvoice()}
-                            >
-                                <Text style={globalStyles.buttonText}>FACTURA</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </>
-                ) : 
-                // Si no hay cuota pendiente
-                (
-                    <>
-                        <View style={globalStyles.card}>
-                            <Text style={styles.label}>Pago pendiente</Text>
-                            <Text style={styles.amount}>$0</Text>
-                        </View>
-                        <View style={styles.statusContainer}>
-                            <Text style={styles.statusText}>Estás al día con la cuota</Text>
-                            <MaterialIcons name="check-circle" size={24} color={theme.colors.success} />
-                        </View>
-                    </>
-                )}
-            </View>
-            {showInvoiceModal && (
-                <Modal
-                    visible={showInvoiceModal}
-                    animationType="fade"
-                    transparent={true}
-                    onRequestClose={closeInvoiceModal}
-                    statusBarTranslucent={true}
-                >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>FACTURA</Text>
+                    {/* Si hay cuota pendiente */}
+                    {cuota.pendiente ? (
+                        <>
+                            <View style={globalStyles.card}>
+                                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+                                    <Text style={styles.label}>Pago pendiente </Text>
+                                    <MaterialIcons name="error-outline" size={18} color={theme.colors.error} />
+                                </View>
+                                <Text style={styles.amount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                                
+                                {/* Botones de pago */}
+                                <View style={styles.paymentButtonsContainer}>
                                 <TouchableOpacity
-                                    style={styles.closeIcon}
-                                    onPress={closeInvoiceModal}
+                                    style={styles.payButton}
+                                    onPress={() => router.push("/MetodoDePago")}
                                 >
-                                    <MaterialIcons name="close" size={24} color={theme.colors.textSecondary} />
+                                    <Text style={globalStyles.buttonText}>Pagar</Text>
+                                </TouchableOpacity>
+                                </View>
+                            </View>
+
+                            {/* Sección de factura */}
+                            <View style={globalStyles.card}>
+                                <View style={styles.invoiceHeader}>
+                                    <MaterialIcons name="receipt" size={24} color={theme.colors.primary} />
+                                    <Text style={styles.invoiceTitle}>FACTURA</Text>
+                                </View>
+                                
+                                <View style={styles.invoiceInfo}>
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>Número de Factura:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.numeroFactura}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.fechaEmision}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.fechaVencimiento}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>Cliente:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.cliente}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>DNI:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.dni}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>Servicio:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.servicio}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.invoiceRow}>
+                                        <Text style={styles.invoiceLabel}>Período:</Text>
+                                        <Text style={styles.invoiceValue}>{factura.periodo}</Text>
+                                    </View>
+                                    
+                                    <View style={styles.totalRow}>
+                                        <Text style={styles.totalLabel}>TOTAL:</Text>
+                                        <Text style={styles.totalAmount}>${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                                    </View>
+                                </View>
+                                
+                                <TouchableOpacity 
+                                    style={styles.downloadButton}
+                                    onPress={handleDownloadInvoice}
+                                >
+                                    <MaterialIcons name="download" size={20} color={theme.colors.background} />
+                                    <Text style={styles.downloadButtonText}>DESCARGAR FACTURA</Text>
                                 </TouchableOpacity>
                             </View>
-                            
-                            <View style={styles.invoiceInfo}>
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Número de Factura:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.numeroFactura}</Text>
-                                </View>
-                                
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.fechaEmision}</Text>
-                                </View>
-                                
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.fechaVencimiento}</Text>
-                                </View>
-                                
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Cliente:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.cliente}</Text>
-                                </View>
-                                
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>DNI:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.dni}</Text>
-                                </View>
-                                
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Servicio:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.servicio}</Text>
-                                </View>
-                                
-                                <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Período:</Text>
-                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
-                                </View>
-                                
-                                <View style={styles.totalRow}>
-                                    <Text style={styles.totalLabel}>TOTAL:</Text>
-                                    <Text style={styles.totalAmount}>${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                        </>
+                    ) : 
+                    // Si no hay cuota pendiente
+                    (
+                        <>
+                            <View style={globalStyles.card}>
+                                <View style={styles.paidStatusContainer}>
+                                    <View style={styles.paidTextContainer}>
+                                        <View style={styles.paidTitleContainer}>
+                                            <Text style={styles.paidTitle}>Al día con la cuota</Text>
+                                            <MaterialIcons name="check-circle" size={20} color={theme.colors.success} />
+                                        </View>
+                                        <Text style={styles.paidAmount}>$0</Text>
+                                        <Text style={styles.paidSubtitle}>No tienes pagos pendientes</Text>
+                                    </View>
                                 </View>
                             </View>
-                            
-                            <TouchableOpacity 
-                                style={styles.downloadButton}
-                                onPress={handleDownloadInvoice}
-                            >
-                                <MaterialIcons name="download" size={20} color={theme.colors.background} />
-                                <Text style={styles.downloadButtonText}>DESCARGAR FACTURA</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-            )}
+
+                            {/* Información del último pago */}
+                            <View style={globalStyles.card}>
+                                <Text style={styles.infoTitle}>Último Pago Realizado</Text>
+                                
+                                <View style={styles.infoRow}>
+                                    <MaterialIcons name="payment" size={20} color={theme.colors.primary} />
+                                    <Text style={styles.infoLabel}>Monto pagado:</Text>
+                                    <Text style={styles.infoValue}>$10.213,89</Text>
+                                </View>
+                                
+                                <View style={styles.infoRow}>
+                                    <MaterialIcons name="calendar-today" size={20} color={theme.colors.primary} />
+                                    <Text style={styles.infoLabel}>Fecha de pago:</Text>
+                                    <Text style={styles.infoValue}>15/01/2024</Text>
+                                </View>
+                                
+                                <View style={styles.infoRow}>
+                                    <MaterialIcons name="receipt" size={20} color={theme.colors.primary} />
+                                    <Text style={styles.infoLabel}>N° Factura:</Text>
+                                    <Text style={styles.infoValue}>0001-00000001</Text>
+                                </View>
+                                
+                                <View style={styles.infoRow}>
+                                    <MaterialIcons name="schedule" size={20} color={theme.colors.primary} />
+                                    <Text style={styles.infoLabel}>Próximo vencimiento:</Text>
+                                    <Text style={styles.infoValue}>15/02/2024</Text>
+                                </View>
+
+                                <TouchableOpacity 
+                                    style={styles.downloadButton}
+                                    onPress={handleDownloadInvoice}
+                                >
+                                    <MaterialIcons name="download" size={20} color={theme.colors.background} />
+                                    <Text style={styles.downloadButtonText}>DESCARGAR FACTURA</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                    )}
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
 
-const styles = StyleSheet.create({
+// Función para generar estilos dinámicos basados en el tema
+const createStyles = (theme: any) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: theme.colors.surface,
+    },
+    scrollView: {
+        flex: 1,
+    },
+    scrollContent: {
+        paddingBottom: theme.spacing.xl,
     },
     container: {
         flex: 1,
@@ -343,6 +353,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         minHeight: 36,
+        // Sombras para destacar del fondo
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
     },
     payButtonText: {
         color: theme.colors.background,
@@ -350,10 +366,15 @@ const styles = StyleSheet.create({
         fontFamily: theme.typography.fontFamily.bold,
         textAlign: "center",
     },
+    invoiceHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: theme.spacing.md,
+    },
     invoiceTitle: {
         fontFamily: theme.typography.fontFamily.bold,
-        fontSize: theme.typography.fontSize.medium,
-        marginBottom: theme.spacing.xs,
+        fontSize: theme.typography.fontSize.large,
+        marginLeft: theme.spacing.sm,
         color: theme.colors.textPrimary,
     },
     invoiceText: {
@@ -368,14 +389,20 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.colors.card,
         borderRadius: theme.borderRadius.lg,
         padding: theme.spacing.md,
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: theme.colors.success,
+        // Sombras para destacar
+        shadowColor: theme.colors.success,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 4,
     },
     statusText: {
-        color: theme.colors.primary,
+        color: theme.colors.textPrimary,
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.bold,
         marginRight: theme.spacing.sm,
@@ -417,55 +444,23 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.fontSize.small,
         fontFamily: theme.typography.fontFamily.bold,
     },
-    invoiceButton: {
-        backgroundColor: theme.colors.primary,
-        borderRadius: theme.borderRadius.md,
-        paddingVertical: theme.spacing.xs,
-        paddingHorizontal: theme.spacing.sm,
-        marginTop: theme.spacing.md,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 36,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        paddingTop: StatusBar.currentHeight || 0,
-    },
-    modalContent: {
-        backgroundColor: theme.colors.background,
-        padding: theme.spacing.lg,
-        borderRadius: theme.borderRadius.lg,
-        width: "80%",
-        maxHeight: "80%",
-        alignItems: "center",
-    },
-    modalHeader: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
-        marginBottom: theme.spacing.md,
-    },
-    modalTitle: {
-        fontFamily: theme.typography.fontFamily.bold,
-        fontSize: theme.typography.fontSize.medium,
-        color: theme.colors.textPrimary,
-    },
-    closeIcon: {
-        padding: theme.spacing.sm,
-    },
     invoiceInfo: {
         width: "100%",
         marginBottom: theme.spacing.md,
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
     },
     invoiceRow: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         marginBottom: theme.spacing.xs,
+        paddingVertical: theme.spacing.xs,
+        borderBottomWidth: 0.5,
+        borderBottomColor: theme.colors.border,
     },
     invoiceLabel: {
         fontFamily: theme.typography.fontFamily.medium,
@@ -482,6 +477,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         marginTop: theme.spacing.md,
+        paddingTop: theme.spacing.sm,
+        borderTopWidth: 2,
+        borderTopColor: theme.colors.primary,
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.sm,
+        padding: theme.spacing.sm,
     },
     totalLabel: {
         fontFamily: theme.typography.fontFamily.medium,
@@ -491,25 +492,7 @@ const styles = StyleSheet.create({
     totalAmount: {
         fontFamily: theme.typography.fontFamily.bold,
         fontSize: theme.typography.fontSize.medium,
-        color: theme.colors.textPrimary,
-    },
-    closeButton: {
-        backgroundColor: theme.colors.primary,
-        borderRadius: theme.borderRadius.md,
-        paddingVertical: theme.spacing.xs,
-        paddingHorizontal: theme.spacing.sm,
-        marginTop: theme.spacing.md,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 36,
-    },
-    closeButtonText: {
-        color: theme.colors.background,
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-    },
-    invoiceInfoContainer: {
-        marginBottom: theme.spacing.md,
+        color: theme.colors.primary,
     },
     downloadButton: {
         backgroundColor: theme.colors.primary,
@@ -521,6 +504,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         minHeight: 36,
+        // Sombras para destacar
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
     },
     downloadButtonText: {
         color: theme.colors.background,
@@ -529,15 +518,21 @@ const styles = StyleSheet.create({
         marginLeft: theme.spacing.sm,
     },
     toggleButton: {
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.colors.card,
         borderRadius: theme.borderRadius.sm,
         paddingVertical: theme.spacing.xs,
         paddingHorizontal: theme.spacing.sm,
         alignItems: "center",
         justifyContent: "center",
         minHeight: 28,
-        borderWidth: 1,
-        borderColor: theme.colors.textSecondary,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        // Sombras sutiles
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
     },
     toggleButtonText: {
         color: theme.colors.textSecondary,
@@ -548,13 +543,19 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: theme.colors.surface,
+        backgroundColor: theme.colors.card,
         borderRadius: theme.borderRadius.md,
         padding: theme.spacing.sm,
         marginBottom: theme.spacing.md,
-        borderWidth: 1,
-        borderColor: theme.colors.textSecondary,
-        opacity: 0.8,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        opacity: 0.9,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
     },
     devLabel: {
         color: theme.colors.textSecondary,
@@ -574,12 +575,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         marginBottom: theme.spacing.xs,
+        marginTop: 0,
     },
     paidTitle: {
         fontFamily: theme.typography.fontFamily.medium,
         fontSize: theme.typography.fontSize.medium,
         color: theme.colors.success,
-        marginRight: theme.spacing.sm,
+        marginRight: 4,
     },
     paidAmount: {
         fontFamily: theme.typography.fontFamily.bold,
@@ -615,6 +617,41 @@ const styles = StyleSheet.create({
         fontFamily: theme.typography.fontFamily.bold,
         fontSize: theme.typography.fontSize.small,
         color: theme.colors.textPrimary,
+    },
+    actionButton: {
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.md,
+        marginTop: theme.spacing.sm,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 44,
+        // Sombras para destacar
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    actionButtonText: {
+        color: theme.colors.background,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
+        marginLeft: theme.spacing.sm,
+    },
+    secondaryActionButton: {
+        backgroundColor: theme.colors.surface,
+        borderWidth: 2,
+        borderColor: theme.colors.primary,
+        marginTop: theme.spacing.sm,
+    },
+    secondaryActionButtonText: {
+        color: theme.colors.primary,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
+        marginLeft: theme.spacing.sm,
     },
 });
 
