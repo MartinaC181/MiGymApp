@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from "reac
 import globalStyles from "../styles/global";
 import { useTheme } from "../context/ThemeContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { saveStopwatchState, loadStopwatchState, clearStopwatchState, StopwatchState } from "../utils/storage";
 
 const formatTime = (value: number) => value.toString().padStart(2, "0");
 
@@ -12,10 +13,44 @@ const Stopwatch: React.FC = () => {
   const [centiseconds, setCentiseconds] = useState(0); // Para precisión de centésimas
   const [isRunning, setIsRunning] = useState(false);
   const [laps, setLaps] = useState<number[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Animación para el pulso cuando está corriendo
   const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  // Cargar estado guardado al montar el componente
+  useEffect(() => {
+    const loadSavedState = async () => {
+      try {
+        const savedState = await loadStopwatchState();
+        if (savedState) {
+          setCentiseconds(savedState.centiseconds);
+          setIsRunning(savedState.isRunning);
+          setLaps(savedState.laps);
+        }
+      } catch (error) {
+        console.error('Error loading stopwatch state:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadSavedState();
+  }, []);
+
+  // Guardar estado cuando cambie (solo si ya se cargó)
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const currentState: StopwatchState = {
+      centiseconds,
+      isRunning,
+      laps,
+    };
+
+    saveStopwatchState(currentState);
+  }, [centiseconds, isRunning, laps, isLoaded]);
 
   useEffect(() => {
     if (isRunning) {

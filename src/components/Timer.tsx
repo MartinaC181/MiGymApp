@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Vibration, StyleSheet, TextInput, Modal, 
 import globalStyles from "../styles/global";
 import { useTheme } from "../context/ThemeContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { saveTimerState, loadTimerState, clearTimerState, TimerState } from "../utils/storage";
 
 interface TimerProps {
   initialHours?: number;
@@ -24,6 +25,7 @@ const Timer: React.FC<TimerProps> = ({
   );
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Estados para los inputs
@@ -39,6 +41,48 @@ const Timer: React.FC<TimerProps> = ({
   // Estado y animación para el modal de finalización
   const [showModal, setShowModal] = useState(false);
   const flashAnim = useRef(new Animated.Value(0)).current;
+
+  // Cargar estado guardado al montar el componente
+  useEffect(() => {
+    const loadSavedState = async () => {
+      try {
+        const savedState = await loadTimerState();
+        if (savedState) {
+          setSecondsLeft(savedState.totalSeconds);
+          setIsRunning(savedState.isRunning);
+          setIsFinished(savedState.totalSeconds === 0 && savedState.isRunning);
+          setCustomInitialSeconds(savedState.totalSeconds > 0 ? savedState.totalSeconds : savedState.hours * 3600 + savedState.minutes * 60 + savedState.seconds);
+          
+          // Actualizar inputs con los valores guardados
+          setInputHours(savedState.hours.toString());
+          setInputMinutes(savedState.minutes.toString());
+          setInputSeconds(savedState.seconds.toString());
+        }
+      } catch (error) {
+        console.error('Error loading timer state:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadSavedState();
+  }, []);
+
+  // Guardar estado cuando cambie (solo si ya se cargó)
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const currentState: TimerState = {
+      hours: Math.floor(secondsLeft / 3600),
+      minutes: Math.floor((secondsLeft % 3600) / 60),
+      seconds: secondsLeft % 60,
+      totalSeconds: secondsLeft,
+      isRunning,
+      isPaused: !isRunning && secondsLeft > 0 && !isFinished,
+    };
+
+    saveTimerState(currentState);
+  }, [secondsLeft, isRunning, isFinished, isLoaded]);
 
   useEffect(() => {
     if (isRunning && secondsLeft > 0) {
@@ -84,10 +128,35 @@ const Timer: React.FC<TimerProps> = ({
     setIsRunning((prev) => !prev);
   };
 
-  const handleRestart = () => {
+  const handleRestart = async () => {
     setSecondsLeft(customInitialSeconds);
     setIsRunning(false);
     setIsFinished(false);
+    
+    // Actualizar los inputs para reflejar el tiempo reiniciado
+    const hours = Math.floor(customInitialSeconds / 3600);
+    const minutes = Math.floor((customInitialSeconds % 3600) / 60);
+    const seconds = customInitialSeconds % 60;
+    
+    setInputHours(hours.toString());
+    setInputMinutes(minutes.toString());
+    setInputSeconds(seconds.toString());
+    
+    // Limpiar estado guardado y guardar el nuevo estado inicial
+    try {
+      const resetState: TimerState = {
+        hours,
+        minutes, 
+        seconds,
+        totalSeconds: customInitialSeconds,
+        isRunning: false,
+        isPaused: false,
+      };
+      
+      await saveTimerState(resetState);
+    } catch (error) {
+      console.error('Error saving reset timer state:', error);
+    }
   };
 
   // Mostrar modal y animar destello al finalizar
