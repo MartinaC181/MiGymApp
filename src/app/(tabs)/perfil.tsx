@@ -98,25 +98,25 @@ const Profile = () => {
                         icon="peso" 
                         label="Peso" 
                         value={`${weight || '---'} kg`} 
-                        gradientColors={isDarkMode ? ['#2d3748', '#4a5568'] : ['#667eea', '#764ba2']} 
+                        gradientColors={theme.colors.gradient1} 
                     />
                     <InfoBox 
                         icon="altura" 
                         label="Altura" 
                         value={`${heightInMeters || '---'} m`} 
-                        gradientColors={isDarkMode ? ['#553c9a', '#805ad5'] : ['#f093fb', '#f5576c']} 
+                        gradientColors={theme.colors.gradient2} 
                     />
                     <InfoBox 
                         icon="ideal" 
                         label="Peso ideal" 
                         value={`${idealWeight || '---'} kg`} 
-                        gradientColors={isDarkMode ? ['#2c5282', '#3182ce'] : ['#4facfe', '#00f2fe']} 
+                        gradientColors={theme.colors.gradient3} 
                     />
                     <InfoBox 
                         icon="imc" 
                         label="IMC" 
                         value={`${imc || '---'}`} 
-                        gradientColors={isDarkMode ? ['#276749', '#38a169'] : ['#43e97b', '#38f9d7']} 
+                        gradientColors={theme.colors.gradient4} 
                         onPress={() => router.push({
                             pathname: '/Imc',
                             params: { weight, height }

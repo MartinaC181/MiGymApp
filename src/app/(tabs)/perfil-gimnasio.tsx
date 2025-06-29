@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIn
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
-import { getCurrentUser, getGymByBusinessName } from '../../utils/storage';
+import { getCurrentUser, getGymUserByBusinessName } from '../../utils/storage';
 import { ClientUser, GymUser } from '../../data/Usuario';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,7 +23,7 @@ const GymProfile = () => {
             const user = await getCurrentUser() as ClientUser;
             if (user && user.gymId) {
                 setUserData(user);
-                const gym = await getGymByBusinessName(user.gymId);
+                const gym = await getGymUserByBusinessName(user.gymId);
                 setGymData(gym);
             }
         } catch (error) {
@@ -208,7 +208,7 @@ const GymProfile = () => {
             {/* Header con logo del gimnasio */}
             <View style={styles.header}>
                 <LinearGradient
-                    colors={[theme.colors.primary, '#0099CC']}
+                    colors={theme.colors.gradient1}
                     style={styles.headerGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -235,7 +235,7 @@ const GymProfile = () => {
                         icon="map-marker" 
                         title="Dirección" 
                         value={gymData.address || "No especificada"}
-                        gradientColors={['#667eea', '#764ba2']}
+                        gradientColors={theme.colors.gradient1}
                         onPress={handleAddressPress}
                     />
                     
@@ -244,7 +244,7 @@ const GymProfile = () => {
                             icon="phone" 
                             title="Teléfono" 
                             value={gymData.phone}
-                            gradientColors={['#f093fb', '#f5576c']}
+                            gradientColors={theme.colors.gradient2}
                             onPress={handlePhonePress}
                         />
                     )}
@@ -253,7 +253,7 @@ const GymProfile = () => {
                         icon="email" 
                         title="Email" 
                         value={gymData.email}
-                        gradientColors={['#4facfe', '#00f2fe']}
+                        gradientColors={theme.colors.gradient3}
                         onPress={handleEmailPress}
                     />
                 </View>
@@ -276,13 +276,13 @@ const GymProfile = () => {
                             icon="account-group" 
                             title="Clientes" 
                             value={`${getClientCount()}`}
-                            gradientColors={['#43e97b', '#38f9d7']}
+                            gradientColors={theme.colors.gradient4}
                         />
                         <StatCard 
                             icon="dumbbell" 
                             title="Clases" 
                             value={`${getClassCount()}`}
-                            gradientColors={['#fa709a', '#fee140']}
+                            gradientColors={theme.colors.gradient5}
                         />
                     </View>
                 </View>

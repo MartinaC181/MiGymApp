@@ -44,12 +44,12 @@ export default function BibliotecaEjercicios() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
   const [quickCategories] = useState([
-    { id: 'Pecho', name: 'Pecho', icon: 'dumbbell', gradient: ['#FF6B6B', '#FFE66D'] },
-    { id: 'Piernas', name: 'Piernas', icon: 'run', gradient: ['#4ECDC4', '#44A08D'] },
-    { id: 'Brazos', name: 'Brazos', icon: 'arm-flex', gradient: ['#45B7D1', '#96C93D'] },
-    { id: 'Espalda', name: 'Espalda', icon: 'human-handsup', gradient: ['#F7DC6F', '#BB6BD9'] },
-    { id: 'Hombros', name: 'Hombros', icon: 'weight-lifter', gradient: ['#BB6BD9', '#FF6B6B'] },
-    { id: 'Core', name: 'Core', icon: 'karate', gradient: ['#96C93D', '#4ECDC4'] }
+    { id: 'Pecho', name: 'Pecho', icon: 'dumbbell', gradient: theme.colors.gradient1 },
+    { id: 'Piernas', name: 'Piernas', icon: 'run', gradient: theme.colors.gradient2 },
+    { id: 'Brazos', name: 'Brazos', icon: 'arm-flex', gradient: theme.colors.gradient3 },
+    { id: 'Espalda', name: 'Espalda', icon: 'human-handsup', gradient: theme.colors.gradient4 },
+    { id: 'Hombros', name: 'Hombros', icon: 'weight-lifter', gradient: theme.colors.gradient5 },
+    { id: 'Core', name: 'Core', icon: 'karate', gradient: theme.colors.gradient6 }
   ]);
 
   // Listas en español para los filtros
@@ -279,7 +279,7 @@ export default function BibliotecaEjercicios() {
             <Image source={{ uri: ejercicio.gifUrl }} style={styles.exerciseImage} />
           ) : (
             <LinearGradient
-              colors={['#667eea', '#764ba2']}
+              colors={theme.colors.gradient1}
               style={styles.placeholderGradient}
             >
               <MaterialIcons name="fitness-center" size={isGrid ? 24 : 32} color="white" />
@@ -1339,7 +1339,7 @@ export default function BibliotecaEjercicios() {
                     }}
                   >
                     <LinearGradient
-                      colors={[theme.colors.primary, '#45B7D1']}
+                      colors={theme.colors.gradient1}
                       style={styles.addToRoutineBtnGradient}
                     >
                       <MaterialIcons name="add" size={20} color="white" />

@@ -39,8 +39,8 @@ export default function Entrenamiento() {
       description: 'Crea y personaliza tus rutinas de entrenamiento',
       icon: 'fitness-center',
       colors: {
-        light: ['#667eea', '#764ba2'],
-        dark: ['#4a5568', '#2d3748']
+        light: theme.colors.gradient1,
+        dark: theme.colors.gradient1
       },
       route: '/rutina'
     },
@@ -50,8 +50,8 @@ export default function Entrenamiento() {
       description: 'Controla el tiempo de tus series y descansos',
       icon: 'timer',
       colors: {
-        light: ['#f093fb', '#f5576c'],
-        dark: ['#805ad5', '#553c9a']
+        light: theme.colors.gradient2,
+        dark: theme.colors.gradient2
       },
       route: '/temporizador'
     },
@@ -61,8 +61,8 @@ export default function Entrenamiento() {
       description: 'Explora más de 1300 ejercicios con videos',
       icon: 'menu-book',
       colors: {
-        light: ['#4facfe', '#00f2fe'],
-        dark: ['#3182ce', '#2c5282']
+        light: theme.colors.gradient3,
+        dark: theme.colors.gradient3
       },
       route: '/biblioteca-ejercicios'
     },
@@ -72,8 +72,8 @@ export default function Entrenamiento() {
       description: 'Calcula tu ritmo y repeticiones máximas',
       icon: 'calculate',
       colors: {
-        light: ['#43e97b', '#38f9d7'],
-        dark: ['#38a169', '#2f855a']
+        light: theme.colors.gradient4,
+        dark: theme.colors.gradient4
       },
       route: '/calculadora-rpm'
     }
