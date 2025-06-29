@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
@@ -64,7 +64,11 @@ const Profile = () => {
     }
 
     return (
-        <View style={globalStyles.container}>
+        <ScrollView 
+            style={styles.container} 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+        >
             {/* Avatar con fondo y botón de edición*/}
             <View style={styles.avatarWrapper}>
                 <Image source={perfilMirtho} style={styles.avatar}/>
@@ -112,12 +116,28 @@ const Profile = () => {
 
             {/* Botón de editar */}
             <TouchableOpacity 
-                style={[globalStyles.LoginButton, { width: 280, alignSelf: 'center', maxWidth: '100%' }]}
+                style={[globalStyles.LoginButton, { width: 280, alignSelf: 'center', maxWidth: '100%', marginBottom: theme.spacing.md }]}
                 onPress={() => router.push('EditProfile')}
             >
                 <Text style={globalStyles.buttonText}>Editar</Text>
             </TouchableOpacity>
-        </View>
+
+            {/* Botón para ver perfil del gimnasio */}
+            {userData?.gymId && (
+                <TouchableOpacity 
+                    style={[styles.gymButton, { width: 280, alignSelf: 'center', maxWidth: '100%' }]}
+                    onPress={() => router.push('perfil-gimnasio')}
+                >
+                    <MaterialCommunityIcons 
+                        name="dumbbell" 
+                        size={20} 
+                        color={theme.colors.primary} 
+                        style={{ marginRight: 8 }}
+                    />
+                    <Text style={styles.gymButtonText}>Ver Perfil del Gimnasio</Text>
+                </TouchableOpacity>
+            )}
+        </ScrollView>
     );
 };
 
@@ -160,9 +180,13 @@ const styles = StyleSheet.create({
     // Se eliminaron header y title redundantes
     container: {
         flex: 1,
-        justifyContent: 'flex-start',
+        backgroundColor: theme.colors.background,
+    },
+    scrollContent: {
+        flexGrow: 1,
         alignItems: 'center',
-        padding: theme.spacing.lg,
+        paddingTop: theme.spacing.lg,
+        paddingBottom: theme.spacing.xl,
     },
     avatarWrapper: {
         position: 'relative',
@@ -269,6 +293,29 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 8,
         top: 8,
+    },
+    gymButton: {
+        backgroundColor: theme.colors.surface,
+        borderWidth: 2,
+        borderColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.md,
+        paddingHorizontal: theme.spacing.lg,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    gymButtonText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.primary,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
 });
 
