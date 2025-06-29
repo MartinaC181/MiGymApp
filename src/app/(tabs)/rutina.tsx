@@ -6,39 +6,39 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 
-const grupos = [
-  {
-    nombre: 'Piernas',
-    icon: 'run',
-    gradient: ['#667eea', '#764ba2'],
-    ejercicios: 12,
-    descripcion: 'Cuádriceps, glúteos y pantorrillas'
-  },
-  {
-    nombre: 'Brazos',
-    icon: 'arm-flex',
-    gradient: ['#f093fb', '#f5576c'],
-    ejercicios: 8,
-    descripcion: 'Bíceps, tríceps y antebrazos'
-  },
-  {
-    nombre: 'Pecho',
-    icon: 'weight-lifter',
-    gradient: ['#4facfe', '#00f2fe'],
-    ejercicios: 6,
-    descripcion: 'Pectorales mayor y menor'
-  },
-  {
-    nombre: 'Espalda',
-    icon: 'human-handsup',
-    gradient: ['#43e97b', '#38f9d7'],
-    ejercicios: 10,
-    descripcion: 'Dorsales, romboides y trapecio'
-  },
-];
-
 export default function Rutina() {
   const { theme, isDarkMode } = useTheme();
+
+  const grupos = [
+    {
+      nombre: 'Piernas',
+      icon: 'run',
+      gradient: theme.colors.gradient1,
+      ejercicios: 12,
+      descripcion: 'Cuádriceps, glúteos y pantorrillas'
+    },
+    {
+      nombre: 'Brazos',
+      icon: 'arm-flex',
+      gradient: theme.colors.gradient2,
+      ejercicios: 8,
+      descripcion: 'Bíceps, tríceps y antebrazos'
+    },
+    {
+      nombre: 'Pecho',
+      icon: 'weight-lifter',
+      gradient: theme.colors.gradient3,
+      ejercicios: 6,
+      descripcion: 'Pectorales mayor y menor'
+    },
+    {
+      nombre: 'Espalda',
+      icon: 'human-handsup',
+      gradient: theme.colors.gradient4,
+      ejercicios: 10,
+      descripcion: 'Dorsales, romboides y trapecio'
+    },
+  ];
 
   const renderGrupoCard = (grupo: any, index: number) => (
     <TouchableOpacity

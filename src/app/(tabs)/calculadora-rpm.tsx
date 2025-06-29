@@ -55,25 +55,25 @@ export default function CalculadoraRPM() {
           name: 'Brzycki',
           value: calcularBrzycki(pesoNum, repsNum),
           description: 'Fórmula más popular y precisa',
-          color: '#667eea'
+          color: theme.colors.primary
         },
         {
           name: 'Epley',
           value: calcularEpley(pesoNum, repsNum),
           description: 'Recomendada para 2-10 repeticiones',
-          color: '#f093fb'
+          color: theme.colors.primaryDark
         },
         {
           name: 'McGlothin',
           value: calcularMcGlothin(pesoNum, repsNum),
           description: 'Buena para altas repeticiones',
-          color: '#4facfe'
+          color: theme.colors.accent
         },
         {
           name: 'Lombardi',
           value: calcularLombardi(pesoNum, repsNum),
           description: 'Conservadora y segura',
-          color: '#43e97b'
+          color: theme.colors.secondary
         }
       ];
 
@@ -213,7 +213,7 @@ export default function CalculadoraRPM() {
       padding: theme.spacing.xl,
       paddingHorizontal: theme.spacing.md,
       alignItems: 'center',
-      shadowColor: '#667eea',
+      shadowColor: theme.colors.primary,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
@@ -457,7 +457,7 @@ export default function CalculadoraRPM() {
             {/* Promedio destacado */}
             <View style={styles.averageSection}>
               <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={theme.colors.gradient1}
                 style={styles.averageGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
