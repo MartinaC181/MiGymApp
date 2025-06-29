@@ -648,7 +648,7 @@ export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.creat
     borderRadius: theme.borderRadius.md,
     backgroundColor: theme.colors.background,
     marginBottom: 0,
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   autocompleteInputContainerFocused: {
     borderWidth: 2,
@@ -661,7 +661,7 @@ export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.creat
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
-    overflow: 'hidden',
+    overflow: 'visible',
   },
 
   autocompleteInputWrapper: {

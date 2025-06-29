@@ -43,6 +43,7 @@ export default function Entrenamiento() {
       description: 'Controla el tiempo de tus series y descansos',
       icon: 'timer',
       colors: ['#b3dcec', '#e6f3f9'],
+      route: '/temporizador'
     },
     {
       id: 'guia',

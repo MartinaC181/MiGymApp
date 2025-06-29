@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Modal, StatusBar, Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
+import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
+import { ClientUser } from "../../data/Usuario";
 
 // Función hardcode para verificar estados de vista
 function getCuotaInfo(pendiente: boolean) {
@@ -26,35 +28,69 @@ function getCuotaInfo(pendiente: boolean) {
     }
 }
 
-// Objeto con los datos de factura
-const getFacturaData = (cuotaInfo: any) => {
-    return {
-        numeroFactura: "#2024-001",
-        fechaEmision: "15/01/2024",
-        fechaVencimiento: "15/02/2024",
-        cliente: cuotaInfo.nombre,
-        dni: cuotaInfo.dni,
-        servicio: "Membresía Gimnasio",
-        periodo: "Enero 2024",
-        monto: cuotaInfo.monto,
-        items: [
-            {
-                descripcion: "Membresía Mensual",
-                cantidad: 1,
-                precioUnitario: 10213.89,
-                subtotal: 10213.89
-            }
-        ],
-        total: cuotaInfo.monto
-    };
-};
-
 export default function Cuota() {
-    const [pendiente, setPendiente] = useState(true);
+    // Estado para indicar si la cuota está pendiente o no
+    const [pendiente, setPendiente] = useState<boolean>(true);
+
+    // Información de cuota basada en el estado `pendiente`
     const cuota = getCuotaInfo(pendiente);
-    const factura = getFacturaData(cuota);
+
     const router = useRouter();
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+    const [cuotaData, setCuotaData] = useState(null);
+    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Cargar datos del usuario y su información de pago
+    useEffect(() => {
+        loadPaymentData();
+    }, []);
+
+    const loadPaymentData = async () => {
+        try {
+            // Obtener usuario actual
+            const user = await getCurrentUser() as ClientUser;
+            if (!user) {
+                setCuotaData({
+                    pendiente: false,
+                    monto: 0,
+                    nombre: "Usuario no encontrado",
+                    dni: "N/A"
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            setCurrentUser(user);
+
+            // Obtener información de pago del usuario
+            const paymentInfo = await getUserPaymentInfo(user.id);
+            
+            // Formatear la información para el componente
+            const cuotaInfo = {
+                pendiente: paymentInfo.pendiente,
+                monto: paymentInfo.monto,
+                nombre: user.name,
+                dni: (user as any).dni || "No especificado",
+                numeroFactura: paymentInfo.numeroFactura,
+                fechaEmision: paymentInfo.fechaEmision,
+                fechaVencimiento: paymentInfo.fechaVencimiento,
+                periodo: paymentInfo.periodo
+            };
+
+            setCuotaData(cuotaInfo);
+        } catch (error) {
+            console.error("Error cargando datos de pago:", error);
+            setCuotaData({
+                pendiente: false,
+                monto: 0,
+                nombre: "Error cargando datos",
+                dni: "N/A"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Efecto para cambiar el StatusBar cuando el modal esté abierto
     useEffect(() => {
@@ -71,65 +107,70 @@ export default function Cuota() {
         }
     }, [showInvoiceModal]);
 
+    // Función para manejar el pago con Mercado Pago
+    const handleMercadoPagoPayment = async () => {
+        // Aquí iría la lógica de integración con Mercado Pago
+        console.log("Procesando pago con Mercado Pago...");
+        const data = await handleIntegrationMercadoPago();
 
-    // Función para generar y descargar la factura
-    const handleDownloadInvoice = async () => {
+        if (!data) {
+           return console.error("Error al procesar el pago con Mercado Pago");
+        }
+
+        openBrowserAsync(data);
+    };
+
+    // Función para manejar la vista de la factura
+    const handleViewInvoice = () => {
+        setShowInvoiceModal(true);
+    };
+
+    // Función para cerrar el modal
+    const closeInvoiceModal = () => {
+        setShowInvoiceModal(false);
+    };
+
+    // Función para formatear fechas
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "N/A";
         try {
-            // Generar contenido de la factura en formato texto
-            const invoiceContent = `
-FACTURA
-${factura.numeroFactura}
-
-Fecha de Emisión: ${factura.fechaEmision}
-Fecha de Vencimiento: ${factura.fechaVencimiento}
-
-CLIENTE:
-Nombre: ${factura.cliente}
-DNI: ${factura.dni}
-
-SERVICIO:
-${factura.servicio}
-Período: ${factura.periodo}
-
-DETALLE:
-${factura.items.map(item => 
-    `${item.descripcion} - Cantidad: ${item.cantidad} - Precio: $${item.precioUnitario.toLocaleString("es-AR", { minimumFractionDigits: 2 })} - Subtotal: $${item.subtotal.toLocaleString("es-AR", { minimumFractionDigits: 2 })}`
-).join('\n')}
-
-TOTAL A PAGAR: $${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
-            `.trim();
-
-            // Crear archivo temporal
-            const fileName = `factura_${factura.numeroFactura.replace('#', '').replace('-', '_')}.txt`;
-            const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-            
-            await FileSystem.writeAsStringAsync(fileUri, invoiceContent, {
-                encoding: FileSystem.EncodingType.UTF8,
-            });
-
-            // Verificar si se puede compartir
-            const isAvailable = await Sharing.isAvailableAsync();
-            if (isAvailable) {
-                await Sharing.shareAsync(fileUri, {
-                    mimeType: 'text/plain',
-                    dialogTitle: 'Descargar Factura',
-                });
-            } else {
-                Alert.alert(
-                    'Descarga completada',
-                    `La factura se ha guardado como: ${fileName}`,
-                    [{ text: 'OK' }]
-                );
-            }
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
         } catch (error) {
-            console.error('Error al descargar la factura:', error);
-            Alert.alert(
-                'Error',
-                'No se pudo descargar la factura. Inténtalo de nuevo.',
-                [{ text: 'OK' }]
-            );
+            return "Fecha inválida";
         }
     };
+
+    // Datos mock para la factura en el modal
+    const factura = {
+        numeroFactura: "0001-00000001",
+        fechaEmision: formatDate("2024-01-15"),
+        fechaVencimiento: formatDate("2024-02-15"),
+        cliente: cuota.nombre,
+        dni: cuota.dni,
+        servicio: "Membresía Gimnasio",
+        total: cuota.monto
+    };
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text>Cargando información de cuota...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (!cuota) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text>Error cargando información de cuota</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -168,22 +209,65 @@ TOTAL A PAGAR: $${factura.total.toLocaleString("es-AR", { minimumFractionDigits:
                             </View>
                         </View>
                         <View style={globalStyles.card}>
-                            <Text style={styles.invoiceTitle}>Factura asociada</Text>
+                            <Text style={styles.invoiceTitle}>Factura asociada a</Text>
+                            <Text style={styles.invoiceText}><Text style={styles.bold}>Nombre:</Text> {cuota.nombre}</Text>
+                            <Text style={styles.invoiceText}><Text style={styles.bold}>DNI:</Text> {cuota.dni}</Text>
+                            <TouchableOpacity 
+                                style={styles.invoiceButton}
+                                onPress={() => handleViewInvoice()}
+                            >
+                                <Text style={globalStyles.buttonText}>FACTURA</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </>
+                ) : 
+                // Si no hay cuota pendiente
+                (
+                    <>
+                        <View style={globalStyles.card}>
+                            <Text style={styles.label}>Pago pendiente</Text>
+                            <Text style={styles.amount}>$0</Text>
+                        </View>
+                        <View style={styles.statusContainer}>
+                            <Text style={styles.statusText}>Estás al día con la cuota</Text>
+                            <MaterialIcons name="check-circle" size={24} color={theme.colors.success} />
+                        </View>
+                    </>
+                )}
+            </View>
+            {showInvoiceModal && (
+                <Modal
+                    visible={showInvoiceModal}
+                    animationType="fade"
+                    transparent={true}
+                    onRequestClose={closeInvoiceModal}
+                    statusBarTranslucent={true}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>FACTURA</Text>
+                                <TouchableOpacity
+                                    style={styles.closeIcon}
+                                    onPress={closeInvoiceModal}
+                                >
+                                    <MaterialIcons name="close" size={24} color={theme.colors.textSecondary} />
+                                </TouchableOpacity>
+                            </View>
                             
-                            {/* Información de la factura */}
-                            <View style={styles.invoiceInfoContainer}>
+                            <View style={styles.invoiceInfo}>
                                 <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Número:</Text>
+                                    <Text style={styles.invoiceLabel}>Número de Factura:</Text>
                                     <Text style={styles.invoiceValue}>{factura.numeroFactura}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Emisión:</Text>
+                                    <Text style={styles.invoiceLabel}>Fecha de Emisión:</Text>
                                     <Text style={styles.invoiceValue}>{factura.fechaEmision}</Text>
                                 </View>
                                 
                                 <View style={styles.invoiceRow}>
-                                    <Text style={styles.invoiceLabel}>Vencimiento:</Text>
+                                    <Text style={styles.invoiceLabel}>Fecha de Vencimiento:</Text>
                                     <Text style={styles.invoiceValue}>{factura.fechaVencimiento}</Text>
                                 </View>
                                 
@@ -204,7 +288,7 @@ TOTAL A PAGAR: $${factura.total.toLocaleString("es-AR", { minimumFractionDigits:
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Período:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.periodo}</Text>
+                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
                                 </View>
                                 
                                 <View style={styles.totalRow}>
@@ -221,45 +305,9 @@ TOTAL A PAGAR: $${factura.total.toLocaleString("es-AR", { minimumFractionDigits:
                                 <Text style={styles.downloadButtonText}>DESCARGAR FACTURA</Text>
                             </TouchableOpacity>
                         </View>
-                    </>
-                ) : 
-                // Si no hay cuota pendiente
-                (
-                    <>
-                        <View style={globalStyles.card}>
-                            <View style={styles.paidStatusContainer}>
-                                <View style={styles.paidTextContainer}>
-                                    <View style={styles.paidTitleContainer}>
-                                        <Text style={styles.paidTitle}>Cuota al día</Text>
-                                        <MaterialIcons name="check-circle" size={18} color={theme.colors.success} />
-                                    </View>
-                                    <Text style={styles.paidAmount}>$0</Text>
-                                    <Text style={styles.paidSubtitle}>No tienes pagos pendientes</Text>
-                                </View>
-                            </View>
-                        </View>
-                        
-                        <View style={globalStyles.card}>
-                            <Text style={styles.infoTitle}>Información de membresía</Text>
-                            <View style={styles.infoRow}>
-                                <MaterialIcons name="calendar-today" size={18} color={theme.colors.textSecondary} />
-                                <Text style={styles.infoLabel}>Último pago:</Text>
-                                <Text style={styles.infoValue}>15/01/2024</Text>
-                            </View>
-                            <View style={styles.infoRow}>
-                                <MaterialIcons name="schedule" size={18} color={theme.colors.textSecondary} />
-                                <Text style={styles.infoLabel}>Próximo vencimiento:</Text>
-                                <Text style={styles.infoValue}>15/02/2024</Text>
-                            </View>
-                            <View style={styles.infoRow}>
-                                <MaterialIcons name="account-circle" size={18} color={theme.colors.textSecondary} />
-                                <Text style={styles.infoLabel}>Estado:</Text>
-                                <Text style={[styles.infoValue, { color: theme.colors.success }]}>Activo</Text>
-                            </View>
-                        </View>
-                    </>
-                )}
-            </View>
+                    </View>
+                </Modal>
+            )}
         </SafeAreaView>
     );
 }
@@ -569,3 +617,8 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
     },
 });
+
+// Función placeholder para descarga de factura
+const handleDownloadInvoice = () => {
+    Alert.alert('Descarga', 'La descarga de factura estará disponible próximamente.');
+};

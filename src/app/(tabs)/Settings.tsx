@@ -73,6 +73,15 @@ const Settings = () => {
 
     ];
 
+    // Agregar acceso al debug sólo en modo desarrollo
+    if (__DEV__) {
+        items.push({
+            icon: aboutIcon,
+            label: 'Debug Storage',
+            onPress: () => router.push('/debug-storage'),
+        });
+    }
+
     return (
         <View style={globalStyles.safeArea}>
             <View style={[styles.container, { backgroundColor: theme.colors.background }]}>

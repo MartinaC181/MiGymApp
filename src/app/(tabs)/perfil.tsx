@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import theme from "../../constants/theme";
+import { getCurrentUser } from '../../utils/storage';
+import { ClientUser } from '../../data/Usuario';
 import pesoImg from '../../../assets/profile/bascula.png';
 import alturaImg from '../../../assets/profile/altura.png';
 import idealImg from '../../../assets/profile/pesoIdeal.png';
@@ -21,15 +23,42 @@ const iconMap: Record<string, any> = {
 
 const Profile = () => {
     const router = useRouter();
-    const params = useLocalSearchParams();
+    const [userData, setUserData] = useState<ClientUser | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const name = params.name || '';
-    const email = params.email || '';
-    const weight = params.weight || '';
-    const idealWeight = params.idealWeight || '';
-    const height = params.height || '';
+    useEffect(() => {
+        loadUserData();
+    }, []);
 
-    const imc = (parseFloat(weight as string) / Math.pow(parseFloat(height as string), 2)).toFixed(2);
+    const loadUserData = async () => {
+        try {
+            const user = await getCurrentUser() as ClientUser;
+            if (user) {
+                setUserData(user);
+            }
+        } catch (error) {
+            console.error('Error cargando datos del usuario:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Usar datos del estado o valores por defecto
+    const name = userData?.name || 'Sin nombre';
+    const email = userData?.email || 'Sin correo';
+    const weight = (userData as any)?.weight || '0';
+    const idealWeight = (userData as any)?.idealWeight || '0';
+    const height = (userData as any)?.height || '0';
+
+    const imc = (parseFloat(weight) / Math.pow(parseFloat(height), 2)).toFixed(2);
+    
+    if (loading) {
+        return (
+            <View style={[globalStyles.container, { justifyContent: 'center' }]}>
+                <Text>Cargando...</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={globalStyles.container}>
@@ -43,8 +72,8 @@ const Profile = () => {
             </View>
 
             {/* Nombre y correo */}
-            <Text style={styles.name}>{name || 'Sin nombre'}</Text>
-            <Text style={styles.email}>{email || 'Sin correo'}</Text>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.email}>{email}</Text>
 
             {/* Cuadricula */}
             <View style={styles.grid}>
@@ -55,8 +84,10 @@ const Profile = () => {
             </View>
 
             {/* Botón de editar */}
-            <TouchableOpacity style={globalStyles.LoginButton}
-                              onPress={() => router.push('EditProfile')}>
+            <TouchableOpacity 
+                style={[globalStyles.LoginButton, { width: 280, alignSelf: 'center', maxWidth: '100%' }]}
+                onPress={() => router.push('EditProfile')}
+            >
                 <Text style={globalStyles.buttonText}>Editar</Text>
             </TouchableOpacity>
         </View>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { 
     View, 
@@ -13,6 +13,8 @@ import styles, { CARD_WIDTH, CARD_SPACING } from "../../styles/home";
 import globalStyles from "../../styles/global";
 import Racha from "../../components/Racha";
 import theme from "../../constants/theme";
+import { getCurrentUser, getAvailableClasses } from "../../utils/storage";
+import { ClientUser } from "../../data/Usuario";
 
 export default function Home() {
     // Estado para controlar el slide activo
@@ -21,36 +23,30 @@ export default function Home() {
     const [searchText, setSearchText] = useState("");
     // Estado para mostrar/ocultar sugerencias
     const [showSuggestions, setShowSuggestions] = useState(false);
+    // Estado para las clases cargadas desde AsyncStorage
+    const [clases, setClases] = useState([]);
+    // Estado para el usuario actual
+    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const router = useRouter();
-    
 
-    const clases = [
-        {
-            id: 1,
-            nombre: "FUNCIONAL HIT",
-            imagen: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-        },
-      {
-            id: 2,
-            nombre: "CROSSFIT",
-            imagen: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 3,
-            nombre: "YOGA",
-            imagen: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 4,
-            nombre: "SPINNING",
-            imagen: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 5,
-            nombre: "PILATES",
-            imagen: "https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-        },
-    ];
+    // Cargar datos desde AsyncStorage al montar el componente
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            // Cargar clases disponibles
+            const availableClases = await getAvailableClasses();
+            setClases(availableClases);
+
+            // Cargar usuario actual
+            const user = await getCurrentUser() as ClientUser;
+            setCurrentUser(user);
+        } catch (error) {
+            console.error("Error cargando datos del home:", error);
+        }
+    };
 
     // Filtrar clases basado en el texto de búsqueda
     const filteredClases = clases.filter(clase =>
@@ -106,10 +102,19 @@ export default function Home() {
         setShowSuggestions(text.length > 0);
     };
 
+    // Obtener el nombre del usuario o mostrar un saludo genérico
+    const getUserName = () => {
+        if (currentUser?.name) {
+            const firstName = currentUser.name.split(' ')[0];
+            return firstName;
+        }
+        return "Usuario";
+    };
+
     return (
         <View style={[globalStyles.container, styles.homeContainer]}>
             <View style={styles.greetingContainer}>
-                <Text style={styles.greeting}>Hola, <Text style={styles.name}>Mirtho!</Text></Text>
+                <Text style={styles.greeting}>Hola, <Text style={styles.name}>{getUserName()}!</Text></Text>
                 <Text style={styles.subGreeting}>¿Listo para entrenar?</Text>
             </View>
 
