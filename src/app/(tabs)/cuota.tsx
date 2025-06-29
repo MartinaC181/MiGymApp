@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Modal, StatusBar } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Modal, StatusBar, Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import theme from "../../constants/theme";
 import globalStyles from "../../styles/global";
-import { handleIntegrationMercadoPago } from "@/src/utils/MPIntegration";
-import { openBrowserAsync } from "expo-web-browser";
+import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
+import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
+import { ClientUser } from "../../data/Usuario";
 
 // Función hardcode para verificar estados de vista
-function getCuotaInfo() {
-    // Cambiá este valor para probar ambos estados
-    const pendiente = true;
-
+function getCuotaInfo(pendiente: boolean) {
     if (pendiente) {
         return {
             pendiente: true,
@@ -29,34 +28,69 @@ function getCuotaInfo() {
     }
 }
 
-// Objeto con los datos de factura
-const getFacturaData = (cuotaInfo: any) => {
-    return {
-        numeroFactura: "#2024-001",
-        fechaEmision: "15/01/2024",
-        fechaVencimiento: "15/02/2024",
-        cliente: cuotaInfo.nombre,
-        dni: cuotaInfo.dni,
-        servicio: "Membresía Gimnasio",
-        periodo: "Enero 2024",
-        monto: cuotaInfo.monto,
-        items: [
-            {
-                descripcion: "Membresía Mensual",
-                cantidad: 1,
-                precioUnitario: 10213.89,
-                subtotal: 10213.89
-            }
-        ],
-        total: cuotaInfo.monto
-    };
-};
-
 export default function Cuota() {
-    const cuota = getCuotaInfo();
-    const factura = getFacturaData(cuota);
+    // Estado para indicar si la cuota está pendiente o no
+    const [pendiente, setPendiente] = useState<boolean>(true);
+
+    // Información de cuota basada en el estado `pendiente`
+    const cuota = getCuotaInfo(pendiente);
+
     const router = useRouter();
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+    const [cuotaData, setCuotaData] = useState(null);
+    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Cargar datos del usuario y su información de pago
+    useEffect(() => {
+        loadPaymentData();
+    }, []);
+
+    const loadPaymentData = async () => {
+        try {
+            // Obtener usuario actual
+            const user = await getCurrentUser() as ClientUser;
+            if (!user) {
+                setCuotaData({
+                    pendiente: false,
+                    monto: 0,
+                    nombre: "Usuario no encontrado",
+                    dni: "N/A"
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            setCurrentUser(user);
+
+            // Obtener información de pago del usuario
+            const paymentInfo = await getUserPaymentInfo(user.id);
+            
+            // Formatear la información para el componente
+            const cuotaInfo = {
+                pendiente: paymentInfo.pendiente,
+                monto: paymentInfo.monto,
+                nombre: user.name,
+                dni: (user as any).dni || "No especificado",
+                numeroFactura: paymentInfo.numeroFactura,
+                fechaEmision: paymentInfo.fechaEmision,
+                fechaVencimiento: paymentInfo.fechaVencimiento,
+                periodo: paymentInfo.periodo
+            };
+
+            setCuotaData(cuotaInfo);
+        } catch (error) {
+            console.error("Error cargando datos de pago:", error);
+            setCuotaData({
+                pendiente: false,
+                monto: 0,
+                nombre: "Error cargando datos",
+                dni: "N/A"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Efecto para cambiar el StatusBar cuando el modal esté abierto
     useEffect(() => {
@@ -77,7 +111,7 @@ export default function Cuota() {
     const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
         console.log("Procesando pago con Mercado Pago...");
-        const data = await handleIntegrationMercadoPago(factura.items[0]);
+        const data = await handleIntegrationMercadoPago();
 
         if (!data) {
            return console.error("Error al procesar el pago con Mercado Pago");
@@ -96,9 +130,64 @@ export default function Cuota() {
         setShowInvoiceModal(false);
     };
 
+    // Función para formatear fechas
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "N/A";
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        } catch (error) {
+            return "Fecha inválida";
+        }
+    };
+
+    // Datos mock para la factura en el modal
+    const factura = {
+        numeroFactura: "0001-00000001",
+        fechaEmision: formatDate("2024-01-15"),
+        fechaVencimiento: formatDate("2024-02-15"),
+        cliente: cuota.nombre,
+        dni: cuota.dni,
+        servicio: "Membresía Gimnasio",
+        total: cuota.monto
+    };
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text>Cargando información de cuota...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (!cuota) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text>Error cargando información de cuota</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
+                {/* Botón provisorio para cambiar estado */}
+                <View style={styles.devContainer}>
+                    <Text style={styles.devLabel}>🔧 DESARROLLO</Text>
+                    <TouchableOpacity 
+                        style={styles.toggleButton}
+                        onPress={() => setPendiente(!pendiente)}
+                    >
+                        <Text style={styles.toggleButtonText}>
+                            {pendiente ? "Cambiar a PAGADO" : "Cambiar a PENDIENTE"}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
                 {/* Si hay cuota pendiente */}
                 {cuota.pendiente ? (
                     <>
@@ -117,16 +206,6 @@ export default function Cuota() {
                             >
                                 <Text style={globalStyles.buttonText}>Pagar</Text>
                             </TouchableOpacity>
-                                
-                                <TouchableOpacity
-                                    style={styles.mercadopagoButton}
-                                    onPress={() => handleMercadoPagoPayment()}
-                                >
-                                    <View style={styles.mpLogoContainer}>
-                                        <MaterialIcons name="account-balance-wallet" size={16} color="#009EE3" />
-                                    </View>
-                                    <Text style={styles.mercadopagoText}>MERCADO PAGO</Text>
-                                </TouchableOpacity>
                             </View>
                         </View>
                         <View style={globalStyles.card}>
@@ -209,20 +288,21 @@ export default function Cuota() {
                                 
                                 <View style={styles.invoiceRow}>
                                     <Text style={styles.invoiceLabel}>Período:</Text>
-                                    <Text style={styles.invoiceValue}>{factura.periodo}</Text>
+                                    <Text style={styles.invoiceValue}>Enero 2024</Text>
                                 </View>
                                 
                                 <View style={styles.totalRow}>
-                                    <Text style={styles.totalLabel}>TOTAL A PAGAR:</Text>
+                                    <Text style={styles.totalLabel}>TOTAL:</Text>
                                     <Text style={styles.totalAmount}>${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
                                 </View>
                             </View>
                             
-                            <TouchableOpacity
-                                style={styles.closeButton}
-                                onPress={closeInvoiceModal}
+                            <TouchableOpacity 
+                                style={styles.downloadButton}
+                                onPress={handleDownloadInvoice}
                             >
-                                <Text style={styles.closeButtonText}>CERRAR</Text>
+                                <MaterialIcons name="download" size={20} color={theme.colors.background} />
+                                <Text style={styles.downloadButtonText}>DESCARGAR FACTURA</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -244,7 +324,7 @@ const styles = StyleSheet.create({
     },
     label: {
         color: theme.colors.textSecondary,
-        fontSize: theme.typography.fontSize.small,
+        fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.medium,
     },
     amount: {
@@ -428,4 +508,117 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.bold,
     },
+    invoiceInfoContainer: {
+        marginBottom: theme.spacing.md,
+    },
+    downloadButton: {
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        marginTop: theme.spacing.md,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 36,
+    },
+    downloadButtonText: {
+        color: theme.colors.background,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.bold,
+        marginLeft: theme.spacing.sm,
+    },
+    toggleButton: {
+        backgroundColor: theme.colors.background,
+        borderRadius: theme.borderRadius.sm,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 28,
+        borderWidth: 1,
+        borderColor: theme.colors.textSecondary,
+    },
+    toggleButtonText: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+    },
+    devContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: theme.colors.textSecondary,
+        opacity: 0.8,
+    },
+    devLabel: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+    },
+    paidStatusContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        paddingVertical: theme.spacing.xs,
+    },
+    paidTextContainer: {
+        flex: 1,
+    },
+    paidTitleContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: theme.spacing.xs,
+    },
+    paidTitle: {
+        fontFamily: theme.typography.fontFamily.medium,
+        fontSize: theme.typography.fontSize.medium,
+        color: theme.colors.success,
+        marginRight: theme.spacing.sm,
+    },
+    paidAmount: {
+        fontFamily: theme.typography.fontFamily.bold,
+        fontSize: 28,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.xs,
+    },
+    paidSubtitle: {
+        fontFamily: theme.typography.fontFamily.medium,
+        fontSize: theme.typography.fontSize.medium,
+        color: theme.colors.textSecondary,
+    },
+    infoTitle: {
+        fontFamily: theme.typography.fontFamily.bold,
+        fontSize: theme.typography.fontSize.medium,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.md,
+    },
+    infoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: theme.spacing.sm,
+        paddingVertical: theme.spacing.xs,
+    },
+    infoLabel: {
+        fontFamily: theme.typography.fontFamily.medium,
+        fontSize: theme.typography.fontSize.small,
+        color: theme.colors.textSecondary,
+        flex: 1,
+        marginLeft: theme.spacing.sm,
+    },
+    infoValue: {
+        fontFamily: theme.typography.fontFamily.bold,
+        fontSize: theme.typography.fontSize.small,
+        color: theme.colors.textPrimary,
+    },
 });
+
+// Función placeholder para descarga de factura
+const handleDownloadInvoice = () => {
+    Alert.alert('Descarga', 'La descarga de factura estará disponible próximamente.');
+};

@@ -32,11 +32,27 @@ export default StyleSheet.create({
     zIndex: 100,
     marginTop: -46,
     marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   iconContainerActive: {
     backgroundColor: theme.colors.background,
     transform: [{ scale: 1.08 }],
     marginTop: -50,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
   },
   iconContainerPressed: {
      backgroundColor: theme.colors.surface,

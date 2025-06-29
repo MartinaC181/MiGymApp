@@ -3,19 +3,20 @@ import { View, Text, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "../styles/racha";
 import theme from "../constants/theme";
-import { UsuarioAtleta as initialUser } from "../data/Usuario";
 import { calcularRachaSemanal, addAttendanceIfNeeded, countAttendancesThisWeek } from "../utils/racha";
-import { loadClientData, saveClientData } from "../utils/storage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getCurrentUser, getAttendance, saveAttendance } from "../utils/storage";
+import { ClientUser } from "../data/Usuario";
 import RachaModal from "./RachaModal";
 import Flame from "./Flame";
 import { Animated } from "react-native";
 
 export default function Racha({ onPress }: { onPress?: () => void }) {
-  const [user, setUser] = useState(initialUser);
-  const [attendance, setAttendance] = useState<string[]>(initialUser.attendance);
+  const [user, setUser] = useState<ClientUser | null>(null);
+  const [attendance, setAttendance] = useState<string[]>([]);
   const [forceUpdate, setForceUpdate] = useState(0);
-  const { weeklyGoal } = user;
+  const [isLoading, setIsLoading] = useState(true);
+
+  const weeklyGoal = user?.weeklyGoal || 3;
 
   const { currentWeekCount, streak } = useMemo(() => {
     const result = calcularRachaSemanal(attendance, weeklyGoal, new Date());
@@ -25,37 +26,68 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [dotScale] = useState(new Animated.Value(1));
 
-  // Load persisted data on mount
+  // Cargar datos del usuario desde AsyncStorage
   useEffect(() => {
-    (async () => {
-      const stored = await loadClientData();
-      if (stored && stored.attendance) {
-        setUser(stored);
-        setAttendance(stored.attendance);
-      }
-    })();
+    loadUserData();
   }, []);
 
+  const loadUserData = async () => {
+    try {
+      const currentUser = await getCurrentUser() as ClientUser;
+      if (currentUser && currentUser.role === 'client') {
+        const userAttendance = await getAttendance(currentUser.id);
+        setUser(currentUser);
+        setAttendance(userAttendance);
+      } else {
+        // Si no hay usuario logueado, usar valores por defecto
+        setUser(null);
+        setAttendance([]);
+      }
+    } catch (error) {
+      console.error("Error cargando datos del usuario:", error);
+      setUser(null);
+      setAttendance([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleMarkAttendance = async () => {
+    if (!user) {
+      console.warn("No hay usuario logueado");
+      return;
+    }
+
     const { updated, added } = addAttendanceIfNeeded(attendance);
     if (!added) {
-      return; // No cerrar el modal, solo no hacer nada si ya hay asistencia
+      return; // Ya hay asistencia para hoy
     }
-    setAttendance(updated);
-    const newUser = { ...user, attendance: updated } as typeof user;
-    setUser(newUser);
-    await saveClientData(newUser);
-    // No cerrar el modal automáticamente, el usuario decide cuándo cerrar
+
+    try {
+      setAttendance(updated);
+      await saveAttendance(user.id, updated);
+    } catch (error) {
+      console.error("Error guardando asistencia:", error);
+      // Revertir cambio en caso de error
+      setAttendance(attendance);
+    }
   };
 
   const handleResetAttendance = async () => {
-    await AsyncStorage.removeItem("atleta");
-    setAttendance([]);
-    setUser({ ...user, attendance: [] });
-    setModalVisible(false);
+    if (!user) return;
+
+    try {
+      setAttendance([]);
+      await saveAttendance(user.id, []);
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error reseteando asistencia:", error);
+    }
   };
 
   const handleIncrementStreak = async () => {
+    if (!user) return;
+
     const today = new Date();
     const newAttendance = [...attendance];
     
@@ -92,13 +124,16 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
     
     newAttendance.sort();
     
-    setAttendance(newAttendance);
-    const newUser = { ...user, attendance: newAttendance } as typeof user;
-    setUser(newUser);
-    await saveClientData(newUser);
-    
-    // Forzar actualización
-    setForceUpdate(prev => prev + 1);
+    try {
+      setAttendance(newAttendance);
+      await saveAttendance(user.id, newAttendance);
+      // Forzar actualización
+      setForceUpdate(prev => prev + 1);
+    } catch (error) {
+      console.error("Error incrementando racha:", error);
+      // Revertir cambio en caso de error
+      setAttendance(attendance);
+    }
   };
 
   const renderProgressDots = () => {
@@ -128,6 +163,27 @@ export default function Racha({ onPress }: { onPress?: () => void }) {
       Animated.timing(dotScale, { toValue: 1, duration: 250, useNativeDriver: true }),
     ]).start();
   }, [currentWeekCount]);
+
+  // Mostrar componente simplificado si está cargando o no hay usuario
+  if (isLoading) {
+    return (
+      <View style={styles.card}>
+        <Text>Cargando racha...</Text>
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.card}>
+        <View style={styles.row}>
+          <Flame size={28} muted={true} />
+          <Text style={styles.streakText}>0</Text>
+          <Text style={styles.label}>¡Inicia sesión para ver tu racha!</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <>
