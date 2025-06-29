@@ -1,10 +1,10 @@
 
 const colors = {
   primary: '#00BFFF',
-  background: '#FFFFFF',
+  background: '#ffffff',
   textPrimary: '#111111',
   textSecondary: '#3E3E3E',
-  surface: '#F7F7F7',
+  surface: '#F4F4F4',
   success: '#88DA62',
   error: '#FF5A5F',
 };
