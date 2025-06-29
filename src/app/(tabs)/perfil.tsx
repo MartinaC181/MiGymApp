@@ -10,6 +10,7 @@ import alturaImg from '../../../assets/profile/altura.png';
 import idealImg from '../../../assets/profile/pesoIdeal.png';
 import imcImg from '../../../assets/profile/imc.png';
 import perfilMirtho from '../../../assets/profile/perfilMirtho.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -51,7 +52,8 @@ const Profile = () => {
     const idealWeight = (userData as any)?.idealWeight || '0';
     const height = (userData as any)?.height || '0';
 
-    const imc = (parseFloat(weight) / Math.pow(parseFloat(height), 2)).toFixed(2);
+    const imc = (parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2)).toFixed(2);
+    const heightInMeters = (parseFloat(height) / 100).toFixed(2);
     
     if (loading) {
         return (
@@ -87,7 +89,7 @@ const Profile = () => {
                 <InfoBox 
                     icon="altura" 
                     label="Altura" 
-                    value={`${height || '---'} m`} 
+                    value={`${heightInMeters || '---'} m`} 
                     gradientColors={['#f093fb', '#f5576c']} 
                 />
                 <InfoBox 

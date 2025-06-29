@@ -4,8 +4,7 @@ import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
-import { getCurrentUser, updateUserProfile } from '../../utils/storage';
-import { ClientUser } from '../../data/Usuario';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfile = ({navigation}: any) => {
     const [name, setName] = useState('');
@@ -13,7 +12,6 @@ const EditProfile = ({navigation}: any) => {
     const [weight, setWeight] = useState('');
     const [idealWeight, setIdealWeight] = useState('');
     const [height, setHeight] = useState('');
-    const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     // Cargar datos del usuario actual
@@ -22,14 +20,14 @@ const EditProfile = ({navigation}: any) => {
     }, []);
 
     const loadUserData = async () => {
-        const user = await getCurrentUser() as ClientUser;
-        if (user && user.role === 'client') {
-            setCurrentUser(user);
+        const userData = await AsyncStorage.getItem('@MiGymApp:currentUser');
+        const user = userData ? JSON.parse(userData) : null;
+        if (user) {
             setName(user.name || '');
             setEmail(user.email || '');
-            setWeight((user as any).weight || '');
-            setIdealWeight((user as any).idealWeight || '');
-            setHeight((user as any).height || '');
+            setWeight(user.weight?.toString() || '');
+            setIdealWeight(user.idealWeight?.toString() || '');
+            setHeight(user.height?.toString() || '');
         }
     };
 
@@ -67,10 +65,9 @@ const EditProfile = ({navigation}: any) => {
     const hasError = nameError || emailError || weightError || idealWeightError || heightError;
 
     const handleSave = async () => {
-        if (!currentUser || hasError) return;
+        if (hasError) return;
         setIsLoading(true);
         try {
-            // Actualizar usuario con los nuevos datos
             const updates = {
                 name,
                 email,
@@ -78,8 +75,7 @@ const EditProfile = ({navigation}: any) => {
                 idealWeight,
                 height
             };
-            await updateUserProfile(currentUser.id, updates);
-            // Navegar de vuelta al perfil
+            await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
             router.push('/perfil');
         } catch (error) {
             console.error('Error guardando perfil:', error);
@@ -91,12 +87,12 @@ const EditProfile = ({navigation}: any) => {
     return (
         <View style={globalStyles.safeArea}>
             <View style={{padding: theme.spacing.lg}}>
-                <Text style={globalStyles.label}>Nombre</Text>
+                <Text style={globalStyles.label}>Nombre y Apellido</Text>
                 <TextInput
                     style={globalStyles.input}
                     value={name}
                     onChangeText={setName}
-                    placeholder="Nombre"/>
+                    placeholder="Nombre y Apellido"/>
                 {nameError ? <Text style={globalStyles.errorText}>{nameError}</Text> : null}
 
                 <Text style={globalStyles.label}>Email</Text>
@@ -108,7 +104,7 @@ const EditProfile = ({navigation}: any) => {
                     keyboardType="email-address"/>
                 {emailError ? <Text style={globalStyles.errorText}>{emailError}</Text> : null}
 
-                <Text style={globalStyles.label}>Peso actual</Text>
+                <Text style={globalStyles.label}>Peso actual (Kg)</Text>
                 <TextInput
                     style={globalStyles.input}
                     value={weight}
@@ -126,7 +122,7 @@ const EditProfile = ({navigation}: any) => {
                     keyboardType="decimal-pad"/>
                 {idealWeightError ? <Text style={globalStyles.errorText}>{idealWeightError}</Text> : null}
 
-                <Text style={globalStyles.label}>Altura</Text>
+                <Text style={globalStyles.label}>Altura (Cm)</Text>
                 <TextInput
                     style={globalStyles.input}
                     value={height}
