@@ -39,12 +39,12 @@ export default function BibliotecaEjercicios() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
   const [quickCategories] = useState([
-    { id: 'Pecho', name: 'Pecho', icon: 'fitness-center', gradient: ['#FF6B6B', '#FFE66D'] },
-    { id: 'Piernas', name: 'Piernas', icon: 'directions-run', gradient: ['#4ECDC4', '#44A08D'] },
-    { id: 'Brazos', name: 'Brazos', icon: 'fitness-center', gradient: ['#45B7D1', '#96C93D'] },
-    { id: 'Espalda', name: 'Espalda', icon: 'accessibility', gradient: ['#F7DC6F', '#BB6BD9'] },
-    { id: 'Hombros', name: 'Hombros', icon: 'sports-gymnastics', gradient: ['#BB6BD9', '#FF6B6B'] },
-    { id: 'Core', name: 'Core', icon: 'sports-martial-arts', gradient: ['#96C93D', '#4ECDC4'] }
+    { id: 'Pecho', name: 'Pecho', icon: 'dumbbell', gradient: ['#FF6B6B', '#FFE66D'] },
+    { id: 'Piernas', name: 'Piernas', icon: 'run', gradient: ['#4ECDC4', '#44A08D'] },
+    { id: 'Brazos', name: 'Brazos', icon: 'arm-flex', gradient: ['#45B7D1', '#96C93D'] },
+    { id: 'Espalda', name: 'Espalda', icon: 'human-handsup', gradient: ['#F7DC6F', '#BB6BD9'] },
+    { id: 'Hombros', name: 'Hombros', icon: 'weight-lifter', gradient: ['#BB6BD9', '#FF6B6B'] },
+    { id: 'Core', name: 'Core', icon: 'karate', gradient: ['#96C93D', '#4ECDC4'] }
   ]);
 
   const muscleGroups = getAvailableMuscleGroups();

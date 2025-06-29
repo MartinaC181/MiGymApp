@@ -70,6 +70,12 @@ export default StyleSheet.create({
     color: 'white',
     marginTop: 4,
   },
+  iconTextActive: {
+    fontSize: theme.typography.fontSize.medium,
+    fontFamily: theme.typography.fontFamily.bold,
+    color: 'white',
+    marginTop: 4,
+  },
   navItemWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -77,13 +83,16 @@ export default StyleSheet.create({
   },
   activeIndicator: {
     position: 'absolute',
-    bottom: -8,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: theme.colors.background,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
+    top: -5,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'white',
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 3,
+    elevation: 3,
   },
 });
 

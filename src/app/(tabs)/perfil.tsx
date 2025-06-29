@@ -12,6 +12,7 @@ import imcImg from '../../../assets/profile/imc.png';
 import perfilMirtho from '../../../assets/profile/perfilMirtho.png';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const iconMap: Record<string, any> = {
@@ -77,10 +78,34 @@ const Profile = () => {
 
             {/* Cuadricula */}
             <View style={styles.grid}>
-                <InfoBox icon="peso" label="Peso" value={`${weight || '---'} kg`}/>
-                <InfoBox icon="altura" label="Altura" value={`${height || '---'} m`}/>
-                <InfoBox icon="ideal" label="Peso ideal" value={`${idealWeight || '---'} kg`}/>
-                <InfoBox icon="imc" label="IMC" value={`${imc || '---'}`}/>
+                <InfoBox 
+                    icon="peso" 
+                    label="Peso" 
+                    value={`${weight || '---'} kg`} 
+                    gradientColors={['#667eea', '#764ba2']} 
+                />
+                <InfoBox 
+                    icon="altura" 
+                    label="Altura" 
+                    value={`${height || '---'} m`} 
+                    gradientColors={['#f093fb', '#f5576c']} 
+                />
+                <InfoBox 
+                    icon="ideal" 
+                    label="Peso ideal" 
+                    value={`${idealWeight || '---'} kg`} 
+                    gradientColors={['#4facfe', '#00f2fe']} 
+                />
+                <InfoBox 
+                    icon="imc" 
+                    label="IMC" 
+                    value={`${imc || '---'}`} 
+                    gradientColors={['#43e97b', '#38f9d7']} 
+                    onPress={() => router.push({
+                        pathname: '/Imc',
+                        params: { weight, height }
+                    })} 
+                />
             </View>
 
             {/* Botón de editar */}
@@ -94,18 +119,39 @@ const Profile = () => {
     );
 };
 
-const InfoBox = ({icon, value, label}: {
+const InfoBox = ({icon, value, label, gradientColors, onPress}: {
     icon: 'peso' | 'altura' | 'ideal' | 'imc';
     value: string;
     label: string;
+    gradientColors: [string, string];
+    onPress?: () => void;
 }) => (
-    <View style={styles.box}>
-        <View style={styles.iconCircle}>
-            <Image source={iconMap[icon]} style={styles.iconImage}/>
-        </View>
-        <Text style={styles.boxValue}>{value}</Text>
-        <Text style={styles.boxLabel}>{label}</Text>
-    </View>
+    <TouchableOpacity 
+        style={styles.box} 
+        onPress={onPress}
+        activeOpacity={onPress ? 0.8 : 1}
+    >
+        <LinearGradient
+            colors={gradientColors}
+            style={styles.boxGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+        >
+            <View style={styles.iconCircle}>
+                <Image source={iconMap[icon]} style={styles.iconImage}/>
+            </View>
+            <Text style={styles.boxValue}>{value}</Text>
+            <Text style={styles.boxLabel}>{label}</Text>
+            {onPress && (
+                <MaterialCommunityIcons 
+                    name="chevron-right" 
+                    size={16} 
+                    color="rgba(255,255,255,0.8)" 
+                    style={styles.chevronIcon}
+                />
+            )}
+        </LinearGradient>
+    </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
@@ -169,41 +215,58 @@ const styles = StyleSheet.create({
     box: {
         width: 130,
         height: 120,
-        backgroundColor: '#b3dcec',
         borderRadius: theme.borderRadius.md,
-        paddingVertical: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.xs,
-        alignItems: 'center',
-        justifyContent: 'center',
         marginBottom: theme.spacing.md,
-        elevation: 8,
-
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 6,
+        overflow: 'hidden',
     },
     iconCircle: {
         width: 50,
         height: 50,
-        borderRadius: 20,
-        backgroundColor: theme.colors.primary,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255,255,255,0.2)',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: theme.spacing.xs,
     },
     iconImage: {
-        width: 30,
-        height: 30,
+        width: 28,
+        height: 28,
         resizeMode: 'contain',
+        tintColor: 'white',
     },
     boxValue: {
-        fontSize: theme.typography.fontSize.medium,
+        fontSize: theme.typography.fontSize.large,
         fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
+        color: 'white',
         marginTop: theme.spacing.xs,
+        textShadowColor: 'rgba(0,0,0,0.3)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
     },
     boxLabel: {
         fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: 'rgba(255,255,255,0.9)',
         marginTop: theme.spacing.xs,
+    },
+    boxGradient: {
+        flex: 1,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.xs,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+    },
+    chevronIcon: {
+        position: 'absolute',
+        right: 8,
+        top: 8,
     },
 });
 

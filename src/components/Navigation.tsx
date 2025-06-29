@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Pressable, Text, Keyboard } from 'react-native';
+import { View, Pressable, Text, Keyboard, Animated } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -35,24 +35,54 @@ export default function Navigation() {
     route: string;
   }) => {
     const isActive = pathname === route;
+    const scaleAnim = new Animated.Value(isActive ? 1.08 : 1);
+    
+    const handlePressIn = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 0.95,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }).start();
+    };
+
+    const handlePressOut = () => {
+      Animated.spring(scaleAnim, {
+        toValue: isActive ? 1.08 : 1,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }).start();
+    };
+
+    const handlePress = () => {
+      router.push(route);
+    };
     
     return (
       <View style={styles.navItemWrapper}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.iconContainer,
-            isActive && styles.iconContainerActive,
-            pressed ? styles.iconContainerPressed : {},
-          ]}
-          onPress={() => router.push(route)}
-        >
-          <MaterialCommunityIcons
-            name={iconName}
-            size={36}
-            color={theme.colors.primary}
-          />
-        </Pressable>
-        <Text style={styles.iconText}>
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          <Pressable
+            style={[
+              styles.iconContainer,
+              isActive && styles.iconContainerActive,
+            ]}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={handlePress}
+          >
+            <MaterialCommunityIcons
+              name={iconName}
+              size={isActive ? 38 : 36}
+              color={theme.colors.primary}
+            />
+            {isActive && <View style={styles.activeIndicator} />}
+          </Pressable>
+        </Animated.View>
+        <Text style={[
+          styles.iconText,
+          isActive && styles.iconTextActive
+        ]}>
           {label}
         </Text>
       </View>
