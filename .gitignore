@@ -43,3 +43,9 @@ yarn-error.*
 .cursorignore
 .cursor*
 GEMINI.md
+
+#idea
+.idea*
+
+#vscode
+.vscode*

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image, Switch, TouchableOpacity, Share, Alert} from 'react-native';
+import {View, Text, StyleSheet, Image, Switch, TouchableOpacity, Share, Alert, Modal} from 'react-native';
 
 import modeIcon from '../../../assets/settings/modoscuro.png';
 import changeIcon from '../../../assets/settings/llave.png';
@@ -11,6 +11,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {useRouter} from "expo-router";
 import { createGlobalStyles } from "../../styles/global";
 import { useTheme } from "../../context/ThemeContext";
+import { clearSession } from "../../utils/storage";
 import TerminosModal from "../../components/TerminosModal";
 import PoliticasModal from "../../components/PoliticasModal";
 import SobreAppModal from "../../components/SobreAppModal";
@@ -23,6 +24,7 @@ const Settings = () => {
     const [showTerminos, setShowTerminos] = useState(false);
     const [showPoliticas, setShowPoliticas] = useState(false);
     const [showSobreApp, setShowSobreApp] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const handleShareApp = async () => {
         try {
@@ -48,6 +50,16 @@ const Settings = () => {
                 [{ text: 'OK' }]
             );
         }
+    };
+
+    const handleLogout = async () => {
+        setShowLogoutModal(false);
+        await clearSession(); // Limpiar la sesión de AsyncStorage
+        router.replace("/login"); // replace para limpiar el stack
+    };
+
+    const handleCancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
     const items = [
@@ -144,6 +156,13 @@ const Settings = () => {
                     </TouchableOpacity>))
                 }
 
+                {/* Botón Cerrar sesión */}
+                <View style={[styles.logoutContainer, {marginTop: theme.spacing.xl}]}>
+                    <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.colors.primary }]} onPress={() => setShowLogoutModal(true)}>
+                        <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+                    </TouchableOpacity>
+                </View>
+
             </View>
 
             {/* Modal de Términos y Condiciones */}
@@ -163,6 +182,66 @@ const Settings = () => {
                 visible={showSobreApp}
                 onClose={() => setShowSobreApp(false)}
             />
+
+            {/* Modal de confirmación de logout */}
+            <Modal
+                visible={showLogoutModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={handleCancelLogout}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[
+                        styles.modalContainer, 
+                        { backgroundColor: theme.colors.background }
+                    ]}>
+                        <Text style={[
+                            styles.modalTitle, 
+                            { color: theme.colors.textPrimary }
+                        ]}>
+                            Cerrar sesión
+                        </Text>
+                        <Text style={[
+                            styles.modalMessage, 
+                            { color: theme.colors.textSecondary }
+                        ]}>
+                            ¿Estás seguro que querés cerrar tu sesión?
+                        </Text>
+                        
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity 
+                                style={[
+                                    styles.cancelButton, 
+                                    { backgroundColor: theme.colors.surface }
+                                ]} 
+                                onPress={handleCancelLogout}
+                            >
+                                <Text style={[
+                                    styles.cancelButtonText, 
+                                    { color: theme.colors.textSecondary }
+                                ]}>
+                                    Cancelar
+                                </Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity 
+                                style={[
+                                    styles.confirmButton, 
+                                    { backgroundColor: theme.colors.primary }
+                                ]} 
+                                onPress={handleLogout}
+                            >
+                                <Text style={[
+                                    styles.confirmButtonText, 
+                                    { color: theme.colors.background }
+                                ]}>
+                                    Cerrar sesión
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
         </View>
     )
@@ -209,7 +288,79 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         marginLeft: 40, // 24 + 16
         marginBottom: 16, // Usando el valor directo ya que theme se aplica dinámicamente
-    }
+    },
 
+    // Estilos para el botón de cerrar sesión
+    logoutContainer: {
+        alignItems: 'center',
+        paddingVertical: 16,
+    },
+    logoutButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 8,
+        minWidth: 200,
+        alignItems: 'center',
+    },
+    logoutButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontFamily: 'Roboto-Medium',
+    },
 
+    // Estilos del modal (reutilizados de Header.tsx)
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        borderRadius: 12,
+        padding: 24,
+        margin: 16,
+        minWidth: 300,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontFamily: 'Roboto-Bold',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    modalMessage: {
+        fontSize: 16,
+        fontFamily: 'Roboto-Regular',
+        textAlign: 'center',
+        marginBottom: 24,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+    cancelButton: {
+        flex: 1,
+        borderRadius: 8,
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        fontSize: 16,
+        fontFamily: 'Roboto-Medium',
+    },
+    confirmButton: {
+        flex: 1,
+        borderRadius: 8,
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    confirmButtonText: {
+        fontSize: 16,
+        fontFamily: 'Roboto-Medium',
+    },
 });
