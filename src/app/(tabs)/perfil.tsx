@@ -55,8 +55,10 @@ const Profile = () => {
             </View>
 
             {/* Botón de editar */}
-            <TouchableOpacity style={globalStyles.LoginButton}
-                              onPress={() => router.push('EditProfile')}>
+            <TouchableOpacity 
+                style={[globalStyles.LoginButton, { width: 280, alignSelf: 'center', maxWidth: '100%' }]}
+                onPress={() => router.push('EditProfile')}
+            >
                 <Text style={globalStyles.buttonText}>Editar</Text>
             </TouchableOpacity>
         </View>

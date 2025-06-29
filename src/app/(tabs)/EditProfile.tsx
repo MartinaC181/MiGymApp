@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import globalStyles from '../../styles/global';
 import theme from '../../constants/theme';
@@ -12,31 +12,54 @@ const EditProfile = ({navigation}: any) => {
         const [weight, setWeight] = useState('75');
         const [idealWeight, setIdealWeight] = useState('65');
         const [height, setHeight] = useState('1.72');
+        const [error, setError] = useState("");
 
-        // const handleSave = () => {
-    //     const updateData = {
-    //         name,
-    //         email,
-    //         weight,
-    //         idealWeight,
-    //         height
-    //     };
-    //     console.log("Datos guardados:", updateData);
-    // };
+        const validateEmail = (email: string) => {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+        const validateNumber = (value: string) => {
+            return /^\d+(\.\d+)?$/.test(value) && parseFloat(value) > 0;
+        };
 
-    const handleSave = () => {
-        router.push({
-            pathname: '/perfil',
-            params: {
-                name,
-                email,
-                weight,
-                idealWeight,
-                height,
-            },
-        });
+        // Estados de error individuales
+        const [nameError, setNameError] = useState("");
+        const [emailError, setEmailError] = useState("");
+        const [weightError, setWeightError] = useState("");
+        const [idealWeightError, setIdealWeightError] = useState("");
+        const [heightError, setHeightError] = useState("");
 
-    };
+        // Validaciones en tiempo real por campo
+        useEffect(() => {
+            setNameError(!name.trim() ? "El nombre es obligatorio." : "");
+        }, [name]);
+        useEffect(() => {
+            setEmailError(!validateEmail(email) ? "El email no es válido." : "");
+        }, [email]);
+        useEffect(() => {
+            setWeightError(!validateNumber(weight) ? "El peso actual debe ser un número mayor a 0." : "");
+        }, [weight]);
+        useEffect(() => {
+            setIdealWeightError(!validateNumber(idealWeight) ? "El peso ideal debe ser un número mayor a 0." : "");
+        }, [idealWeight]);
+        useEffect(() => {
+            setHeightError(!validateNumber(height) ? "La altura debe ser un número mayor a 0." : "");
+        }, [height]);
+
+        const hasError = nameError || emailError || weightError || idealWeightError || heightError;
+
+        const handleSave = () => {
+            if (hasError) return;
+            router.push({
+                pathname: '/perfil',
+                params: {
+                    name,
+                    email,
+                    weight,
+                    idealWeight,
+                    height,
+                },
+            });
+        };
 
 
 
@@ -49,6 +72,7 @@ const EditProfile = ({navigation}: any) => {
                         value={name}
                         onChangeText={setName}
                         placeholder="Nombre"/>
+                    {nameError ? <Text style={globalStyles.errorText}>{nameError}</Text> : null}
 
                     <Text style={globalStyles.label}>Email</Text>
                     <TextInput
@@ -57,6 +81,8 @@ const EditProfile = ({navigation}: any) => {
                         onChangeText={setEmail}
                         placeholder="Email"
                         keyboardType="email-address"/>
+                    {emailError ? <Text style={globalStyles.errorText}>{emailError}</Text> : null}
+
                     <Text style={globalStyles.label}>Peso actual</Text>
                     <TextInput
                         style={globalStyles.input}
@@ -64,6 +90,8 @@ const EditProfile = ({navigation}: any) => {
                         onChangeText={setWeight}
                         placeholder="Kg"
                         keyboardType="decimal-pad"/>
+                    {weightError ? <Text style={globalStyles.errorText}>{weightError}</Text> : null}
+
                     <Text style={globalStyles.label}>Peso ideal</Text>
                     <TextInput
                         style={globalStyles.input}
@@ -71,6 +99,8 @@ const EditProfile = ({navigation}: any) => {
                         onChangeText={setIdealWeight}
                         placeholder="Kg"
                         keyboardType="decimal-pad"/>
+                    {idealWeightError ? <Text style={globalStyles.errorText}>{idealWeightError}</Text> : null}
+
                     <Text style={globalStyles.label}>Altura</Text>
                     <TextInput
                         style={globalStyles.input}
@@ -78,6 +108,7 @@ const EditProfile = ({navigation}: any) => {
                         onChangeText={setHeight}
                         placeholder="cm"
                         keyboardType="decimal-pad"/>
+                    {heightError ? <Text style={globalStyles.errorText}>{heightError}</Text> : null}
 
                     <TouchableOpacity style={styles.primaryButton} onPress={handleSave}>
                         <Text style={globalStyles.buttonText}>Guardar cambios</Text>
