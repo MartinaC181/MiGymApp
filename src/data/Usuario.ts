@@ -14,9 +14,13 @@ export interface ClientUser {
   gymId?: string; // ID del gimnasio al que pertenece
   birthDate?: string;
   membershipType?: string;
+<<<<<<< HEAD
   weight?: string; // Peso del usuario
   idealWeight?: string; // Peso ideal del usuario
   height?: string; // Altura del usuario
+=======
+  dni?: string; // Documento Nacional de Identidad
+>>>>>>> 394840338902fb0d950ef963b3ddfb8efb6c2d2a
 }
 
 // Interface para gimnasios
@@ -51,7 +55,8 @@ export const UsuarioAtleta: ClientUser = {
   weeklyStreak: 1,
   gymId: "gym_1",
   birthDate: "1990-05-15",
-  membershipType: "premium"
+  membershipType: "premium",
+  dni: "20.123.456"
 };
 
 // Usuario gimnasio de ejemplo

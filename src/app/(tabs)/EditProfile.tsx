@@ -13,6 +13,7 @@ const EditProfile = ({navigation}: any) => {
     const [weight, setWeight] = useState('');
     const [idealWeight, setIdealWeight] = useState('');
     const [height, setHeight] = useState('');
+    const [dni, setDni] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     // Cargar datos del usuario actual
@@ -29,6 +30,7 @@ const EditProfile = ({navigation}: any) => {
             setWeight(user.weight?.toString() || '');
             setIdealWeight(user.idealWeight?.toString() || '');
             setHeight(user.height?.toString() || '');
+            setDni(user.dni?.toString() || '');
         }
     };
 
@@ -45,6 +47,7 @@ const EditProfile = ({navigation}: any) => {
     const [weightError, setWeightError] = useState("");
     const [idealWeightError, setIdealWeightError] = useState("");
     const [heightError, setHeightError] = useState("");
+    const [dniError, setDniError] = useState("");
 
     // Validaciones en tiempo real por campo
     useEffect(() => {
@@ -62,8 +65,15 @@ const EditProfile = ({navigation}: any) => {
     useEffect(() => {
         setHeightError(!validateNumber(height) ? "La altura debe ser un número mayor a 0." : "");
     }, [height]);
+    useEffect(() => {
+            setDniError(
+                !validateNumber(dni) || dni.length < 7 || dni.length > 8
+                    ? "El DNI debe tener entre 7 y 8 dígitos."
+                    : ""
+            );
+        }, [dni]);
 
-    const hasError = nameError || emailError || weightError || idealWeightError || heightError;
+    const hasError = nameError || emailError || weightError || idealWeightError || heightError || dniError;
 
     const handleSave = async () => {
         if (hasError) return;
@@ -74,7 +84,8 @@ const EditProfile = ({navigation}: any) => {
                 email,
                 weight,
                 idealWeight,
-                height
+                height,
+                dni
             };
             await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
             router.push('/perfil');
@@ -100,6 +111,21 @@ const EditProfile = ({navigation}: any) => {
                     placeholder="Nombre y Apellido"
                     placeholderTextColor={theme.colors.textSecondary}/>
                 {nameError ? <Text style={globalStyles.errorText}>{nameError}</Text> : null}
+
+                <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>DNI <Text style={{ color: '#999' }}>(sin puntos)</Text></Text>
+                <TextInput
+                    style={[globalStyles.input, { 
+                        backgroundColor: theme.colors.surface,
+                        color: theme.colors.textPrimary,
+                        borderColor: theme.colors.border
+                    }]}
+                    value={dni}
+                    onChangeText={setDni}
+                    placeholder="12345678"
+                    placeholderTextColor={theme.colors.textSecondary}
+                    keyboardType="number-pad"
+                />
+                {dniError ? <Text style={globalStyles.errorText}>{dniError}</Text> : null}
 
                 <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Email</Text>
                 <TextInput
