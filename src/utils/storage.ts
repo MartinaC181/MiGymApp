@@ -535,7 +535,7 @@ export const initializeAppData = async () => {
   } catch (error) {
     console.error("Error inicializando datos:", error);
   }
-}; 
+};
 
 // Funciones para manejar el tema
 export const saveThemePreference = async (isDarkMode: boolean) => {
@@ -678,8 +678,41 @@ export const deleteGymClient = async (gymUserId: string, clientId: string) => {
 export const getGymUserByBusinessName = async (businessName: string): Promise<GymUser | null> => {
   try {
     const usersDB = await getUsersDB();
-    const gym = Object.values(usersDB).find(u => (u as GymUser).role === 'gym' && (u as GymUser).businessName === businessName) as GymUser | undefined;
+    
+    // Buscar por businessName exacto
+    let gym = Object.values(usersDB).find(u => (u as GymUser).role === 'gym' && (u as GymUser).businessName === businessName) as GymUser | undefined;
     if (gym) return gym;
+    
+    // Buscar por email (para casos donde el businessName cambió pero el email sigue siendo el mismo)
+    if (businessName.includes('@')) {
+      gym = Object.values(usersDB).find(u => (u as GymUser).role === 'gym' && (u as GymUser).email === businessName) as GymUser | undefined;
+      if (gym) return gym;
+    }
+    
+    // Buscar por ID (para casos donde el gymId es realmente un ID)
+    if (businessName.includes('_')) {
+      gym = Object.values(usersDB).find(u => u.id === businessName && (u as GymUser).role === 'gym') as GymUser | undefined;
+      if (gym) return gym;
+    }
+
+    // Buscar por coincidencia parcial en businessName (para casos donde el nombre cambió ligeramente)
+    gym = Object.values(usersDB).find(u => {
+      if ((u as GymUser).role !== 'gym') return false;
+      const gymBusinessName = (u as GymUser).businessName?.toLowerCase() || '';
+      const searchName = businessName.toLowerCase();
+      
+      // Verificar si el businessName actual contiene el nombre buscado o viceversa
+      return gymBusinessName.includes(searchName) || searchName.includes(gymBusinessName);
+    }) as GymUser | undefined;
+    if (gym) return gym;
+
+    // Buscar por email del administrador del gimnasio (para casos donde el cliente tiene el email del admin guardado)
+    const gymUsers = Object.values(usersDB).filter(u => (u as GymUser).role === 'gym') as GymUser[];
+    for (const gymUser of gymUsers) {
+      if (gymUser.email === businessName) {
+        return gymUser;
+      }
+    }
 
     // Fallback: si no existe en la base registrada, devolver uno por defecto
     const defaultGyms: Record<string, Partial<GymUser>> = {

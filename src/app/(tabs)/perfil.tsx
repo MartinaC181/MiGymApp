@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import { useTheme } from '../../context/ThemeContext';
 import { getCurrentUser } from '../../utils/storage';
-import { ClientUser } from '../../data/Usuario';
+import { ClientUser, GymUser } from '../../data/Usuario';
 import pesoImg from '../../../assets/profile/bascula.png';
 import alturaImg from '../../../assets/profile/altura.png';
 import idealImg from '../../../assets/profile/pesoIdeal.png';
@@ -14,7 +14,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from 'expo-linear-gradient';
-
 
 const iconMap: Record<string, any> = {
     peso: pesoImg,
@@ -26,7 +25,7 @@ const iconMap: Record<string, any> = {
 const Profile = () => {
     const router = useRouter();
     const { theme, isDarkMode } = useTheme();
-    const [userData, setUserData] = useState<ClientUser | null>(null);
+    const [userData, setUserData] = useState<ClientUser | GymUser | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -35,7 +34,7 @@ const Profile = () => {
 
     const loadUserData = async () => {
         try {
-            const user = await getCurrentUser() as ClientUser;
+            const user = await getCurrentUser();
             if (user) {
                 setUserData(user);
             }
@@ -46,12 +45,17 @@ const Profile = () => {
         }
     };
 
-    // Usar datos del estado o valores por defecto
-    const name = userData?.name || 'Sin nombre';
-    const email = userData?.email || 'Sin correo';
-    const weight = (userData as any)?.weight || '0';
-    const idealWeight = (userData as any)?.idealWeight || '0';
-    const height = (userData as any)?.height || '0';
+    // Si es un usuario de gimnasio, mostrar el perfil de gimnasio
+    if (userData?.role === 'gym') {
+        return <GymProfileView gymData={userData as GymUser} />;
+    }
+
+    // Usar datos del estado o valores por defecto para clientes
+    const name = (userData as ClientUser)?.name || 'Sin nombre';
+    const email = (userData as ClientUser)?.email || 'Sin correo';
+    const weight = (userData as ClientUser)?.weight || '0';
+    const idealWeight = (userData as ClientUser)?.idealWeight || '0';
+    const height = (userData as ClientUser)?.height || '0';
 
     const imc = (parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2)).toFixed(2);
     const heightInMeters = (parseFloat(height) / 100).toFixed(2);
@@ -59,7 +63,8 @@ const Profile = () => {
     if (loading) {
         return (
             <View style={[globalStyles.container, { justifyContent: 'center' }]}>
-                <Text>Cargando...</Text>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text style={styles.loadingText}>Cargando perfil...</Text>
             </View>
         );
     }
@@ -141,7 +146,7 @@ const Profile = () => {
                 </TouchableOpacity>
 
                 {/* Botón para ver perfil del gimnasio */}
-                {userData?.gymId && (
+                {(userData as ClientUser)?.gymId && (
                     <TouchableOpacity 
                         style={[styles.gymButton, { 
                             width: 280, 
@@ -164,6 +169,343 @@ const Profile = () => {
             </View>
         </ScrollView>
     );
+};
+
+// Componente para mostrar el perfil de gimnasio
+const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
+    const router = useRouter();
+    const { theme, isDarkMode } = useTheme();
+
+    // Función para obtener el número de clientes
+    const getClientCount = () => {
+        return gymData.clients.length;
+    };
+
+    // Función para obtener el número de clases
+    const getClassCount = () => {
+        return gymData.classes.length;
+    };
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.background,
+        },
+        header: {
+            height: 200,
+            marginBottom: theme.spacing.lg,
+        },
+        headerGradient: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: theme.spacing.xl,
+        },
+        logoContainer: {
+            width: 80,
+            height: 80,
+            borderRadius: 40,
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: theme.spacing.md,
+        },
+        gymName: {
+            fontSize: theme.typography.fontSize.title,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: 'white',
+            textAlign: 'center',
+            marginBottom: theme.spacing.xs,
+        },
+        gymType: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: 'rgba(255,255,255,0.8)',
+            textAlign: 'center',
+        },
+        content: {
+            padding: theme.spacing.lg,
+        },
+        section: {
+            marginBottom: theme.spacing.xl,
+        },
+        sectionTitle: {
+            fontSize: theme.typography.fontSize.large,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+            marginBottom: theme.spacing.md,
+        },
+        infoCard: {
+            marginBottom: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            overflow: 'hidden',
+            shadowColor: isDarkMode ? "#ffffff" : "#000000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: isDarkMode ? 0.1 : 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        infoCardGradient: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: theme.spacing.md,
+        },
+        infoCardContent: {
+            marginLeft: theme.spacing.md,
+            flex: 1,
+        },
+        infoCardTitle: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: 'rgba(255,255,255,0.8)',
+            marginBottom: 2,
+        },
+        infoCardValue: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: 'white',
+        },
+        infoCardChevron: {
+            marginLeft: 'auto',
+            alignSelf: 'center',
+        },
+        descriptionCard: {
+            backgroundColor: theme.colors.surface,
+            padding: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            borderLeftWidth: 4,
+            borderLeftColor: theme.colors.primary,
+        },
+        descriptionText: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textPrimary,
+            lineHeight: 22,
+        },
+        statsContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+        },
+        statCard: {
+            flex: 1,
+            marginHorizontal: theme.spacing.xs,
+            borderRadius: theme.borderRadius.md,
+            overflow: 'hidden',
+            shadowColor: isDarkMode ? "#ffffff" : "#000000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: isDarkMode ? 0.1 : 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        statCardGradient: {
+            alignItems: 'center',
+            padding: theme.spacing.md,
+        },
+        statCardValue: {
+            fontSize: theme.typography.fontSize.title,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: 'white',
+            marginTop: theme.spacing.xs,
+        },
+        statCardTitle: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: 'rgba(255,255,255,0.8)',
+            marginTop: 2,
+        },
+        planCard: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: theme.colors.surface,
+            padding: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            borderLeftWidth: 4,
+            borderLeftColor: theme.colors.primary,
+        },
+        planText: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+            marginLeft: theme.spacing.sm,
+        },
+        editButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: theme.spacing.lg,
+        },
+    });
+
+    return (
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+            {/* Header con logo del gimnasio */}
+            <View style={styles.header}>
+                <LinearGradient
+                    colors={theme.colors.gradient1}
+                    style={styles.headerGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    <View style={styles.logoContainer}>
+                        <MaterialCommunityIcons 
+                            name="dumbbell" 
+                            size={48} 
+                            color="white" 
+                        />
+                    </View>
+                    <Text style={styles.gymName}>{gymData.businessName}</Text>
+                    <Text style={styles.gymType}>Mi Gimnasio</Text>
+                </LinearGradient>
+            </View>
+
+            {/* Información del gimnasio */}
+            <View style={styles.content}>
+                {/* Información de contacto */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Información de Contacto</Text>
+                    
+                    <InfoCard 
+                        icon="map-marker" 
+                        title="Dirección" 
+                        value={gymData.address || "No especificada"}
+                        gradientColors={theme.colors.gradient1}
+                    />
+                    
+                    {gymData.phone && (
+                        <InfoCard 
+                            icon="phone" 
+                            title="Teléfono" 
+                            value={gymData.phone}
+                            gradientColors={theme.colors.gradient2}
+                        />
+                    )}
+                    
+                    <InfoCard 
+                        icon="email" 
+                        title="Email" 
+                        value={gymData.email}
+                        gradientColors={theme.colors.gradient3}
+                    />
+                </View>
+
+                {/* Descripción */}
+                {gymData.description && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Descripción</Text>
+                        <View style={styles.descriptionCard}>
+                            <Text style={styles.descriptionText}>{gymData.description}</Text>
+                        </View>
+                    </View>
+                )}
+
+                {/* Estadísticas */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Estadísticas</Text>
+                    <View style={styles.statsContainer}>
+                        <StatCard 
+                            icon="account-group" 
+                            title="Clientes" 
+                            value={`${getClientCount()}`}
+                            gradientColors={theme.colors.gradient4}
+                        />
+                        <StatCard 
+                            icon="dumbbell" 
+                            title="Clases" 
+                            value={`${getClassCount()}`}
+                            gradientColors={theme.colors.gradient5}
+                        />
+                    </View>
+                </View>
+
+                {/* Plan de suscripción */}
+                {gymData.subscriptionPlan && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Plan de Suscripción</Text>
+                        <View style={styles.planCard}>
+                            <MaterialCommunityIcons 
+                                name="crown" 
+                                size={24} 
+                                color={theme.colors.primary} 
+                            />
+                            <Text style={styles.planText}>
+                                Plan {gymData.subscriptionPlan.toUpperCase()}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+
+                {/* Botón de editar */}
+                <TouchableOpacity 
+                    style={[globalStyles.LoginButton, styles.editButton]}
+                    onPress={() => router.push('/(tabs)/EditGymProfile')}
+                >
+                    <MaterialCommunityIcons 
+                        name="pencil" 
+                        size={20} 
+                        color="white" 
+                        style={{ marginRight: 8 }}
+                    />
+                    <Text style={globalStyles.buttonText}>Editar Perfil del Gimnasio</Text>
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
+    );
+
+    // Componente InfoCard dentro del componente principal para acceder a styles
+    function InfoCard({ icon, title, value, gradientColors }: {
+        icon: string;
+        title: string;
+        value: string;
+        gradientColors: [string, string];
+    }) {
+        return (
+            <View style={styles.infoCard}>
+                <LinearGradient
+                    colors={gradientColors}
+                    style={styles.infoCardGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    <MaterialCommunityIcons 
+                        name={icon as any} 
+                        size={24} 
+                        color="white" 
+                    />
+                    <View style={styles.infoCardContent}>
+                        <Text style={styles.infoCardTitle}>{title}</Text>
+                        <Text style={styles.infoCardValue}>{value}</Text>
+                    </View>
+                </LinearGradient>
+            </View>
+        );
+    }
+
+    // Componente StatCard dentro del componente principal para acceder a styles
+    function StatCard({ icon, title, value, gradientColors }: {
+        icon: string;
+        title: string;
+        value: string;
+        gradientColors: [string, string];
+    }) {
+        return (
+            <View style={styles.statCard}>
+                <LinearGradient
+                    colors={gradientColors}
+                    style={styles.statCardGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    <MaterialCommunityIcons 
+                        name={icon as any} 
+                        size={32} 
+                        color="white" 
+                    />
+                    <Text style={styles.statCardValue}>{value}</Text>
+                    <Text style={styles.statCardTitle}>{title}</Text>
+                </LinearGradient>
+            </View>
+        );
+    }
 };
 
 const InfoBox = ({icon, value, label, gradientColors, onPress}: {
@@ -211,6 +553,11 @@ const styles = StyleSheet.create({
         paddingTop: 24,
         paddingBottom: 32,
         padding: 24,
+    },
+    loadingText: {
+        marginTop: 16,
+        fontSize: 16,
+        color: '#666',
     },
     avatarWrapper: {
         position: 'relative',

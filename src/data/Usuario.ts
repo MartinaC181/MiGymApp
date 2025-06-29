@@ -14,6 +14,9 @@ export interface ClientUser {
   gymId?: string; // ID del gimnasio al que pertenece
   birthDate?: string;
   membershipType?: string;
+  weight?: string; // Peso del usuario
+  idealWeight?: string; // Peso ideal del usuario
+  height?: string; // Altura del usuario
 }
 
 // Interface para gimnasios

@@ -565,8 +565,4 @@ const GymProfile = () => {
     }
 };
 
-
-
-
-
 export default GymProfile; 
