@@ -3,13 +3,15 @@ import { View, Pressable, Text, Keyboard, Animated } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../styles/navigation';
-import theme from '../constants/theme';
+import useNavigationStyles from '../styles/navigation';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const styles = useNavigationStyles();
+  const { theme, isDarkMode } = useTheme();
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -61,6 +63,7 @@ export default function Navigation() {
     
     return (
       <View style={styles.navItemWrapper}>
+<<<<<<< HEAD
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           <Pressable
             style={[
@@ -83,6 +86,23 @@ export default function Navigation() {
           styles.iconText,
           isActive && styles.iconTextActive
         ]}>
+=======
+        <Pressable
+          style={({ pressed }) => [
+            styles.iconContainer,
+            isActive && styles.iconContainerActive,
+            pressed ? styles.iconContainerPressed : {},
+          ]}
+          onPress={() => router.push(route)}
+        >
+          <MaterialCommunityIcons
+            name={iconName}
+            size={36}
+            color={isDarkMode ? '#000000' : theme.colors.primary}
+          />
+        </Pressable>
+        <Text style={styles.iconText}>
+>>>>>>> d42276fec0e478aa814894107b34b340480ad486
           {label}
         </Text>
       </View>

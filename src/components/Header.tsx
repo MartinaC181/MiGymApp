@@ -4,6 +4,7 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
 import theme from "../constants/theme";
 import { clearSession } from "../utils/storage";
+import { useTheme } from "../context/ThemeContext";
 
 type HeaderProps = {
   title: string;
@@ -14,6 +15,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
   const isHome = pathname.includes('/home');
+  const { theme, isDarkMode } = useTheme();
 
   const handleBackPress = () => {
     if (isHome) {
@@ -37,18 +39,28 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
 
   return (
     <>
-      <View style={styles.header}>
+      <View style={[
+        styles.header, 
+        { 
+          backgroundColor: isDarkMode ? '#0066CC' : theme.colors.primary 
+        }
+      ]}>
         {showBack && (
           <TouchableOpacity style={styles.leftIcon} onPress={handleBackPress}>
             <MaterialIcons
               name="chevron-left"
               size={28}
-              color={theme.colors.background}
+              color={isDarkMode ? '#ffffff' : theme.colors.background}
             />
           </TouchableOpacity>
         )}
 
-        <Text style={styles.title}>{title}</Text>
+        <Text style={[
+          styles.title, 
+          { color: isDarkMode ? '#ffffff' : theme.colors.background }
+        ]}>
+          {title}
+        </Text>
 
         <TouchableOpacity
           style={styles.rightIcon}
@@ -57,7 +69,7 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
           <MaterialCommunityIcons
             name="cog-outline"
             size={24}
-            color={theme.colors.background}
+            color={isDarkMode ? '#ffffff' : theme.colors.background}
           />
         </TouchableOpacity>
       </View>
@@ -70,25 +82,52 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
         onRequestClose={handleCancelLogout}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Cerrar sesión</Text>
-            <Text style={styles.modalMessage}>
+          <View style={[
+            styles.modalContainer, 
+            { backgroundColor: theme.colors.background }
+          ]}>
+            <Text style={[
+              styles.modalTitle, 
+              { color: theme.colors.textPrimary }
+            ]}>
+              Cerrar sesión
+            </Text>
+            <Text style={[
+              styles.modalMessage, 
+              { color: theme.colors.textSecondary }
+            ]}>
               ¿Estás seguro que querés cerrar tu sesión?
             </Text>
             
             <View style={styles.modalButtons}>
               <TouchableOpacity 
-                style={styles.cancelButton} 
+                style={[
+                  styles.cancelButton, 
+                  { backgroundColor: theme.colors.surface }
+                ]} 
                 onPress={handleCancelLogout}
               >
-                <Text style={styles.cancelButtonText}>Cancelar</Text>
+                <Text style={[
+                  styles.cancelButtonText, 
+                  { color: theme.colors.textSecondary }
+                ]}>
+                  Cancelar
+                </Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={styles.confirmButton} 
+                style={[
+                  styles.confirmButton, 
+                  { backgroundColor: theme.colors.primary }
+                ]} 
                 onPress={handleLogout}
               >
-                <Text style={styles.confirmButtonText}>Cerrar sesión</Text>
+                <Text style={[
+                  styles.confirmButtonText, 
+                  { color: theme.colors.background }
+                ]}>
+                  Cerrar sesión
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -101,28 +140,26 @@ const Header = ({ title, showBack = false }: HeaderProps) => {
 const styles = StyleSheet.create({
   header: {
     width: "100%",
-    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 50,
+    paddingTop: 60,
     paddingBottom: 16,
-    borderBottomLeftRadius: theme.borderRadius.lg,
-    borderBottomRightRadius: theme.borderRadius.lg,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   title: {
-    fontSize: theme.typography.fontSize.title,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.background,
+    fontSize: 20,
+    fontFamily: 'Roboto-Bold',
   },
   leftIcon: {
     position: "absolute",
     left: 16,
-    top: 54,
+    top: 64,
   },
   rightIcon: {
     position: "absolute",
     right: 16,
-    top: 54,
+    top: 64,
   },
   // Estilos del modal
   modalOverlay: {
@@ -132,10 +169,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.xl,
-    margin: theme.spacing.lg,
+    borderRadius: 12,
+    padding: 24,
+    margin: 16,
     minWidth: 300,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -144,47 +180,41 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalTitle: {
-    fontSize: theme.typography.fontSize.large,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
+    fontSize: 18,
+    fontFamily: 'Roboto-Bold',
     textAlign: 'center',
-    marginBottom: theme.spacing.md,
+    marginBottom: 12,
   },
   modalMessage: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.regular,
-    color: theme.colors.textSecondary,
+    fontSize: 16,
+    fontFamily: 'Roboto-Regular',
     textAlign: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: 24,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: theme.spacing.md,
+    gap: 12,
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: theme.spacing.md,
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
   },
   confirmButton: {
     flex: 1,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: theme.spacing.md,
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   confirmButtonText: {
-    fontSize: theme.typography.fontSize.medium,
-    fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.background,
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
   },
 });
 

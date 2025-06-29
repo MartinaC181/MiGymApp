@@ -1,15 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Keyboard } from 'react-native';
 import { Slot, usePathname } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../styles/tabsLayout';
+import useTabsLayoutStyles from '../../styles/tabsLayout';
 import Navigation from '../../components/Navigation';
 import Header from '../../components/Header';
 
 export default function TabsLayout() {
   const pathname = usePathname();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const styles = useTabsLayoutStyles();
   
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -43,7 +43,7 @@ export default function TabsLayout() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <Header title={getHeaderTitle(pathname)} showBack />
       <View style={styles.content}>
         <Slot />
