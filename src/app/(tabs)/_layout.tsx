@@ -1,4 +1,4 @@
-// app/(tabs)/_layout.tsx
+
 import React, { useState, useEffect } from 'react';
 import { View, Keyboard } from 'react-native';
 import { Slot, usePathname } from 'expo-router';
@@ -30,6 +30,7 @@ export default function TabsLayout() {
     if (path.includes('/home')) return 'Inicio';
     if (path.includes('/clases')) return 'Clases';
     if (path.includes('/rutina')) return 'Rutina';
+    if (path.includes('/entrenamiento')) return 'Entrenamiento';
     if (path.includes('/cuota')) return 'Cuota';
     if (path.includes('/perfil')) return 'Perfil';
     if (path.includes('/Imc')) return 'IMC';
@@ -37,6 +38,7 @@ export default function TabsLayout() {
     if (path.includes('/Settings')) return 'Configuración';
     if (path.includes('/GrupoDetalle')) return 'Editar Rutina';
     if (path.includes('/facturacion')) return 'Facturación';
+    if (path.includes('/temporizador')) return 'Temporizador';
     return 'Mi Gym App';
   };
 

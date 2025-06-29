@@ -67,8 +67,9 @@ export default function Navigation() {
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <View style={styles.container}>
         <NavItem iconName="home" label="Inicio" route="/home" />
-        <NavItem iconName="weight-lifter" label="Rutina" route="/rutina" />
+        <NavItem iconName="weight-lifter" label="Rutina" route="/entrenamiento" />
         <NavItem iconName="wallet" label="Cuota" route="/cuota" />
+        {/* <NavItem iconName="timer-outline" label="Temporizador" route="/temporizador" /> */}
         <NavItem iconName="account" label="Perfil" route="/perfil" />
       </View>
     </SafeAreaView>
