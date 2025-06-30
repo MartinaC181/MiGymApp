@@ -11,9 +11,6 @@ import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
 import { getCurrentUser, getUserPaymentInfo, processPayment, getGymQuotaSettings } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
 
-// Hardcodea el resultado del pago aquí
-const pagoExitoso = true; // Cambia a false para probar el error
-
 export default function Facturacion() {
     // Hook para el tema dinámico
     const { theme } = useTheme();
@@ -24,6 +21,7 @@ export default function Facturacion() {
     
     const [procesando, setProcesando] = useState(false);
     const [resultado, setResultado] = useState<null | "exito" | "error">(null);
+    const [pagoExitoso, setPagoExitoso] = useState(true); // Estado para controlar el resultado del pago
     
     // Estados para los campos del formulario
     const [cardName, setCardName] = useState("");
@@ -211,7 +209,8 @@ export default function Facturacion() {
             // Simular delay
             setTimeout(() => {
                 setProcesando(false);
-                setResultado(result.success ? 'exito' : 'error');
+                // Usar el estado pagoExitoso para determinar el resultado
+                setResultado(pagoExitoso ? 'exito' : 'error');
             }, 3000);
         } catch (error) {
             console.error('Error procesando pago:', error);
@@ -296,6 +295,19 @@ export default function Facturacion() {
     // Pantalla de formulario
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+            {/* Botón de desarrollo para cambiar resultado del pago */}
+            <View style={styles.devContainer}>
+                <Text style={styles.devLabel}>🔧 DESARROLLO</Text>
+                <TouchableOpacity 
+                    style={styles.toggleButton}
+                    onPress={() => setPagoExitoso(!pagoExitoso)}
+                >
+                    <Text style={styles.toggleButtonText}>
+                        {pagoExitoso ? "Cambiar a PAGO RECHAZADO" : "Cambiar a PAGO EXITOSO"}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
             <View style={styles.titleContainer}>
                 <MaterialIcons name="credit-card" size={32} color={theme.colors.primary} />
                 <Text style={styles.title}>Método de pago</Text>
@@ -459,7 +471,7 @@ export default function Facturacion() {
                 <View style={styles.amountContainer}>
                     <Text style={styles.amountLabel}>MONTO A PAGAR</Text>
                     <Text style={styles.amount}>
-                        {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '$10,213.89'}
+                        {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '0'}
                     </Text>
                 </View>
 
@@ -817,5 +829,51 @@ const createStyles = (theme: any) => StyleSheet.create({
         color: theme.colors.textSecondary,
         marginLeft: theme.spacing.xs,
         flex: 1,
+    },
+    // Estilos para el botón de desarrollo
+    devContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        opacity: 0.9,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    devLabel: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+    },
+    toggleButton: {
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.sm,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 28,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        // Sombras sutiles
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    toggleButtonText: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
     },
 });

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Alert, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { openBrowserAsync } from "expo-web-browser";
 import { useTheme } from "../../context/ThemeContext";
 import { createGlobalStyles } from "../../styles/global";
-import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
 import { getCurrentUser, getUserPaymentInfo, getGymQuotaSettings } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
 
@@ -14,16 +12,29 @@ function getCuotaInfo(pendiente: boolean) {
     if (pendiente) {
         return {
             pendiente: true,
-            monto: 10213.89,
             nombre: "Teo Risso",
-            dni: "40.000.000"
+            dni: "40.000.000",
+            numeroFactura: "0001-00000001",
+            fechaEmision: "2024-01-01",
+            fechaVencimiento: "2024-01-15",
+            periodo: "Enero 2024"
         };
     } else {
         return {
             pendiente: false,
             monto: 0,
             nombre: "Teo Risso",
-            dni: "40.000.000"
+            dni: "40.000.000",
+            numeroFactura: "0001-00000001",
+            fechaEmision: "2024-01-01",
+            fechaVencimiento: "2024-01-15",
+            periodo: "Enero 2024",
+            ultimoPago: {
+                monto: 10213.89,
+                fecha: "2024-01-15",
+                numeroFactura: "0001-00000001",
+                proximoVencimiento: "2024-02-15"
+            }
         };
     }
 }
@@ -38,6 +49,8 @@ export default function Cuota() {
     
     // Estado para indicar si la cuota está pendiente o no
     const [pendiente, setPendiente] = useState<boolean>(true);
+    // Estado para controlar si estamos en modo desarrollo
+    const [isDevMode, setIsDevMode] = useState<boolean>(false);
 
     const router = useRouter();
     const [cuotaData, setCuotaData] = useState(null);
@@ -46,7 +59,24 @@ export default function Cuota() {
     const [quotaDescription, setQuotaDescription] = useState<string>("");
 
     // Información de cuota basada en los datos reales o el estado `pendiente` como fallback
-    const cuota = cuotaData || getCuotaInfo(pendiente);
+    // En modo desarrollo, usar datos reales pero con estado pendiente controlado por el botón
+    const cuota = isDevMode ? {
+        ...cuotaData,
+        pendiente: pendiente,
+        // Si está pagado, agregar información del último pago
+        ...(pendiente ? {} : {
+            ultimoPago: {
+                monto: cuotaData?.monto || 10213.89,
+                fecha: cuotaData?.fechaEmision || "2024-01-15",
+                numeroFactura: cuotaData?.numeroFactura || "0001-00000001",
+                proximoVencimiento: cuotaData?.fechaVencimiento || "2024-02-15"
+            }
+        })
+    } : (cuotaData ? {
+        ...cuotaData,
+        // Si no estamos en modo desarrollo, usar el estado pendiente real de los datos
+        pendiente: cuotaData.pendiente
+    } : getCuotaInfo(pendiente));
 
     // Cargar datos del usuario y su información de pago
     useEffect(() => {
@@ -64,6 +94,7 @@ export default function Cuota() {
                     nombre: "Usuario no encontrado",
                     dni: "N/A"
                 });
+                setPendiente(false);
                 setIsLoading(false);
                 return;
             }
@@ -100,6 +131,8 @@ export default function Cuota() {
             };
 
             setCuotaData(cuotaInfo);
+            // Actualizar el estado pendiente con los datos reales
+            setPendiente(paymentInfo.pendiente);
         } catch (error) {
             console.error("Error cargando datos de pago:", error);
             setCuotaData({
@@ -108,6 +141,7 @@ export default function Cuota() {
                 nombre: "Error cargando datos",
                 dni: "N/A"
             });
+            setPendiente(false);
             setQuotaDescription("Membresía mensual del gimnasio");
         } finally {
             setIsLoading(false);
@@ -126,16 +160,16 @@ export default function Cuota() {
         }
     };
 
-    // Datos mock para la factura
+    // Datos para la factura usando datos reales del localStorage
     const factura = {
-        numeroFactura: cuotaData?.numeroFactura || "N/A",
-        fechaEmision: formatDate(cuotaData?.fechaEmision || ""),
-        fechaVencimiento: formatDate(cuotaData?.fechaVencimiento || ""),
-        cliente: cuotaData?.nombre || "Usuario no especificado",
-        dni: cuotaData?.dni || "N/A",
-        servicio: quotaDescription || "Membresía Gimnasio",
-        total: cuotaData?.monto || 0,
-        periodo: cuotaData?.periodo || "N/A"
+        numeroFactura: cuota?.numeroFactura || cuotaData?.numeroFactura || "N/A",
+        fechaEmision: formatDate(cuota?.fechaEmision || cuotaData?.fechaEmision || ""),
+        fechaVencimiento: formatDate(cuota?.fechaVencimiento || cuotaData?.fechaVencimiento || ""),
+        cliente: cuota?.nombre || cuotaData?.nombre || "Usuario no especificado",
+        dni: cuota?.dni || cuotaData?.dni || "N/A",
+        servicio: quotaDescription || cuota?.servicio || "Membresía Gimnasio",
+        total: cuota?.monto || cuotaData?.monto || 0,
+        periodo: cuota?.periodo || cuotaData?.periodo || "N/A"
     };
 
     if (isLoading) {
@@ -171,7 +205,10 @@ export default function Cuota() {
                         <Text style={styles.devLabel}>🔧 DESARROLLO</Text>
                         <TouchableOpacity 
                             style={styles.toggleButton}
-                            onPress={() => setPendiente(!pendiente)}
+                            onPress={() => {
+                                setIsDevMode(true);
+                                setPendiente(!pendiente);
+                            }}
                         >
                             <Text style={styles.toggleButtonText}>
                                 {pendiente ? "Cambiar a PAGADO" : "Cambiar a PENDIENTE"}
@@ -190,10 +227,12 @@ export default function Cuota() {
                                 <Text style={styles.amount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
                                 
                                 {/* Descripción de la cuota */}
-                                {quotaDescription && (
+                                {(quotaDescription || cuota.servicio) && (
                                     <View style={styles.quotaDescriptionContainer}>
                                         <MaterialIcons name="info-outline" size={16} color={theme.colors.textSecondary} />
-                                        <Text style={styles.quotaDescriptionText}>{quotaDescription}</Text>
+                                        <Text style={styles.quotaDescriptionText}>
+                                            {quotaDescription || cuota.servicio || "Membresía mensual del gimnasio"}
+                                        </Text>
                                     </View>
                                 )}
                                 
@@ -290,25 +329,33 @@ export default function Cuota() {
                                 <View style={styles.infoRow}>
                                     <MaterialIcons name="payment" size={20} color={theme.colors.primary} />
                                     <Text style={styles.infoLabel}>Monto pagado:</Text>
-                                    <Text style={styles.infoValue}>$10.213,89</Text>
+                                    <Text style={styles.infoValue}>
+                                        ${cuota.ultimoPago?.monto?.toLocaleString("es-AR", { minimumFractionDigits: 2 }) || "10.213,89"}
+                                    </Text>
                                 </View>
                                 
                                 <View style={styles.infoRow}>
                                     <MaterialIcons name="calendar-today" size={20} color={theme.colors.primary} />
                                     <Text style={styles.infoLabel}>Fecha de pago:</Text>
-                                    <Text style={styles.infoValue}>15/01/2024</Text>
+                                    <Text style={styles.infoValue}>
+                                        {cuota.ultimoPago?.fecha ? formatDate(cuota.ultimoPago.fecha) : "15/01/2024"}
+                                    </Text>
                                 </View>
                                 
                                 <View style={styles.infoRow}>
                                     <MaterialIcons name="receipt" size={20} color={theme.colors.primary} />
                                     <Text style={styles.infoLabel}>N° Factura:</Text>
-                                    <Text style={styles.infoValue}>0001-00000001</Text>
+                                    <Text style={styles.infoValue}>
+                                        {cuota.ultimoPago?.numeroFactura || "0001-00000001"}
+                                    </Text>
                                 </View>
                                 
                                 <View style={styles.infoRow}>
                                     <MaterialIcons name="schedule" size={20} color={theme.colors.primary} />
                                     <Text style={styles.infoLabel}>Próximo vencimiento:</Text>
-                                    <Text style={styles.infoValue}>15/02/2024</Text>
+                                    <Text style={styles.infoValue}>
+                                        {cuota.ultimoPago?.proximoVencimiento ? formatDate(cuota.ultimoPago.proximoVencimiento) : "15/02/2024"}
+                                    </Text>
                                 </View>
 
                                 <TouchableOpacity 
