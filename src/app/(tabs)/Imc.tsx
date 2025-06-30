@@ -10,9 +10,10 @@ const Imc = () => {
 
     const numericWeight = parseFloat(weight as string);
     const numericHeight = parseFloat(height as string);
+    const heightInMeters = numericHeight / 100;
 
     const imc =
-        numericWeight > 0 && numericHeight > 0 ? numericWeight / Math.pow(numericHeight, 2) : NaN;
+        numericWeight > 0 && heightInMeters > 0 ? numericWeight / Math.pow(heightInMeters, 2) : NaN;
 
     const imcValue = isNaN(imc) ? '---' : imc.toFixed(2);
 
