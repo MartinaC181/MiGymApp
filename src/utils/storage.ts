@@ -776,3 +776,122 @@ export const getGymUserByBusinessName = async (businessName: string): Promise<Gy
     return null;
   }
 };
+
+// ==================== TIMER & STOPWATCH STORAGE ====================
+
+export interface TimerState {
+  hours: number;
+  minutes: number;
+  seconds: number;
+  totalSeconds: number;
+  isRunning: boolean;
+  isPaused: boolean;
+  lastSaveTime?: number; // timestamp para calcular tiempo transcurrido
+}
+
+export interface StopwatchState {
+  centiseconds: number;
+  isRunning: boolean;
+  laps: number[];
+  lastSaveTime?: number; // timestamp para calcular tiempo transcurrido
+}
+
+// Guardar estado del temporizador
+export const saveTimerState = async (state: TimerState) => {
+  try {
+    const stateWithTimestamp = {
+      ...state,
+      lastSaveTime: Date.now()
+    };
+    await AsyncStorage.setItem('@MiGymApp:timerState', JSON.stringify(stateWithTimestamp));
+  } catch (error) {
+    console.error('Error saving timer state:', error);
+  }
+};
+
+// Cargar estado del temporizador
+export const loadTimerState = async (): Promise<TimerState | null> => {
+  try {
+    const state = await AsyncStorage.getItem('@MiGymApp:timerState');
+    if (!state) return null;
+    
+    const parsedState: TimerState = JSON.parse(state);
+    
+    // Si el timer estaba corriendo, calcular el tiempo transcurrido
+    if (parsedState.isRunning && parsedState.lastSaveTime) {
+      const timeElapsed = Math.floor((Date.now() - parsedState.lastSaveTime) / 1000);
+      const newTotalSeconds = Math.max(0, parsedState.totalSeconds - timeElapsed);
+      
+      return {
+        ...parsedState,
+        totalSeconds: newTotalSeconds,
+        hours: Math.floor(newTotalSeconds / 3600),
+        minutes: Math.floor((newTotalSeconds % 3600) / 60),
+        seconds: newTotalSeconds % 60,
+        isRunning: newTotalSeconds > 0 ? parsedState.isRunning : false,
+      };
+    }
+    
+    return parsedState;
+  } catch (error) {
+    console.error('Error loading timer state:', error);
+    return null;
+  }
+};
+
+// Limpiar estado del temporizador
+export const clearTimerState = async () => {
+  try {
+    await AsyncStorage.removeItem('@MiGymApp:timerState');
+  } catch (error) {
+    console.error('Error clearing timer state:', error);
+  }
+};
+
+// Guardar estado del cronómetro
+export const saveStopwatchState = async (state: StopwatchState) => {
+  try {
+    const stateWithTimestamp = {
+      ...state,
+      lastSaveTime: Date.now()
+    };
+    await AsyncStorage.setItem('@MiGymApp:stopwatchState', JSON.stringify(stateWithTimestamp));
+  } catch (error) {
+    console.error('Error saving stopwatch state:', error);
+  }
+};
+
+// Cargar estado del cronómetro
+export const loadStopwatchState = async (): Promise<StopwatchState | null> => {
+  try {
+    const state = await AsyncStorage.getItem('@MiGymApp:stopwatchState');
+    if (!state) return null;
+    
+    const parsedState: StopwatchState = JSON.parse(state);
+    
+    // Si el cronómetro estaba corriendo, calcular el tiempo transcurrido
+    if (parsedState.isRunning && parsedState.lastSaveTime) {
+      const timeElapsed = Math.floor((Date.now() - parsedState.lastSaveTime) / 10); // centiseconds
+      const newCentiseconds = parsedState.centiseconds + timeElapsed;
+      
+      return {
+        ...parsedState,
+        centiseconds: newCentiseconds,
+      };
+    }
+    
+    return parsedState;
+  } catch (error) {
+    console.error('Error loading stopwatch state:', error);
+    return null;
+  }
+};
+
+// Limpiar estado del cronómetro
+export const clearStopwatchState = async () => {
+  try {
+    await AsyncStorage.removeItem('@MiGymApp:stopwatchState');
+  } catch (error) {
+    console.error('Error clearing stopwatch state:', error);
+  }
+};
