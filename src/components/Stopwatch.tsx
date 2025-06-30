@@ -123,6 +123,19 @@ const Stopwatch: React.FC = () => {
     return `${formatTime(minutes)}:${formatTime(seconds)}.${formatTime(centis)}`;
   };
 
+  // Función específica para formatear tiempos parciales más pequeños
+  const formatLapTime = (cs: number) => {
+    const minutes = Math.floor(cs / 6000);
+    const seconds = Math.floor((cs % 6000) / 100);
+    const centis = cs % 100;
+    
+    // Si es menos de un minuto, mostrar solo segundos.centésimas
+    if (minutes === 0) {
+      return `${formatTime(seconds)}.${formatTime(centis)}`;
+    }
+    return `${formatTime(minutes)}:${formatTime(seconds)}.${formatTime(centis)}`;
+  };
+
   // Estilos dinámicos basados en el tema
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -188,65 +201,85 @@ const Stopwatch: React.FC = () => {
       backgroundColor: theme.colors.surface,
       borderRadius: 12,
       overflow: 'hidden',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
     },
     tableHeader: {
       flexDirection: 'row',
-      backgroundColor: isDarkMode ? '#333333' : '#F5F5F5',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      backgroundColor: isDarkMode ? '#2A2A2A' : '#F8F9FA',
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      borderBottomWidth: 2,
+      borderBottomColor: isDarkMode ? '#404040' : '#E5E7EB',
     },
     headerCell: {
       flex: 1,
       alignItems: 'center',
     },
     headerCellVuelta: {
-      width: 60,
+      width: 70,
       alignItems: 'center',
     },
     headerText: {
-      fontSize: 14,
-      fontWeight: '600',
+      fontSize: 15,
+      fontWeight: '700',
       color: theme.colors.textSecondary,
       textAlign: 'center',
+      letterSpacing: 0.5,
     },
     tableContent: {
       flex: 1,
     },
     lapRow: {
       flexDirection: 'row',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
       borderBottomWidth: 1,
-      borderBottomColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+      borderBottomColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
       alignItems: 'center',
+      backgroundColor: theme.colors.surface,
+    },
+    lapRowAlternate: {
+      backgroundColor: isDarkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
     },
     lapCell: {
       flex: 1,
       alignItems: 'center',
+      paddingHorizontal: 8,
     },
     lapCellVuelta: {
-      width: 60,
+      width: 70,
       alignItems: 'center',
     },
     lapNumber: {
-      fontSize: 16,
+      fontSize: 18,
       color: theme.colors.textPrimary,
-      fontWeight: '500',
+      fontWeight: '600',
       textAlign: 'center',
+      backgroundColor: isDarkMode ? '#3A3A3A' : '#F3F4F6',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      overflow: 'hidden',
     },
     lapTime: {
-      fontSize: 16,
-      color: theme.colors.textPrimary,
+      fontSize: 17,
+      color: '#2563EB', // Color azul para destacar los tiempos parciales
       fontFamily: 'monospace',
+      fontWeight: '600',
       textAlign: 'center',
+      letterSpacing: 0.5,
     },
     totalTime: {
-      fontSize: 16,
+      fontSize: 17,
       color: theme.colors.textPrimary,
       fontFamily: 'monospace',
+      fontWeight: '500',
       textAlign: 'center',
+      letterSpacing: 0.5,
     },
     emptyState: {
       flex: 1,
@@ -326,9 +359,16 @@ const Stopwatch: React.FC = () => {
               const lapNumber = laps.length - index;
               const previousLapTime = index < laps.length - 1 ? laps[index + 1] : 0;
               const lapDuration = lapTime - previousLapTime;
+              const isAlternate = index % 2 === 1;
               
               return (
-                <View key={index} style={dynamicStyles.lapRow}>
+                <View 
+                  key={index} 
+                  style={[
+                    dynamicStyles.lapRow,
+                    isAlternate && dynamicStyles.lapRowAlternate
+                  ]}
+                >
                   <View style={dynamicStyles.lapCellVuelta}>
                     <Text style={dynamicStyles.lapNumber}>
                       {formatTime(lapNumber)}
@@ -336,7 +376,7 @@ const Stopwatch: React.FC = () => {
                   </View>
                   <View style={dynamicStyles.lapCell}>
                     <Text style={dynamicStyles.lapTime}>
-                      {formatStopwatchTime(lapDuration)}
+                      {formatLapTime(lapDuration)}
                     </Text>
                   </View>
                   <View style={dynamicStyles.lapCell}>
