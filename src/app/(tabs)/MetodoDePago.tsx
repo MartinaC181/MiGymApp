@@ -8,11 +8,8 @@ import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
-import { getCurrentUser, getUserPaymentInfo, processPayment } from "../../utils/storage";
+import { getCurrentUser, getUserPaymentInfo, processPayment, getGymQuotaSettings } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
-
-// Hardcodea el resultado del pago aquí
-const pagoExitoso = true; // Cambia a false para probar el error
 
 export default function Facturacion() {
     // Hook para el tema dinámico
@@ -24,6 +21,7 @@ export default function Facturacion() {
     
     const [procesando, setProcesando] = useState(false);
     const [resultado, setResultado] = useState<null | "exito" | "error">(null);
+    const [pagoExitoso, setPagoExitoso] = useState(true); // Estado para controlar el resultado del pago
     
     // Estados para los campos del formulario
     const [cardName, setCardName] = useState("");
@@ -44,6 +42,7 @@ export default function Facturacion() {
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [paymentInfo, setPaymentInfo] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [quotaDescription, setQuotaDescription] = useState<string>("");
 
     // Cargar datos del usuario y pago al montar
     useEffect(() => {
@@ -62,9 +61,23 @@ export default function Facturacion() {
             setCurrentUser(user);
             const payment = await getUserPaymentInfo(user.id);
             setPaymentInfo(payment);
+
+            // Si el usuario es cliente y tiene gymId, obtener la configuración de cuota del gimnasio
+            if (user.role === 'client' && user.gymId) {
+                try {
+                    const gymQuotaSettings = await getGymQuotaSettings(user.gymId);
+                    setQuotaDescription(gymQuotaSettings.descripcion);
+                } catch (error) {
+                    console.log("No se pudo obtener configuración del gimnasio");
+                    setQuotaDescription("Membresía mensual del gimnasio");
+                }
+            } else {
+                setQuotaDescription("Membresía mensual del gimnasio");
+            }
         } catch (error) {
             console.error("Error cargando datos de pago:", error);
             Alert.alert("Error", "No se pudieron cargar los datos de pago");
+            setQuotaDescription("Membresía mensual del gimnasio");
         } finally {
             setIsLoading(false);
         }
@@ -159,7 +172,7 @@ export default function Facturacion() {
      // Función para manejar el pago con Mercado Pago
      const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
-        const data = await handleIntegrationMercadoPago();
+        const data = await handleIntegrationMercadoPago({quotaDescription, monto: paymentInfo.monto});
 
         if (!data) {
            return console.error("Error al procesar el pago con Mercado Pago");
@@ -196,7 +209,8 @@ export default function Facturacion() {
             // Simular delay
             setTimeout(() => {
                 setProcesando(false);
-                setResultado(result.success ? 'exito' : 'error');
+                // Usar el estado pagoExitoso para determinar el resultado
+                setResultado(pagoExitoso ? 'exito' : 'error');
             }, 3000);
         } catch (error) {
             console.error('Error procesando pago:', error);
@@ -281,6 +295,19 @@ export default function Facturacion() {
     // Pantalla de formulario
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+            {/* Botón de desarrollo para cambiar resultado del pago */}
+            <View style={styles.devContainer}>
+                <Text style={styles.devLabel}>🔧 DESARROLLO</Text>
+                <TouchableOpacity 
+                    style={styles.toggleButton}
+                    onPress={() => setPagoExitoso(!pagoExitoso)}
+                >
+                    <Text style={styles.toggleButtonText}>
+                        {pagoExitoso ? "Cambiar a PAGO RECHAZADO" : "Cambiar a PAGO EXITOSO"}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
             <View style={styles.titleContainer}>
                 <MaterialIcons name="credit-card" size={32} color={theme.colors.primary} />
                 <Text style={styles.title}>Método de pago</Text>
@@ -444,9 +471,9 @@ export default function Facturacion() {
                 <View style={styles.amountContainer}>
                     <Text style={styles.amountLabel}>MONTO A PAGAR</Text>
                     <Text style={styles.amount}>
-                        {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '$10,213.89'}
+                        {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '0'}
                     </Text>
-            </View>
+                </View>
 
                 <TouchableOpacity 
                     style={[
@@ -785,5 +812,68 @@ const createStyles = (theme: any) => StyleSheet.create({
         width: 25,
         height: 25,
         marginRight: theme.spacing.sm,
+    },
+    quotaDescriptionContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    quotaDescriptionText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        marginLeft: theme.spacing.xs,
+        flex: 1,
+    },
+    // Estilos para el botón de desarrollo
+    devContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        opacity: 0.9,
+        // Sombras para destacar
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    devLabel: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+    },
+    toggleButton: {
+        backgroundColor: theme.colors.card,
+        borderRadius: theme.borderRadius.sm,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 28,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
+        // Sombras sutiles
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    toggleButtonText: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
     },
 });

@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { lightTheme } from '../constants/theme';
 
-// Factoría de estilos que recibe el tema actual
-export const createGestionGimnasioStyles = (theme: typeof lightTheme) => StyleSheet.create({
+// Factoría de estilos que recibe el tema actual y si es modo oscuro
+export const createGestionGimnasioStyles = (theme: typeof lightTheme, isDarkMode: boolean = false) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.colors.surface,
@@ -30,7 +30,7 @@ export const createGestionGimnasioStyles = (theme: typeof lightTheme) => StyleSh
         paddingBottom: 120, 
     },
     claseCard: {
-        backgroundColor: theme.colors.background,
+        backgroundColor: isDarkMode ? theme.colors.surfaceLight : theme.colors.background,
         borderRadius: theme.borderRadius.lg,
         marginBottom: theme.spacing.md,
         shadowColor: '#000',
@@ -39,6 +39,7 @@ export const createGestionGimnasioStyles = (theme: typeof lightTheme) => StyleSh
         shadowRadius: 4,
         elevation: 3,
         overflow: 'hidden',
+        ...(isDarkMode && { borderWidth: 1, borderColor: '#444' }),
     },
     claseHeader: {
         padding: theme.spacing.md,
@@ -634,7 +635,7 @@ export const createGestionGimnasioStyles = (theme: typeof lightTheme) => StyleSh
         padding: theme.spacing.lg,
     },
     modalCard: {
-        backgroundColor: theme.colors.background,
+        backgroundColor: isDarkMode ? theme.colors.surfaceLight : theme.colors.background,
         borderRadius: theme.borderRadius.lg,
         padding: theme.spacing.lg,
         width: '100%',
@@ -644,6 +645,7 @@ export const createGestionGimnasioStyles = (theme: typeof lightTheme) => StyleSh
         shadowOpacity: 0.3,
         shadowRadius: 16,
         elevation: 12,
+        ...(isDarkMode && { borderWidth: 1, borderColor: '#444' }),
     },
 
     // === Estilos centralizados para botones ===

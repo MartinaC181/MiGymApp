@@ -104,8 +104,8 @@ export default function GestionCuotas() {
     ];
 
     // === Tema dinámico ===
-    const { theme } = useTheme();
-    const styles = useMemo(() => createGestionGimnasioStyles(theme), [theme]);
+    const { theme, isDarkMode } = useTheme();
+    const styles = useMemo(() => createGestionGimnasioStyles(theme, isDarkMode), [theme, isDarkMode]);
 
     // Estilos locales dependientes del tema
     const localStyles = useMemo(() => StyleSheet.create({
@@ -148,11 +148,12 @@ export default function GestionCuotas() {
         summaryCard: {
             flex: 1,
             minWidth: '45%',
-            backgroundColor: theme.colors.surface,
+            backgroundColor: isDarkMode ? theme.colors.surfaceLight : theme.colors.surface,
             borderRadius: theme.borderRadius.md,
             padding: theme.spacing.md,
             alignItems: 'center',
             gap: theme.spacing.xs,
+            ...(isDarkMode && { borderWidth: 1, borderColor: '#444' }),
         },
         summaryCardValue: {
             fontSize: theme.typography.fontSize.medium,
@@ -258,7 +259,7 @@ export default function GestionCuotas() {
             paddingBottom: 120,
         },
         quotaPaymentCard: {
-            backgroundColor: theme.colors.background,
+            backgroundColor: isDarkMode ? theme.colors.surfaceLight : theme.colors.surface,
             borderRadius: theme.borderRadius.lg,
             marginBottom: theme.spacing.md,
             shadowColor: '#000',
@@ -267,6 +268,7 @@ export default function GestionCuotas() {
             shadowRadius: 4,
             elevation: 3,
             overflow: 'hidden',
+            ...(isDarkMode && { borderWidth: 1, borderColor: '#444' }),
         },
         headerSectionOverride: {
             paddingTop: theme.spacing.lg,
@@ -275,7 +277,17 @@ export default function GestionCuotas() {
         clasesContainerOverride: {
             paddingBottom: theme.spacing.sm,
         },
-    }), [theme]);
+        whiteInput: {
+            borderWidth: 1,
+            borderColor: '#E0E0E0',
+            borderRadius: theme.borderRadius.md,
+            padding: theme.spacing.md,
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: isDarkMode ? '#FFF' : theme.colors.textPrimary,
+            backgroundColor: isDarkMode ? theme.colors.surfaceLight : '#FFFFFF',
+        },
+    }), [theme, isDarkMode]);
 
     useEffect(() => {
         loadQuotaData();
@@ -842,11 +854,11 @@ export default function GestionCuotas() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.baseInputLabel}>Monto de la cuota *</Text>
                             <TextInput
-                                style={styles.whiteInput}
+                                style={localStyles.whiteInput}
                                 value={newAmount}
                                 onChangeText={setNewAmount}
                                 placeholder="Ej: 15000"
-                                placeholderTextColor={theme.colors.textSecondary}
+                                placeholderTextColor={isDarkMode ? '#E0E0E0' : theme.colors.textSecondary}
                                 keyboardType="numeric"
                                 editable={!saving}
                             />
@@ -855,11 +867,11 @@ export default function GestionCuotas() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.baseInputLabel}>Descripción *</Text>
                             <TextInput
-                                style={[styles.whiteInput, { height: 80, textAlignVertical: 'top' }]}
+                                style={[localStyles.whiteInput, { height: 80, textAlignVertical: 'top' }]}
                                 value={newDescription}
                                 onChangeText={setNewDescription}
                                 placeholder="Ej: Cuota mensual de acceso al gimnasio"
-                                placeholderTextColor={theme.colors.textSecondary}
+                                placeholderTextColor={isDarkMode ? '#E0E0E0' : theme.colors.textSecondary}
                                 multiline
                                 numberOfLines={3}
                                 editable={!saving}

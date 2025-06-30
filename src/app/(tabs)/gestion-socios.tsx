@@ -109,7 +109,9 @@ export default function GestionSocios() {
             justifyContent: 'space-between',
             paddingVertical: theme.spacing.sm,
             paddingHorizontal: theme.spacing.md,
-            backgroundColor: theme.colors.background,
+            backgroundColor: 'transparent',
+            borderTopLeftRadius: theme.borderRadius.lg,
+            borderTopRightRadius: theme.borderRadius.lg,
         },
         clientName: {
             fontSize: theme.typography.fontSize.medium,
@@ -120,6 +122,8 @@ export default function GestionSocios() {
             paddingHorizontal: theme.spacing.md,
             paddingVertical: theme.spacing.md,
             backgroundColor: theme.colors.surfaceLight ?? '#FAFAFA',
+            borderBottomLeftRadius: theme.borderRadius.lg,
+            borderBottomRightRadius: theme.borderRadius.lg,
             gap: theme.spacing.md,
         },
         expandedItem: {
@@ -130,6 +134,18 @@ export default function GestionSocios() {
         },
         estadoTextoVencido: {
             color: '#C62828',
+        },
+        userCard: {
+            backgroundColor: theme.colors.surfaceLight ? theme.colors.surfaceLight + 'F2' : '#23272F',
+            borderRadius: theme.borderRadius.lg,
+            marginBottom: theme.spacing.md,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.18,
+            shadowRadius: 4,
+            elevation: 4,
+            borderWidth: 1,
+            borderColor: theme.colors.border ?? '#333',
         },
     }), [theme]);
 
@@ -483,7 +499,7 @@ export default function GestionSocios() {
                         sociosFiltrados.map(client => {
                             const isExpanded = expandedClientIds.has(client.id);
                             return (
-                                <View key={client.id} style={styles.claseCard}>
+                                <View key={client.id} style={[styles.claseCard, localStyles.userCard]}>
                                     {/* Cabecera del acordeón - más compacta */}
                                     <TouchableOpacity
                                         style={localStyles.accordionHeader}
