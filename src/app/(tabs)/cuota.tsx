@@ -331,7 +331,7 @@ export default function Cuota() {
 const createStyles = (theme: any) => StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: theme.colors.surface,
+        backgroundColor: theme.colors.background,
     },
     scrollView: {
         flex: 1,
