@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Alert} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import { useTheme } from '../../context/ThemeContext';
@@ -14,6 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from 'expo-linear-gradient';
+// eslint-disable-next-line import/no-unresolved
+import * as ImagePicker from 'expo-image-picker';
 
 const iconMap: Record<string, any> = {
     peso: pesoImg,
@@ -30,6 +32,11 @@ const Profile = () => {
 
     useEffect(() => {
         loadUserData();
+        // Solicitar permisos al montar
+        (async () => {
+            await ImagePicker.requestCameraPermissionsAsync();
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+        })();
     }, []);
 
     const loadUserData = async () => {
@@ -43,6 +50,38 @@ const Profile = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePickImage = async (fromCamera: boolean) => {
+        try {
+            const result = fromCamera
+                ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 })
+                : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.6 });
+
+            if (!result.canceled && userData) {
+                const newUri = result.assets[0].uri;
+                // Actualizar estado local
+                setUserData({ ...(userData as any), avatarUri: newUri } as any);
+
+                // Persistir en AsyncStorage
+                const updates = { ...(userData as any), avatarUri: newUri };
+                await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
+            }
+        } catch (error) {
+            console.error('Error seleccionando imagen:', error);
+        }
+    };
+
+    const openPickerMenu = () => {
+        Alert.alert(
+            'Foto de perfil',
+            'Selecciona una opción',
+            [
+                { text: 'Cámara', onPress: () => handlePickImage(true) },
+                { text: 'Galería', onPress: () => handlePickImage(false) },
+                { text: 'Cancelar', style: 'cancel' },
+            ],
+        );
     };
 
     // Si es un usuario de gimnasio, mostrar el perfil de gimnasio
@@ -84,10 +123,13 @@ const Profile = () => {
                 }]}>
                     {/* Avatar con fondo y botón de edición*/}
                     <View style={[styles.avatarWrapper, { backgroundColor: theme.colors.surface }]}>
-                        <Image source={perfilMirtho} style={styles.avatar}/>
+                        <Image
+                            source={userData && (userData as any).avatarUri ? { uri: (userData as any).avatarUri } : perfilMirtho}
+                            style={styles.avatar}
+                        />
                         <TouchableOpacity 
                             style={[styles.editIcon, { backgroundColor: theme.colors.primary, borderColor: theme.colors.surface }]}
-                            onPress={() => router.push('EditProfile')}>
+                            onPress={openPickerMenu}>
                             <MaterialCommunityIcons name="pencil" size={16} color="white"/>
                         </TouchableOpacity>
                     </View>

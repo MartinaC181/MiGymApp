@@ -1,10 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, TouchableOpacity, ScrollView} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert} from 'react-native';
 import globalStyles from '../../styles/global';
 import { useTheme } from '../../context/ThemeContext';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// eslint-disable-next-line import/no-unresolved
+import * as ImagePicker from 'expo-image-picker';
 
 const EditProfile = ({navigation}: any) => {
     const { theme, isDarkMode } = useTheme();
@@ -14,6 +16,7 @@ const EditProfile = ({navigation}: any) => {
     const [idealWeight, setIdealWeight] = useState('');
     const [height, setHeight] = useState('');
     const [dni, setDni] = useState('');
+    const [avatarUri, setAvatarUri] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     // Cargar datos del usuario actual
@@ -31,6 +34,7 @@ const EditProfile = ({navigation}: any) => {
             setIdealWeight(user.idealWeight?.toString() || '');
             setHeight(user.height?.toString() || '');
             setDni(user.dni?.toString() || '');
+            setAvatarUri(user.avatarUri || null);
         }
     };
 
@@ -85,7 +89,8 @@ const EditProfile = ({navigation}: any) => {
                 weight,
                 idealWeight,
                 height,
-                dni
+                dni,
+                avatarUri,
             };
             await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
             router.push('/perfil');
@@ -94,6 +99,42 @@ const EditProfile = ({navigation}: any) => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // ------------------  Imagen de perfil ------------------ //
+    const requestPermissions = async () => {
+        await ImagePicker.requestCameraPermissionsAsync();
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+    };
+
+    useEffect(() => {
+        requestPermissions();
+    }, []);
+
+    const handlePickImage = async (fromCamera: boolean) => {
+        try {
+            const result = fromCamera
+                ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 })
+                : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.6 });
+
+            if (!result.canceled) {
+                setAvatarUri(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Error al seleccionar imagen:', error);
+        }
+    };
+
+    const openPickerMenu = () => {
+        Alert.alert(
+            'Foto de perfil',
+            'Selecciona una opción',
+            [
+                { text: 'Cámara', onPress: () => handlePickImage(true) },
+                { text: 'Galería', onPress: () => handlePickImage(false) },
+                { text: 'Cancelar', style: 'cancel' },
+            ],
+        );
     };
 
     return (

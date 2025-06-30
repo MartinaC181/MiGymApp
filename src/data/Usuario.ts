@@ -18,6 +18,7 @@ export interface ClientUser {
   idealWeight?: string; // Peso ideal del usuario
   height?: string; // Altura del usuario
   dni?: string; // Documento Nacional de Identidad
+  avatarUri?: string; // URI de la foto de perfil
   /** Indica si el socio tiene la cuota al día */
   isPaymentUpToDate?: boolean;
 }
@@ -36,6 +37,7 @@ export interface GymUser {
   clients: string[]; // IDs de clientes
   classes: string[]; // IDs de clases
   subscriptionPlan?: string;
+  avatarUri?: string; // Logo o imagen del gimnasio opcional
 }
 
 // Usuario cliente existente

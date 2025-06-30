@@ -23,6 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES"],
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
