@@ -18,7 +18,7 @@ interface FloatingActionButtonProps {
 export default function FloatingActionButton({
     onPress,
     icon = 'library-add',
-    size = 30,
+    size = 28,
     backgroundColor = theme.colors.primary,
     iconColor = '#FFFFFF',
     bottom = 50,
@@ -54,9 +54,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     fabButton: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
+        width: 65,
+        height: 65,
+        borderRadius: 35,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 8,

@@ -146,12 +146,17 @@ export default StyleSheet.create({
         backgroundColor: '#F5E6A8',
     },
     eliminarButton: {
-        backgroundColor: '#F8BDBD',
+        backgroundColor: theme.colors.surface,
     },
     accionButtonText: {
         fontSize: theme.typography.fontSize.small,
         fontFamily: theme.typography.fontFamily.medium,
         color: '#FFFFFF',
+    },
+    eliminarButtonText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
     },
     fabButton: {
         position: 'absolute',
@@ -412,5 +417,210 @@ export default StyleSheet.create({
         color: theme.colors.textSecondary,
         textAlign: 'center',
         lineHeight: 22,
+    },
+    
+    // === Estilos para Búsqueda y Filtros ===
+    searchAndFiltersContainer: {
+        paddingHorizontal: theme.spacing.lg,
+        paddingBottom: theme.spacing.md,
+        backgroundColor: theme.colors.surface,
+    },
+    searchWrapper: {
+        position: 'relative',
+        marginBottom: theme.spacing.md,
+        width: '100%',
+    },
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: theme.colors.background,
+        borderRadius: theme.borderRadius.lg,
+        paddingHorizontal: theme.spacing.md,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 6,
+        borderWidth: 1,
+        borderColor: '#E8E8E8',
+        minHeight: 48,
+    },
+    searchContainerFocused: {
+        borderWidth: 2,
+        borderColor: theme.colors.primary,
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    searchInput: {
+        flex: 1,
+        height: 40,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        paddingRight: theme.spacing.sm,
+    },
+    searchIcon: {
+        marginRight: theme.spacing.xs,
+    },
+    clearSearchButton: {
+        padding: theme.spacing.xs,
+        borderRadius: theme.borderRadius.sm,
+        backgroundColor: '#F5F5F5',
+    },
+    
+    // Contenedor de filtros
+    filtersContainer: {
+        marginBottom: theme.spacing.sm,
+    },
+    filtersTitle: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+        marginBottom: theme.spacing.sm,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    
+    // Filtros horizontales
+    filtersRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: theme.spacing.sm,
+        rowGap: theme.spacing.sm,
+        marginBottom: theme.spacing.xs,
+    },
+    filterChip: {
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.md,
+        borderRadius: theme.borderRadius.pill,
+        borderWidth: 1.5,
+        borderColor: '#E0E0E0',
+        backgroundColor: theme.colors.background,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.xs,
+    },
+    filterChipActive: {
+        backgroundColor: theme.colors.primary,
+        borderColor: theme.colors.primary,
+    },
+    filterChipText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+    },
+    filterChipTextActive: {
+        color: '#FFFFFF',
+    },
+    filterChipCount: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textSecondary,
+        backgroundColor: '#F0F0F0',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 10,
+        minWidth: 20,
+        textAlign: 'center',
+    },
+    filterChipCountActive: {
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        color: '#FFFFFF',
+    },
+    
+    // Filtros de días (para clases)
+    diasFiltersContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: theme.spacing.xs,
+        rowGap: theme.spacing.xs,
+    },
+    diaFilterChip: {
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.sm,
+        borderRadius: theme.borderRadius.md,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        backgroundColor: theme.colors.background,
+        minWidth: 42,
+        alignItems: 'center',
+    },
+    diaFilterChipActive: {
+        backgroundColor: theme.colors.primary,
+        borderColor: theme.colors.primary,
+    },
+    diaFilterText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+    },
+    diaFilterTextActive: {
+        color: '#FFFFFF',
+    },
+    
+    // Contador de resultados
+    resultsCounter: {
+        paddingHorizontal: theme.spacing.lg,
+        paddingBottom: theme.spacing.sm,
+    },
+    resultsText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+    },
+    resultsTextHighlight: {
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.primary,
+    },
+    
+    // Botón para limpiar filtros
+    clearFiltersContainer: {
+        paddingHorizontal: theme.spacing.lg,
+        marginBottom: theme.spacing.sm,
+    },
+    clearFiltersButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.md,
+        backgroundColor: '#F8F8F8',
+        borderRadius: theme.borderRadius.md,
+        gap: theme.spacing.xs,
+        alignSelf: 'flex-start',
+    },
+    clearFiltersText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+    },
+    
+    // Estados especiales de búsqueda
+    searchEmptyContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: theme.spacing.xl * 1.5,
+        paddingHorizontal: theme.spacing.lg,
+    },
+    searchEmptyTitle: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textSecondary,
+        marginTop: theme.spacing.md,
+        marginBottom: theme.spacing.xs,
+        textAlign: 'center',
+    },
+    searchEmptySubtitle: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        textAlign: 'center',
+        lineHeight: 20,
+        opacity: 0.8,
     },
 }); 
