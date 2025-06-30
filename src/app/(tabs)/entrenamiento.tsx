@@ -133,7 +133,7 @@ export default function Entrenamiento() {
   };
 
   return (
-    <View style={[globalStyles.safeArea, styles.container, { backgroundColor: theme.colors.surface }]}>
+    <View style={[globalStyles.safeArea, styles.container, { backgroundColor: theme.colors.background }]}>
         <ScrollView 
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}

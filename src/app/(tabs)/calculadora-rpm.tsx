@@ -130,7 +130,7 @@ export default function CalculadoraRPM() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.background,
     },
     scrollContent: {
       padding: theme.spacing.lg,
