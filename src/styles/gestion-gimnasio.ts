@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
-import theme from '../constants/theme';
+import { lightTheme } from '../constants/theme';
 
-export default StyleSheet.create({
+// Factoría de estilos que recibe el tema actual
+export const createGestionGimnasioStyles = (theme: typeof lightTheme) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.colors.surface,
@@ -737,7 +738,7 @@ export default StyleSheet.create({
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.regular,
         color: theme.colors.textPrimary,
-        backgroundColor: theme.colors.surface,
+        backgroundColor: '#FFFFFF',
     },
 
     // Input con fondo blanco
@@ -749,7 +750,7 @@ export default StyleSheet.create({
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.regular,
         color: theme.colors.textPrimary,
-        backgroundColor: theme.colors.background,
+        backgroundColor: '#FFFFFF',
     },
 
     // TextArea centralizado
@@ -838,7 +839,6 @@ export default StyleSheet.create({
         color: theme.colors.error,
     },
 
-    // === Estilos de loading y error centralizados ===
     loadingText: {
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.regular,
@@ -860,4 +860,6 @@ export default StyleSheet.create({
         color: theme.colors.error,
         textAlign: 'center',
     },
-}); 
+});
+
+export default createGestionGimnasioStyles(lightTheme); 

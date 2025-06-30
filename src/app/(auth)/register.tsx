@@ -586,13 +586,13 @@ export default function Register() {
               style={[
                 globalStyles.buttonText,
                 !isButtonDisabled &&
-                  theme.colors.background === "#0A0A0A" && { color: "#FFFFFF" },
+                  theme.colors.background === "#2A2A2A" && { color: "#FFFFFF" },
                 !isButtonDisabled &&
-                  theme.colors.background === "#ffffff" && { color: "#333333" },
+                  theme.colors.background === "#F8F9FA" && { color: "#333333" },
                 isButtonDisabled &&
-                  theme.colors.background === "#0A0A0A" && { color: "#666666" },
+                  theme.colors.background === "#2A2A2A" && { color: "#666666" },
                 isButtonDisabled &&
-                  theme.colors.background === "#ffffff" && { color: "#999999" },
+                  theme.colors.background === "#F8F9FA" && { color: "#999999" },
               ]}
             >
               Registrarse

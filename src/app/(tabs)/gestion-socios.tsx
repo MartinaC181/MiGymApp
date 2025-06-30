@@ -9,16 +9,16 @@ import {
     TextInput
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import styles from '../../../styles/gestion-gimnasio';
-import theme from '../../../constants/theme';
-import { useAuth } from '../../../hooks/useAuth';
-import { ClientUser } from '../../../data/Usuario';
-import ClientFormModal from '../../../components/ClientFormModal';
+import { useTheme } from '../../context/ThemeContext';
+import { createGestionGimnasioStyles } from '../../styles/gestion-gimnasio';
+import { useAuth } from '../../hooks/useAuth';
+import { ClientUser } from '../../data/Usuario';
+import ClientFormModal from '../../components/ClientFormModal';
 import { 
     getGymClients,
     updateGymClient,
     deleteGymClient
-} from '../../../utils/storage';
+} from '../../utils/storage';
 
 export default function GestionSocios() {
     const { user } = useAuth();
@@ -98,6 +98,40 @@ export default function GestionSocios() {
             isPaymentUpToDate: false,
         }
     ];
+
+    // === Tema dinámico ===
+    const { theme } = useTheme();
+    const styles = useMemo(() => createGestionGimnasioStyles(theme), [theme]);
+    const localStyles = useMemo(() => StyleSheet.create({
+        accordionHeader: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.md,
+            backgroundColor: theme.colors.background,
+        },
+        clientName: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+        },
+        expandedInfo: {
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.md,
+            backgroundColor: theme.colors.surfaceLight ?? '#FAFAFA',
+            gap: theme.spacing.md,
+        },
+        expandedItem: {
+            marginBottom: theme.spacing.sm,
+        },
+        estadoVencido: {
+            backgroundColor: '#FFCDD2',
+        },
+        estadoTextoVencido: {
+            color: '#C62828',
+        },
+    }), [theme]);
 
     // Cargar socios al montar
     useEffect(() => {
@@ -528,35 +562,3 @@ export default function GestionSocios() {
         </View>
     );
 }
-
-// === Estilos locales para la vista de socios ===
-const localStyles = StyleSheet.create({
-    accordionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.md,
-        backgroundColor: theme.colors.background,
-    },
-    clientName: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-    },
-    expandedInfo: {
-        paddingHorizontal: theme.spacing.md,
-        paddingVertical: theme.spacing.md,
-        backgroundColor: '#FAFAFA',
-        gap: theme.spacing.md,
-    },
-    expandedItem: {
-        marginBottom: theme.spacing.sm,
-    },
-    estadoVencido: {
-        backgroundColor: '#FFCDD2', // Rojo pastel
-    },
-    estadoTextoVencido: {
-        color: '#C62828', // Texto rojo oscuro para contraste
-    },
-});

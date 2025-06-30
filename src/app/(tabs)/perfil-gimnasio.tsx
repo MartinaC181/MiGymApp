@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Linking, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import globalStyles from "../../../styles/global";
-import { useTheme } from '../../../context/ThemeContext';
-import { getCurrentUser, getGymUserByBusinessName } from '../../../utils/storage';
-import { ClientUser, GymUser } from '../../../data/Usuario';
+import globalStyles from "../../styles/global";
+import { useTheme } from '../../context/ThemeContext';
+import { getCurrentUser, getGymUserByBusinessName } from '../../utils/storage';
+import { ClientUser, GymUser } from '../../data/Usuario';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 
