@@ -188,6 +188,7 @@ export default function Register() {
           weeklyStreak: 0,
           gymId: selectedOption || undefined,
           birthDate: selectedDate?.toISOString() || undefined,
+          dni: dni,
         };
 
         await saveUser(newClientUser);
