@@ -6,7 +6,7 @@ import { openBrowserAsync } from "expo-web-browser";
 import { useTheme } from "../../context/ThemeContext";
 import { createGlobalStyles } from "../../styles/global";
 import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
-import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
+import { getCurrentUser, getUserPaymentInfo, getGymQuotaSettings } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
 
 // Función para obtener información de cuota (ahora obsoleta, se usa cuotaData)
@@ -43,6 +43,7 @@ export default function Cuota() {
     const [cuotaData, setCuotaData] = useState(null);
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [quotaDescription, setQuotaDescription] = useState<string>("");
 
     // Información de cuota basada en los datos reales o el estado `pendiente` como fallback
     const cuota = cuotaData || getCuotaInfo(pendiente);
@@ -72,6 +73,20 @@ export default function Cuota() {
             // Obtener información de pago del usuario
             const paymentInfo = await getUserPaymentInfo(user.id);
             
+            // Si el usuario es cliente y tiene gymId, obtener la configuración de cuota del gimnasio
+            let gymQuotaSettings = null;
+            if (user.role === 'client' && user.gymId) {
+                try {
+                    gymQuotaSettings = await getGymQuotaSettings(user.gymId);
+                    setQuotaDescription(gymQuotaSettings.descripcion);
+                } catch (error) {
+                    console.log("No se pudo obtener configuración del gimnasio");
+                    setQuotaDescription("Membresía mensual del gimnasio");
+                }
+            } else {
+                setQuotaDescription("Membresía mensual del gimnasio");
+            }
+            
             // Formatear la información para el componente
             const cuotaInfo = {
                 pendiente: paymentInfo.pendiente,
@@ -93,23 +108,12 @@ export default function Cuota() {
                 nombre: "Error cargando datos",
                 dni: "N/A"
             });
+            setQuotaDescription("Membresía mensual del gimnasio");
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Función para manejar el pago con Mercado Pago
-    const handleMercadoPagoPayment = async () => {
-        // Aquí iría la lógica de integración con Mercado Pago
-        console.log("Procesando pago con Mercado Pago...");
-        const data = await handleIntegrationMercadoPago();
-
-        if (!data) {
-           return console.error("Error al procesar el pago con Mercado Pago");
-        }
-
-        openBrowserAsync(data);
-    };
 
     // Función para formatear fechas
     const formatDate = (dateString: string) => {
@@ -129,7 +133,7 @@ export default function Cuota() {
         fechaVencimiento: formatDate(cuotaData?.fechaVencimiento || ""),
         cliente: cuotaData?.nombre || "Usuario no especificado",
         dni: cuotaData?.dni || "N/A",
-        servicio: "Membresía Gimnasio",
+        servicio: quotaDescription || "Membresía Gimnasio",
         total: cuotaData?.monto || 0,
         periodo: cuotaData?.periodo || "N/A"
     };
@@ -184,6 +188,14 @@ export default function Cuota() {
                                     <MaterialIcons name="error-outline" size={18} color={theme.colors.error} />
                                 </View>
                                 <Text style={styles.amount}>${cuota.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</Text>
+                                
+                                {/* Descripción de la cuota */}
+                                {quotaDescription && (
+                                    <View style={styles.quotaDescriptionContainer}>
+                                        <MaterialIcons name="info-outline" size={16} color={theme.colors.textSecondary} />
+                                        <Text style={styles.quotaDescriptionText}>{quotaDescription}</Text>
+                                    </View>
+                                )}
                                 
                                 {/* Botones de pago */}
                                 <View style={styles.paymentButtonsContainer}>
@@ -652,6 +664,23 @@ const createStyles = (theme: any) => StyleSheet.create({
         fontSize: theme.typography.fontSize.medium,
         fontFamily: theme.typography.fontFamily.bold,
         marginLeft: theme.spacing.sm,
+    },
+    quotaDescriptionContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.sm,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    quotaDescriptionText: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        marginLeft: theme.spacing.xs,
+        flex: 1,
     },
 });
 

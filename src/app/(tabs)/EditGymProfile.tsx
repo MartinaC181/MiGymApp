@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { createGlobalStyles } from "../../../styles/global";
-import { useTheme } from '../../../context/ThemeContext';
-import { getCurrentUser, updateUserProfile } from '../../../utils/storage';
-import { GymUser } from '../../../data/Usuario';
+import { createGlobalStyles } from "../../styles/global";
+import { useTheme } from '../../context/ThemeContext';
+import { getCurrentUser, updateUserProfile } from '../../utils/storage';
+import { GymUser } from '../../data/Usuario';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from '../../../styles/gestion-gimnasio';
-import globalStyles from '../../../styles/global';
+import styles from '../../styles/gestion-gimnasio';
+import globalStyles from '../../styles/global';
 
 const EditGymProfile = () => {
     const router = useRouter();

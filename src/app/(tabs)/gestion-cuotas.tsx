@@ -11,15 +11,15 @@ import {
     ActivityIndicator
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import styles from '../../../styles/gestion-gimnasio';
-import theme from '../../../constants/theme';
-import { useAuth } from '../../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
+import { createGestionGimnasioStyles } from '../../styles/gestion-gimnasio';
+import { useAuth } from '../../hooks/useAuth';
 import { 
     getGymQuotaSettings,
     updateGymQuotaSettings,
     getGymPaymentHistory,
     getGymPaymentsSummary
-} from '../../../utils/storage';
+} from '../../utils/storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface PaymentRecord {
@@ -102,6 +102,192 @@ export default function GestionCuotas() {
             estado: 'completado'
         }
     ];
+
+    // === Tema dinámico ===
+    const { theme, isDarkMode } = useTheme();
+    const styles = useMemo(() => createGestionGimnasioStyles(theme, isDarkMode), [theme, isDarkMode]);
+
+    // Estilos locales dependientes del tema
+    const localStyles = useMemo(() => StyleSheet.create({
+        quotaAmountContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: theme.spacing.md,
+            paddingVertical: theme.spacing.xs,
+        },
+        quotaAmountValue: {
+            fontSize: theme.typography.fontSize.display,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.primary,
+        },
+        quotaDescriptionValue: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textPrimary,
+        },
+        editQuotaButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.colors.primary,
+            borderRadius: theme.borderRadius.md,
+            paddingVertical: theme.spacing.sm,
+            gap: theme.spacing.xs,
+        },
+        editQuotaButtonText: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: '#FFFFFF',
+        },
+        summaryGrid: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: theme.spacing.sm,
+        },
+        summaryCard: {
+            flex: 1,
+            minWidth: '45%',
+            backgroundColor: isDarkMode ? theme.colors.surfaceLight : theme.colors.surface,
+            borderRadius: theme.borderRadius.md,
+            padding: theme.spacing.md,
+            alignItems: 'center',
+            gap: theme.spacing.xs,
+            ...(isDarkMode && { borderWidth: 1, borderColor: '#444' }),
+        },
+        summaryCardValue: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+        },
+        summaryCardLabel: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textSecondary,
+            textAlign: 'center',
+        },
+        accordionHeader: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.md,
+            backgroundColor: theme.colors.background,
+        },
+        paymentClientName: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+        },
+        paymentAmount: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: theme.colors.primary,
+            marginTop: 2,
+        },
+        paymentStatus: {
+            alignItems: 'flex-end',
+            gap: theme.spacing.xs,
+        },
+        paymentDate: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textSecondary,
+        },
+        estadoPendiente: {
+            backgroundColor: '#FFF3E0',
+        },
+        estadoTextoPendiente: {
+            color: '#F57C00',
+        },
+        expandedInfo: {
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.md,
+            backgroundColor: theme.colors.surfaceLight ?? '#FAFAFA',
+            gap: theme.spacing.sm,
+        },
+        expandedRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: theme.spacing.sm,
+        },
+        expandedLabel: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.medium,
+            color: theme.colors.textSecondary,
+            minWidth: 60,
+        },
+        expandedValue: {
+            fontSize: theme.typography.fontSize.small,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.textPrimary,
+            flex: 1,
+        },
+        quotaSearchAndFiltersContainer: {
+            paddingTop: theme.spacing.sm,
+            paddingBottom: theme.spacing.md,
+            backgroundColor: theme.colors.surface,
+        },
+        quotaSearchWrapper: {
+            position: 'relative',
+            marginBottom: theme.spacing.md,
+            width: '100%',
+            paddingHorizontal: theme.spacing.lg,
+        },
+        quotaFiltersContainer: {
+            marginBottom: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.lg,
+        },
+        quotaResultsCounter: {
+            paddingBottom: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.lg,
+        },
+        quotaClearFiltersContainer: {
+            marginBottom: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.lg,
+        },
+        quotaHistoryTitle: {
+            fontSize: theme.typography.fontSize.title,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+            marginTop: theme.spacing.md,
+            marginBottom: theme.spacing.md,
+            paddingHorizontal: theme.spacing.lg,
+        },
+        quotaPaymentsContainer: {
+            paddingHorizontal: theme.spacing.lg,
+            paddingBottom: 120,
+        },
+        quotaPaymentCard: {
+            backgroundColor: isDarkMode ? theme.colors.surfaceLight : theme.colors.surface,
+            borderRadius: theme.borderRadius.lg,
+            marginBottom: theme.spacing.md,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+            overflow: 'hidden',
+            ...(isDarkMode && { borderWidth: 1, borderColor: '#444' }),
+        },
+        headerSectionOverride: {
+            paddingTop: theme.spacing.lg,
+            paddingBottom: theme.spacing.sm,
+        },
+        clasesContainerOverride: {
+            paddingBottom: theme.spacing.sm,
+        },
+        whiteInput: {
+            borderWidth: 1,
+            borderColor: '#E0E0E0',
+            borderRadius: theme.borderRadius.md,
+            padding: theme.spacing.md,
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: isDarkMode ? '#FFF' : theme.colors.textPrimary,
+            backgroundColor: isDarkMode ? theme.colors.surfaceLight : '#FFFFFF',
+        },
+    }), [theme, isDarkMode]);
 
     useEffect(() => {
         loadQuotaData();
@@ -668,11 +854,11 @@ export default function GestionCuotas() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.baseInputLabel}>Monto de la cuota *</Text>
                             <TextInput
-                                style={styles.whiteInput}
+                                style={localStyles.whiteInput}
                                 value={newAmount}
                                 onChangeText={setNewAmount}
                                 placeholder="Ej: 15000"
-                                placeholderTextColor={theme.colors.textSecondary}
+                                placeholderTextColor={isDarkMode ? '#E0E0E0' : theme.colors.textSecondary}
                                 keyboardType="numeric"
                                 editable={!saving}
                             />
@@ -681,11 +867,11 @@ export default function GestionCuotas() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.baseInputLabel}>Descripción *</Text>
                             <TextInput
-                                style={[styles.whiteInput, { height: 80, textAlignVertical: 'top' }]}
+                                style={[localStyles.whiteInput, { height: 80, textAlignVertical: 'top' }]}
                                 value={newDescription}
                                 onChangeText={setNewDescription}
                                 placeholder="Ej: Cuota mensual de acceso al gimnasio"
-                                placeholderTextColor={theme.colors.textSecondary}
+                                placeholderTextColor={isDarkMode ? '#E0E0E0' : theme.colors.textSecondary}
                                 multiline
                                 numberOfLines={3}
                                 editable={!saving}
@@ -724,179 +910,4 @@ export default function GestionCuotas() {
             </Modal>
         </SafeAreaView>
     );
-}
-
-// === Estilos locales específicos (solo únicos) ===
-const localStyles = StyleSheet.create({
-    quotaAmountContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: theme.spacing.md,
-        paddingVertical: theme.spacing.xs,
-    },
-    quotaAmountValue: {
-        fontSize: theme.typography.fontSize.display,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.primary,
-    },
-    quotaDescriptionValue: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textPrimary,
-    },
-    editQuotaButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: theme.colors.primary,
-        borderRadius: theme.borderRadius.md,
-        paddingVertical: theme.spacing.sm,
-        gap: theme.spacing.xs,
-    },
-    editQuotaButtonText: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.medium,
-        color: '#FFFFFF',
-    },
-
-    summaryGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: theme.spacing.sm,
-    },
-    summaryCard: {
-        flex: 1,
-        minWidth: '45%',
-        backgroundColor: theme.colors.surface,
-        borderRadius: theme.borderRadius.md,
-        padding: theme.spacing.md,
-        alignItems: 'center',
-        gap: theme.spacing.xs,
-    },
-    summaryCardValue: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-    },
-    summaryCardLabel: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
-        textAlign: 'center',
-    },
-
-    accordionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.md,
-        backgroundColor: theme.colors.background,
-    },
-    paymentClientName: {
-        fontSize: theme.typography.fontSize.medium,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-    },
-    paymentAmount: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.medium,
-        color: theme.colors.primary,
-        marginTop: 2,
-    },
-    paymentStatus: {
-        alignItems: 'flex-end',
-        gap: theme.spacing.xs,
-    },
-    paymentDate: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textSecondary,
-    },
-    estadoPendiente: {
-        backgroundColor: '#FFF3E0',
-    },
-    estadoTextoPendiente: {
-        color: '#F57C00',
-    },
-    expandedInfo: {
-        paddingHorizontal: theme.spacing.md,
-        paddingVertical: theme.spacing.md,
-        backgroundColor: '#FAFAFA',
-        gap: theme.spacing.sm,
-    },
-    expandedRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: theme.spacing.sm,
-    },
-    expandedLabel: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.medium,
-        color: theme.colors.textSecondary,
-        minWidth: 60,
-    },
-    expandedValue: {
-        fontSize: theme.typography.fontSize.small,
-        fontFamily: theme.typography.fontFamily.regular,
-        color: theme.colors.textPrimary,
-        flex: 1,
-    },
-
-    // === Estilos específicos para cuotas (ancho completo) ===
-    quotaSearchAndFiltersContainer: {
-        paddingTop: theme.spacing.sm,
-        paddingBottom: theme.spacing.md,
-        backgroundColor: theme.colors.surface,
-    },
-    quotaSearchWrapper: {
-        position: 'relative',
-        marginBottom: theme.spacing.md,
-        width: '100%',
-        paddingHorizontal: theme.spacing.lg,
-    },
-    quotaFiltersContainer: {
-        marginBottom: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.lg,
-    },
-    quotaResultsCounter: {
-        paddingBottom: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.lg,
-    },
-    quotaClearFiltersContainer: {
-        marginBottom: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.lg,
-    },
-    quotaHistoryTitle: {
-        fontSize: theme.typography.fontSize.title,
-        fontFamily: theme.typography.fontFamily.bold,
-        color: theme.colors.textPrimary,
-        marginTop: theme.spacing.md,
-        marginBottom: theme.spacing.md,
-        paddingHorizontal: theme.spacing.lg,
-    },
-    quotaPaymentsContainer: {
-        paddingHorizontal: theme.spacing.lg,
-        paddingBottom: 120,
-    },
-    quotaPaymentCard: {
-        backgroundColor: theme.colors.background,
-        borderRadius: theme.borderRadius.lg,
-        marginBottom: theme.spacing.md,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        overflow: 'hidden',
-    },
-    // === Overrides para espacios ===
-    headerSectionOverride: {
-        paddingTop: theme.spacing.lg,
-        paddingBottom: theme.spacing.md,
-    },
-    clasesContainerOverride: {
-        paddingBottom: theme.spacing.md, // elimina el enorme espacio antes del buscador
-    },
-}); 
+} 

@@ -8,19 +8,18 @@ import {
     TextInput
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import theme from '../../../constants/theme';
-import globalStyles from '../../../styles/global';
-import styles from '../../../styles/gestion-gimnasio';
-import { Clase, diasSemana } from '../../../types/Clase';
-import ClassFormModal from '../../../components/ClassFormModal';
-import FloatingActionButton from '../../../components/FloatingActionButton';
-import { useAuth } from '../../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
+import { createGestionGimnasioStyles } from '../../styles/gestion-gimnasio';
+import { Clase, diasSemana } from '../../types/Clase';
+import ClassFormModal from '../../components/ClassFormModal';
+import FloatingActionButton from '../../components/FloatingActionButton';
+import { useAuth } from '../../hooks/useAuth';
 import { 
     getGymClasses, 
     addGymClass, 
     updateGymClass, 
     deleteGymClass 
-} from '../../../utils/storage';
+} from '../../utils/storage';
 
 export default function GestionClases() {
     const { user } = useAuth();
@@ -34,6 +33,10 @@ export default function GestionClases() {
     const [searchFocused, setSearchFocused] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState<'todas' | 'activas' | 'inactivas'>('todas');
     const [diasSeleccionados, setDiasSeleccionados] = useState<Set<string>>(new Set());
+
+    // === Tema dinámico ===
+    const { theme } = useTheme();
+    const styles = useMemo(() => createGestionGimnasioStyles(theme), [theme]);
 
     // Cargar clases del AsyncStorage al montar el componente
     useEffect(() => {

@@ -20,7 +20,7 @@ export default function useNavigationStyles() {
       justifyContent: 'space-around',
       alignItems: 'flex-end',
       backgroundColor: isDarkMode ? '#0066CC' : theme.colors.primary,
-      paddingVertical: theme.spacing.sm + 4,
+      paddingVertical: theme.spacing.sm + 6,
       borderTopLeftRadius: theme.borderRadius.lg,
       borderTopRightRadius: theme.borderRadius.lg,
       pointerEvents: 'auto',
@@ -33,8 +33,8 @@ export default function useNavigationStyles() {
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 100,
-      marginTop: -46,
-      marginBottom: 4,
+      marginTop: -24,
+      marginBottom: 10,
       shadowColor: '#000',
       shadowOffset: {
         width: 0,
@@ -47,7 +47,7 @@ export default function useNavigationStyles() {
     iconContainerActive: {
       backgroundColor: isDarkMode ? theme.colors.primary : theme.colors.background,
       transform: [{ scale: 1.08 }],
-      marginTop: -50,
+      marginTop: -70,
       shadowColor: '#000',
       shadowOffset: {
         width: 0,
@@ -67,32 +67,10 @@ export default function useNavigationStyles() {
       justifyContent: 'center',
       borderRadius: theme.borderRadius.pill,
     },
-    iconText: {
-      fontSize: theme.typography.fontSize.medium,
-      fontFamily: theme.typography.fontFamily.medium,
-      color: isDarkMode ? '#000000' : 'white',
-      marginTop: 4,
-    },
-    iconTextActive: {
-      fontSize: theme.typography.fontSize.medium,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: isDarkMode ? '#000000' : 'white',
-      marginTop: 4,
-    },
     navItemWrapper: {
       alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: 10,
-    },
-    activeIndicator: {
-      position: 'absolute',
-      bottom: -8,
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: isDarkMode ? theme.colors.primary : theme.colors.background,
-      borderWidth: 1,
-      borderColor: isDarkMode ? '#ffffff' : theme.colors.primary,
+      paddingTop: 0,
     },
   });
 }

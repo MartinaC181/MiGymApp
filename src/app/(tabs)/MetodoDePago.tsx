@@ -8,7 +8,7 @@ import pagoError from '../../../assets/pagoerror.png';
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
-import { getCurrentUser, getUserPaymentInfo, processPayment } from "../../utils/storage";
+import { getCurrentUser, getUserPaymentInfo, processPayment, getGymQuotaSettings } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
 
 // Hardcodea el resultado del pago aquí
@@ -44,6 +44,7 @@ export default function Facturacion() {
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [paymentInfo, setPaymentInfo] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [quotaDescription, setQuotaDescription] = useState<string>("");
 
     // Cargar datos del usuario y pago al montar
     useEffect(() => {
@@ -62,9 +63,23 @@ export default function Facturacion() {
             setCurrentUser(user);
             const payment = await getUserPaymentInfo(user.id);
             setPaymentInfo(payment);
+
+            // Si el usuario es cliente y tiene gymId, obtener la configuración de cuota del gimnasio
+            if (user.role === 'client' && user.gymId) {
+                try {
+                    const gymQuotaSettings = await getGymQuotaSettings(user.gymId);
+                    setQuotaDescription(gymQuotaSettings.descripcion);
+                } catch (error) {
+                    console.log("No se pudo obtener configuración del gimnasio");
+                    setQuotaDescription("Membresía mensual del gimnasio");
+                }
+            } else {
+                setQuotaDescription("Membresía mensual del gimnasio");
+            }
         } catch (error) {
             console.error("Error cargando datos de pago:", error);
             Alert.alert("Error", "No se pudieron cargar los datos de pago");
+            setQuotaDescription("Membresía mensual del gimnasio");
         } finally {
             setIsLoading(false);
         }
@@ -159,7 +174,7 @@ export default function Facturacion() {
      // Función para manejar el pago con Mercado Pago
      const handleMercadoPagoPayment = async () => {
         // Aquí iría la lógica de integración con Mercado Pago
-        const data = await handleIntegrationMercadoPago();
+        const data = await handleIntegrationMercadoPago({quotaDescription, monto: paymentInfo.monto});
 
         if (!data) {
            return console.error("Error al procesar el pago con Mercado Pago");
@@ -446,7 +461,7 @@ export default function Facturacion() {
                     <Text style={styles.amount}>
                         {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '$10,213.89'}
                     </Text>
-            </View>
+                </View>
 
                 <TouchableOpacity 
                     style={[
@@ -785,5 +800,22 @@ const createStyles = (theme: any) => StyleSheet.create({
         width: 25,
         height: 25,
         marginRight: theme.spacing.sm,
+    },
+    quotaDescriptionContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    quotaDescriptionText: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        marginLeft: theme.spacing.xs,
+        flex: 1,
     },
 });

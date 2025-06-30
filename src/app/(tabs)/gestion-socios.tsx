@@ -9,20 +9,19 @@ import {
     TextInput
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import styles from '../../../styles/gestion-gimnasio';
-import { useTheme } from '../../../context/ThemeContext';
-import { useAuth } from '../../../hooks/useAuth';
-import { ClientUser } from '../../../data/Usuario';
-import ClientFormModal from '../../../components/ClientFormModal';
+import { useTheme } from '../../context/ThemeContext';
+import { createGestionGimnasioStyles } from '../../styles/gestion-gimnasio';
+import { useAuth } from '../../hooks/useAuth';
+import { ClientUser } from '../../data/Usuario';
+import ClientFormModal from '../../components/ClientFormModal';
 import { 
     getGymClients,
     updateGymClient,
     deleteGymClient
-} from '../../../utils/storage';
+} from '../../utils/storage';
 
 export default function GestionSocios() {
     const { user } = useAuth();
-    const { theme, isDarkMode } = useTheme();
     const [socios, setSocios] = useState<ClientUser[]>([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [editingClient, setEditingClient] = useState<ClientUser | null>(null);
@@ -99,6 +98,56 @@ export default function GestionSocios() {
             isPaymentUpToDate: false,
         }
     ];
+
+    // === Tema dinámico ===
+    const { theme } = useTheme();
+    const styles = useMemo(() => createGestionGimnasioStyles(theme), [theme]);
+    const localStyles = useMemo(() => StyleSheet.create({
+        accordionHeader: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.md,
+            backgroundColor: 'transparent',
+            borderTopLeftRadius: theme.borderRadius.lg,
+            borderTopRightRadius: theme.borderRadius.lg,
+        },
+        clientName: {
+            fontSize: theme.typography.fontSize.medium,
+            fontFamily: theme.typography.fontFamily.bold,
+            color: theme.colors.textPrimary,
+        },
+        expandedInfo: {
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.md,
+            backgroundColor: theme.colors.surfaceLight ?? '#FAFAFA',
+            borderBottomLeftRadius: theme.borderRadius.lg,
+            borderBottomRightRadius: theme.borderRadius.lg,
+            gap: theme.spacing.md,
+        },
+        expandedItem: {
+            marginBottom: theme.spacing.sm,
+        },
+        estadoVencido: {
+            backgroundColor: '#FFCDD2',
+        },
+        estadoTextoVencido: {
+            color: '#C62828',
+        },
+        userCard: {
+            backgroundColor: theme.colors.surfaceLight ? theme.colors.surfaceLight + 'F2' : '#23272F',
+            borderRadius: theme.borderRadius.lg,
+            marginBottom: theme.spacing.md,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.18,
+            shadowRadius: 4,
+            elevation: 4,
+            borderWidth: 1,
+            borderColor: theme.colors.border ?? '#333',
+        },
+    }), [theme]);
 
     // Cargar socios al montar
     useEffect(() => {
@@ -268,8 +317,8 @@ export default function GestionSocios() {
     // Indicador carga
     if (isLoading) {
         return (
-            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }]}>
-                <Text style={[styles.sectionTitle, { color: theme.colors.textPrimary }]}>Cargando socios...</Text>
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={styles.sectionTitle}>Cargando socios...</Text>
             </View>
         );
     }
@@ -277,9 +326,9 @@ export default function GestionSocios() {
     // Verificar rol
     if (!user || user.role !== 'gym') {
         return (
-            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }]}>
-                <Text style={[styles.sectionTitle, { color: theme.colors.textPrimary }]}>Acceso no autorizado</Text>
-                <Text style={[styles.sectionSubtitle, { color: theme.colors.textSecondary }]}>
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={styles.sectionTitle}>Acceso no autorizado</Text>
+                <Text style={styles.sectionSubtitle}>
                     Solo los usuarios de gimnasio pueden gestionar socios
                 </Text>
             </View>
@@ -287,39 +336,26 @@ export default function GestionSocios() {
     }
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.container}>
             <ScrollView style={styles.scrollView}>
                 <View style={styles.headerSection}>
-                    <Text style={[styles.sectionTitle, { color: theme.colors.textPrimary }]}>Gestión de Socios</Text>
-                    <Text style={[styles.sectionSubtitle, { color: theme.colors.textSecondary }]}>
+                    <Text style={styles.sectionTitle}>Gestión de Socios</Text>
+                    <Text style={styles.sectionSubtitle}>
                         Administra los socios de tu gimnasio
                     </Text>
                 </View>
 
                 {/* Sección de búsqueda y filtros */}
-                <View style={[styles.searchAndFiltersContainer, { backgroundColor: theme.colors.surface }]}>
+                <View style={styles.searchAndFiltersContainer}>
                     {/* Input de búsqueda */}
                     <View style={styles.searchWrapper}>
                         <View style={[
                             styles.searchContainer, 
-                            { 
-                                backgroundColor: theme.colors.background,
-                                borderColor: isDarkMode ? theme.colors.border : '#E8E8E8',
-                                shadowColor: theme.colors.shadowColor,
-                            },
-                            searchFocused && {
-                                borderWidth: 2,
-                                borderColor: theme.colors.primary,
-                                shadowColor: theme.colors.primary,
-                                shadowOffset: { width: 0, height: 6 },
-                                shadowOpacity: 0.15,
-                                shadowRadius: 12,
-                                elevation: 8,
-                            }
+                            searchFocused && styles.searchContainerFocused
                         ]}>
                             <MaterialIcons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
                             <TextInput
-                                style={[styles.searchInput, { color: theme.colors.textPrimary }]}
+                                style={styles.searchInput}
                                 placeholder="Buscar por nombre, email o DNI..."
                                 placeholderTextColor={theme.colors.textSecondary}
                                 value={searchText}
@@ -328,7 +364,7 @@ export default function GestionSocios() {
                                 onBlur={() => setSearchFocused(false)}
                             />
                             {searchText.length > 0 && (
-                                <TouchableOpacity onPress={clearSearch} style={[styles.clearSearchButton, { backgroundColor: isDarkMode ? theme.colors.surfaceDark : '#F5F5F5' }]}>
+                                <TouchableOpacity onPress={clearSearch} style={styles.clearSearchButton}>
                                     <MaterialIcons name="close" size={18} color={theme.colors.textSecondary} />
                                 </TouchableOpacity>
                             )}
@@ -337,39 +373,24 @@ export default function GestionSocios() {
 
                     {/* Filtros */}
                     <View style={styles.filtersContainer}>
-                        <Text style={[styles.filtersTitle, { color: theme.colors.textSecondary }]}>Filtrar por estado de cuota</Text>
+                        <Text style={styles.filtersTitle}>Filtrar por estado de cuota</Text>
                         <View style={styles.filtersRow}>
                             <TouchableOpacity
                                 style={[
                                     styles.filterChip,
-                                    { 
-                                        backgroundColor: theme.colors.background,
-                                        borderColor: isDarkMode ? theme.colors.border : '#E0E0E0',
-                                    },
-                                    filtroEstadoPago === 'todos' && {
-                                        backgroundColor: theme.colors.primary,
-                                        borderColor: theme.colors.primary,
-                                    }
+                                    filtroEstadoPago === 'todos' && styles.filterChipActive
                                 ]}
                                 onPress={() => setFiltroEstadoPago('todos')}
                             >
                                 <Text style={[
                                     styles.filterChipText,
-                                    { color: theme.colors.textSecondary },
-                                    filtroEstadoPago === 'todos' && { color: '#FFFFFF' }
+                                    filtroEstadoPago === 'todos' && styles.filterChipTextActive
                                 ]}>
                                     Todos
                                 </Text>
                                 <Text style={[
                                     styles.filterChipCount,
-                                    { 
-                                        color: theme.colors.textSecondary,
-                                        backgroundColor: isDarkMode ? theme.colors.surfaceDark : '#F0F0F0',
-                                    },
-                                    filtroEstadoPago === 'todos' && {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                        color: '#FFFFFF',
-                                    }
+                                    filtroEstadoPago === 'todos' && styles.filterChipCountActive
                                 ]}>
                                     {contadores.total}
                                 </Text>
@@ -378,14 +399,7 @@ export default function GestionSocios() {
                             <TouchableOpacity
                                 style={[
                                     styles.filterChip,
-                                    { 
-                                        backgroundColor: theme.colors.background,
-                                        borderColor: isDarkMode ? theme.colors.border : '#E0E0E0',
-                                    },
-                                    filtroEstadoPago === 'al-dia' && {
-                                        backgroundColor: theme.colors.primary,
-                                        borderColor: theme.colors.primary,
-                                    }
+                                    filtroEstadoPago === 'al-dia' && styles.filterChipActive
                                 ]}
                                 onPress={() => setFiltroEstadoPago('al-dia')}
                             >
@@ -394,21 +408,13 @@ export default function GestionSocios() {
                                 } />
                                 <Text style={[
                                     styles.filterChipText,
-                                    { color: theme.colors.textSecondary },
-                                    filtroEstadoPago === 'al-dia' && { color: '#FFFFFF' }
+                                    filtroEstadoPago === 'al-dia' && styles.filterChipTextActive
                                 ]}>
                                     Al día
                                 </Text>
                                 <Text style={[
                                     styles.filterChipCount,
-                                    { 
-                                        color: theme.colors.textSecondary,
-                                        backgroundColor: isDarkMode ? theme.colors.surfaceDark : '#F0F0F0',
-                                    },
-                                    filtroEstadoPago === 'al-dia' && {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                        color: '#FFFFFF',
-                                    }
+                                    filtroEstadoPago === 'al-dia' && styles.filterChipCountActive
                                 ]}>
                                     {contadores.alDia}
                                 </Text>
@@ -417,14 +423,7 @@ export default function GestionSocios() {
                             <TouchableOpacity
                                 style={[
                                     styles.filterChip,
-                                    { 
-                                        backgroundColor: theme.colors.background,
-                                        borderColor: isDarkMode ? theme.colors.border : '#E0E0E0',
-                                    },
-                                    filtroEstadoPago === 'vencida' && {
-                                        backgroundColor: theme.colors.primary,
-                                        borderColor: theme.colors.primary,
-                                    }
+                                    filtroEstadoPago === 'vencida' && styles.filterChipActive
                                 ]}
                                 onPress={() => setFiltroEstadoPago('vencida')}
                             >
@@ -433,21 +432,13 @@ export default function GestionSocios() {
                                 } />
                                 <Text style={[
                                     styles.filterChipText,
-                                    { color: theme.colors.textSecondary },
-                                    filtroEstadoPago === 'vencida' && { color: '#FFFFFF' }
+                                    filtroEstadoPago === 'vencida' && styles.filterChipTextActive
                                 ]}>
                                     Vencida
                                 </Text>
                                 <Text style={[
                                     styles.filterChipCount,
-                                    { 
-                                        color: theme.colors.textSecondary,
-                                        backgroundColor: isDarkMode ? theme.colors.surfaceDark : '#F0F0F0',
-                                    },
-                                    filtroEstadoPago === 'vencida' && {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                        color: '#FFFFFF',
-                                    }
+                                    filtroEstadoPago === 'vencida' && styles.filterChipCountActive
                                 ]}>
                                     {contadores.vencida}
                                 </Text>
@@ -459,8 +450,8 @@ export default function GestionSocios() {
                 {/* Contador de resultados */}
                 {isFilterActive() && (
                     <View style={styles.resultsCounter}>
-                        <Text style={[styles.resultsText, { color: theme.colors.textSecondary }]}>
-                            Mostrando <Text style={[styles.resultsTextHighlight, { color: theme.colors.primary }]}>{sociosFiltrados.length}</Text> de {contadores.total} socios
+                        <Text style={styles.resultsText}>
+                            Mostrando <Text style={styles.resultsTextHighlight}>{sociosFiltrados.length}</Text> de {contadores.total} socios
                         </Text>
                     </View>
                 )}
@@ -468,28 +459,25 @@ export default function GestionSocios() {
                 {/* Botón para limpiar filtros */}
                 {isFilterActive() && (
                     <View style={styles.clearFiltersContainer}>
-                        <TouchableOpacity 
-                            style={[styles.clearFiltersButton, { backgroundColor: isDarkMode ? theme.colors.surfaceDark : '#F8F8F8' }]} 
-                            onPress={clearAllFilters}
-                        >
+                        <TouchableOpacity style={styles.clearFiltersButton} onPress={clearAllFilters}>
                             <MaterialIcons name="clear-all" size={16} color={theme.colors.textSecondary} />
-                            <Text style={[styles.clearFiltersText, { color: theme.colors.textSecondary }]}>Limpiar filtros</Text>
+                            <Text style={styles.clearFiltersText}>Limpiar filtros</Text>
                         </TouchableOpacity>
                     </View>
                 )}
 
-                <View style={[styles.clasesContainer, { marginTop: 16 }]}>
+                <View style={styles.clasesContainer}>
                     {socios.length === 0 ? (
                         <View style={styles.emptyStateContainer}>
                             <MaterialIcons 
                                 name="people-outline" 
                                 size={64} 
-                                color={isDarkMode ? '#404040' : '#E0E0E0'} 
+                                color="#E0E0E0" 
                             />
-                            <Text style={[styles.emptyStateTitle, { color: theme.colors.textSecondary }]}>
+                            <Text style={styles.emptyStateTitle}>
                                     No hay socios asociados todavía
                             </Text>
-                            <Text style={[styles.emptyStateSubtitle, { color: theme.colors.textSecondary }]}>
+                            <Text style={styles.emptyStateSubtitle}>
                                     Los socios se crean cuando se registran en tu gimnasio.
                             </Text>
                         </View>
@@ -500,10 +488,10 @@ export default function GestionSocios() {
                                 size={48} 
                                 color={theme.colors.textSecondary} 
                             />
-                            <Text style={[styles.searchEmptyTitle, { color: theme.colors.textSecondary }]}>
+                            <Text style={styles.searchEmptyTitle}>
                                 No se encontraron socios
                             </Text>
-                            <Text style={[styles.searchEmptySubtitle, { color: theme.colors.textSecondary }]}>
+                            <Text style={styles.searchEmptySubtitle}>
                                 Intentá ajustar los filtros o el término de búsqueda
                             </Text>
                         </View>
@@ -511,18 +499,15 @@ export default function GestionSocios() {
                         sociosFiltrados.map(client => {
                             const isExpanded = expandedClientIds.has(client.id);
                             return (
-                                <View key={client.id} style={[styles.claseCard, { 
-                                    backgroundColor: isDarkMode ? theme.colors.surface : theme.colors.background,
-                                    shadowColor: theme.colors.shadowColor,
-                                }]}>
+                                <View key={client.id} style={[styles.claseCard, localStyles.userCard]}>
                                     {/* Cabecera del acordeón - más compacta */}
                                     <TouchableOpacity
-                                        style={[localStyles.accordionHeader, { backgroundColor: isDarkMode ? theme.colors.surface : theme.colors.background }]}
+                                        style={localStyles.accordionHeader}
                                         onPress={() => toggleExpand(client.id)}
                                         activeOpacity={0.7}
                                     >
                                         <View style={styles.claseInfo}>
-                                            <Text style={[localStyles.clientName, { color: theme.colors.textPrimary }]}>{client.name}</Text>
+                                            <Text style={localStyles.clientName}>{client.name}</Text>
                                         </View>
                                         
                                         <View style={[
@@ -547,14 +532,14 @@ export default function GestionSocios() {
                                     {/* Contenido expandido - información adicional y botones */}
                                     {isExpanded && (
                                         <>
-                                            <View style={[localStyles.expandedInfo, { backgroundColor: isDarkMode ? theme.colors.surfaceLight : '#FAFAFA' }]}>
+                                            <View style={localStyles.expandedInfo}>
                                                 <View style={[styles.metadataItem, localStyles.expandedItem]}>
                                                     <MaterialIcons name="email" size={16} color={theme.colors.textSecondary} />
-                                                    <Text style={[styles.metadataText, { color: theme.colors.textSecondary }]}>{client.email}</Text>
+                                                    <Text style={styles.metadataText}>{client.email}</Text>
                                                 </View>
                                                 <View style={[styles.metadataItem, localStyles.expandedItem]}>
                                                     <MaterialIcons name="badge" size={16} color={theme.colors.textSecondary} />
-                                                    <Text style={[styles.metadataText, { color: theme.colors.textSecondary }]}>DNI: {client.dni || 'No especificado'}</Text>
+                                                    <Text style={styles.metadataText}>DNI: {client.dni || 'No especificado'}</Text>
                                                 </View>
                                             </View>
                                             <View style={styles.accionesContainer}>
@@ -567,11 +552,11 @@ export default function GestionSocios() {
                                                 </TouchableOpacity>
 
                                                 <TouchableOpacity 
-                                                    style={[styles.accionButton, styles.eliminarButton, { backgroundColor: theme.colors.surface }]}
+                                                    style={[styles.accionButton, styles.eliminarButton]}
                                                     onPress={() => eliminarSocio(client)}
                                                 >
                                                     <MaterialIcons name="delete" size={20} color={theme.colors.textSecondary} />
-                                                    <Text style={[styles.eliminarButtonText, { color: theme.colors.textSecondary }]}>Eliminar</Text>
+                                                    <Text style={styles.eliminarButtonText}>Eliminar</Text>
                                                 </TouchableOpacity>
                                             </View>
                                         </>
@@ -593,32 +578,3 @@ export default function GestionSocios() {
         </View>
     );
 }
-
-// === Estilos locales para la vista de socios ===
-const localStyles = StyleSheet.create({
-    accordionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-    },
-    clientName: {
-        fontSize: 14,
-        fontFamily: 'Roboto-Bold',
-    },
-    expandedInfo: {
-        paddingHorizontal: 16,
-        paddingVertical: 16,
-        gap: 16,
-    },
-    expandedItem: {
-        marginBottom: 8,
-    },
-    estadoVencido: {
-        backgroundColor: '#FFCDD2', // Rojo pastel
-    },
-    estadoTextoVencido: {
-        color: '#C62828', // Texto rojo oscuro para contraste
-    },
-});

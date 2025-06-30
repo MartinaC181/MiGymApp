@@ -89,23 +89,16 @@ export default function Navigation() {
               size={isActive ? 38 : 36}
               color={isDarkMode ? '#000000' : theme.colors.primary}
             />
-            {isActive && <View style={styles.activeIndicator} />}
           </Pressable>
         </Animated.View>
-        <Text style={[
-          styles.iconText,
-          isActive && styles.iconTextActive
-        ]}>
-          {label}
-        </Text>
       </View>
     );
   };
 
   const gymItems = [
-    { icon: 'account-group', label: 'Socios', route: '/(gimnasio)/gestion-socios' },
-    { icon: 'dumbbell', label: 'Clases', route: '/(gimnasio)/gestion-clases' },
-    { icon: 'wallet', label: 'Cuotas', route: '/(gimnasio)/gestion-cuotas' },
+    { icon: 'account-group', label: 'Socios', route: '/gestion-socios' },
+    { icon: 'dumbbell', label: 'Clases', route: '/gestion-clases' },
+    { icon: 'wallet', label: 'Cuotas', route: '/gestion-cuotas' },
     { icon: 'account', label: 'Perfil', route: '/perfil' },
   ];
 

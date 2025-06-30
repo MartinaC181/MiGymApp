@@ -55,7 +55,7 @@ export default function Login() {
           
           // Redirigir según el tipo de usuario
           if (hardcodedUser.role === 'gym') {
-            router.push("/(gimnasio)/gestion-socios");
+            router.push("/gestion-socios");
           } else {
             router.push("/home");
           }
@@ -67,7 +67,7 @@ export default function Login() {
         
         // Redirigir según el tipo de usuario
         if (user.role === 'gym') {
-          router.push("/(gimnasio)/gestion-socios");
+          router.push("/gestion-socios");
         } else {
           router.push("/home");
         }

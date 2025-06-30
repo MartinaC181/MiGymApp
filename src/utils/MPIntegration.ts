@@ -1,17 +1,17 @@
 import { MP_ACCESS_TOKEN } from "../../config.json";
 
-export const handleIntegrationMercadoPago = async () => {
+export const handleIntegrationMercadoPago = async ({quotaDescription, monto}) => {
     const preference = {
         "items": [
             {
                 "id": "Sound system",
                 "title": "Cuota mensual",
-                "description": "Cuota mensual",
+                "description": quotaDescription,
                 "picture_url": "https://i.imgur.com/77AE5KG.png",
                 "category_id": "other",
                 "quantity": 1,
                 "currency_id": "ARS",
-                "unit_price": 10
+                "unit_price": monto
             }
         ]
     }

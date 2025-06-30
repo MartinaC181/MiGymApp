@@ -48,10 +48,10 @@ export default function TabsLayout() {
     if (path.includes('/Settings')) return 'Configuración';
     if (path.includes('/GrupoDetalle')) return 'Editar Rutina';
     if (path.includes('/facturacion')) return 'Facturación';
-    if (path.includes('/gestion-clases')) return 'Gestión de Clases';
-    if (path.includes('/gestion-socios')) return 'Gestión de Socios';
-    if (path.includes('/gestion-cuotas')) return 'Gestión de Cuotas';
-    if (path.includes('/socios')) return 'Socios';
+    if (path.includes('/gestion-clases')) return 'Clases';
+    if (path.includes('/gestion-socios')) return 'Socios';
+    if (path.includes('/gestion-cuotas')) return 'Cuotas';
+    // if (path.includes('/socios')) return 'Socios';
     if (path.includes('/calculadora-rpm')) return 'Calculadora 1RM';
 
     return 'Mi Gym App';
