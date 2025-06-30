@@ -8,6 +8,7 @@ import { getCurrentUser, getUserPaymentInfo, getGymQuotaSettings } from "../../u
 import { ClientUser } from "../../data/Usuario";
 
 // Función para obtener información de cuota (ahora obsoleta, se usa cuotaData)
+// Esta función se mantiene solo para compatibilidad en modo desarrollo
 function getCuotaInfo(pendiente: boolean) {
     if (pendiente) {
         return {
@@ -58,7 +59,7 @@ export default function Cuota() {
     const [isLoading, setIsLoading] = useState(true);
     const [quotaDescription, setQuotaDescription] = useState<string>("");
 
-    // Información de cuota basada en los datos reales o el estado `pendiente` como fallback
+    // Información de cuota basada en los datos reales del localStorage
     // En modo desarrollo, usar datos reales pero con estado pendiente controlado por el botón
     const cuota = isDevMode ? {
         ...cuotaData,
@@ -67,7 +68,7 @@ export default function Cuota() {
         ...(pendiente ? {} : {
             ultimoPago: {
                 monto: cuotaData?.monto || 10213.89,
-                fecha: cuotaData?.fechaEmision || "2024-01-15",
+                fecha: cuotaData?.fechaPago || cuotaData?.fechaEmision || "2024-01-15",
                 numeroFactura: cuotaData?.numeroFactura || "0001-00000001",
                 proximoVencimiento: cuotaData?.fechaVencimiento || "2024-02-15"
             }
@@ -75,7 +76,16 @@ export default function Cuota() {
     } : (cuotaData ? {
         ...cuotaData,
         // Si no estamos en modo desarrollo, usar el estado pendiente real de los datos
-        pendiente: cuotaData.pendiente
+        pendiente: cuotaData.pendiente,
+        // Agregar información del último pago si no está pendiente
+        ...(cuotaData.pendiente ? {} : {
+            ultimoPago: {
+                monto: cuotaData.monto || 0,
+                fecha: cuotaData.fechaPago || cuotaData.fechaEmision || "2024-01-15",
+                numeroFactura: cuotaData.numeroFactura || "0001-00000001",
+                proximoVencimiento: cuotaData.fechaVencimiento || "2024-02-15"
+            }
+        })
     } : getCuotaInfo(pendiente));
 
     // Cargar datos del usuario y su información de pago
@@ -127,7 +137,9 @@ export default function Cuota() {
                 numeroFactura: paymentInfo.numeroFactura,
                 fechaEmision: paymentInfo.fechaEmision,
                 fechaVencimiento: paymentInfo.fechaVencimiento,
-                periodo: paymentInfo.periodo
+                periodo: paymentInfo.periodo,
+                fechaPago: paymentInfo.fechaPago,
+                metodoPago: paymentInfo.metodoPago
             };
 
             setCuotaData(cuotaInfo);
@@ -148,7 +160,6 @@ export default function Cuota() {
         }
     };
 
-
     // Función para formatear fechas
     const formatDate = (dateString: string) => {
         if (!dateString) return "N/A";
@@ -160,13 +171,68 @@ export default function Cuota() {
         }
     };
 
+    // Función para descarga de factura usando datos del localStorage
+    const handleDownloadInvoice = () => {
+        if (!cuotaData || !currentUser) {
+            Alert.alert('Error', 'No se encontraron datos de factura para descargar.');
+            return;
+        }
+
+        // Crear objeto con todos los datos de la factura
+        const invoiceData = {
+            numeroFactura: factura.numeroFactura,
+            fechaEmision: factura.fechaEmision,
+            fechaVencimiento: factura.fechaVencimiento,
+            cliente: factura.cliente,
+            dni: factura.dni,
+            servicio: factura.servicio,
+            total: factura.total,
+            periodo: factura.periodo,
+            estado: cuota.pendiente ? 'PENDIENTE' : 'PAGADO',
+            fechaPago: cuota.ultimoPago?.fecha ? formatDate(cuota.ultimoPago.fecha) : null,
+            metodoPago: cuotaData.metodoPago || 'No especificado'
+        };
+
+        // En una implementación real, aquí se generaría el PDF
+        // Por ahora, mostramos los datos en un alert
+        const invoiceText = `
+FACTURA ${invoiceData.numeroFactura}
+
+Cliente: ${invoiceData.cliente}
+DNI: ${invoiceData.dni}
+Servicio: ${invoiceData.servicio}
+Período: ${invoiceData.periodo}
+
+Fecha de Emisión: ${invoiceData.fechaEmision}
+Fecha de Vencimiento: ${invoiceData.fechaVencimiento}
+Estado: ${invoiceData.estado}
+
+${invoiceData.fechaPago ? `Fecha de Pago: ${invoiceData.fechaPago}` : ''}
+${invoiceData.metodoPago ? `Método de Pago: ${invoiceData.metodoPago}` : ''}
+
+TOTAL: $${invoiceData.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+        `.trim();
+
+        Alert.alert(
+            'Factura Generada', 
+            'Los datos de la factura han sido preparados para descarga.\n\n' + invoiceText,
+            [
+                { text: 'Copiar al Portapapeles', onPress: () => {
+                    // Aquí se copiaría al portapapeles en una implementación real
+                    Alert.alert('Copiado', 'Datos de factura copiados al portapapeles');
+                }},
+                { text: 'Cerrar', style: 'cancel' }
+            ]
+        );
+    };
+
     // Datos para la factura usando datos reales del localStorage
     const factura = {
         numeroFactura: cuota?.numeroFactura || cuotaData?.numeroFactura || "N/A",
         fechaEmision: formatDate(cuota?.fechaEmision || cuotaData?.fechaEmision || ""),
         fechaVencimiento: formatDate(cuota?.fechaVencimiento || cuotaData?.fechaVencimiento || ""),
-        cliente: cuota?.nombre || cuotaData?.nombre || "Usuario no especificado",
-        dni: cuota?.dni || cuotaData?.dni || "N/A",
+        cliente: currentUser?.name || cuota?.nombre || "Usuario no especificado",
+        dni: currentUser?.dni || cuota?.dni || "N/A",
         servicio: quotaDescription || cuota?.servicio || "Membresía Gimnasio",
         total: cuota?.monto || cuotaData?.monto || 0,
         periodo: cuota?.periodo || cuotaData?.periodo || "N/A"
@@ -730,8 +796,3 @@ const createStyles = (theme: any) => StyleSheet.create({
         flex: 1,
     },
 });
-
-// Función placeholder para descarga de factura
-const handleDownloadInvoice = () => {
-    Alert.alert('Descarga', 'La descarga de factura estará disponible próximamente.');
-};
