@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, TouchableOpacity} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, ScrollView} from 'react-native';
 import globalStyles from '../../styles/global';
 import { useTheme } from '../../context/ThemeContext';
 import {router} from "expo-router";
@@ -97,8 +97,8 @@ const EditProfile = ({navigation}: any) => {
     };
 
     return (
-        <View style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
-            <View style={{padding: 24}}>
+        <View style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}> 
+            <ScrollView contentContainerStyle={{padding: 24}} keyboardShouldPersistTaps="handled">
                 <Text style={[globalStyles.label, { color: theme.colors.textPrimary }]}>Nombre y Apellido</Text>
                 <TextInput
                     style={[globalStyles.input, { 
@@ -191,7 +191,7 @@ const EditProfile = ({navigation}: any) => {
                         Guardar cambios
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         </View>
     );
 };
