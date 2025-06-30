@@ -12,9 +12,6 @@ import {useRouter} from "expo-router";
 import { createGlobalStyles } from "../../styles/global";
 import { useTheme } from "../../context/ThemeContext";
 import { clearSession } from "../../utils/storage";
-import TerminosModal from "../../components/TerminosModal";
-import PoliticasModal from "../../components/PoliticasModal";
-import SobreAppModal from "../../components/SobreAppModal";
 
 const Settings = () => {
 
@@ -65,17 +62,17 @@ const Settings = () => {
     const items = [
         {
             icon: aboutIcon, label: 'Sobre la app', onPress: () => {
-                setShowSobreApp(true);
+                router.push('/(tabs)/SobreApp');
             }
         },
         {
             icon: termsIcon, label: 'Términos y condiciones', onPress: () => {
-                setShowTerminos(true);
+                router.push('/(tabs)/TerminosCondiciones');
             }
         },
         {
             icon: privacyIcon, label: 'Políticas de privacidad', onPress: () => {
-                setShowPoliticas(true);
+                router.push('/(tabs)/PoliticasPrivacidad');
             }
         },
         {
@@ -164,24 +161,6 @@ const Settings = () => {
                 </View>
 
             </View>
-
-            {/* Modal de Términos y Condiciones */}
-            <TerminosModal
-                visible={showTerminos}
-                onClose={() => setShowTerminos(false)}
-            />
-
-            {/* Modal de Políticas de Privacidad */}
-            <PoliticasModal
-                visible={showPoliticas}
-                onClose={() => setShowPoliticas(false)}
-            />
-
-            {/* Modal de Sobre la App */}
-            <SobreAppModal
-                visible={showSobreApp}
-                onClose={() => setShowSobreApp(false)}
-            />
 
             {/* Modal de confirmación de logout */}
             <Modal
