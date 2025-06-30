@@ -9,7 +9,7 @@ import { handleIntegrationMercadoPago } from "../../utils/MPIntegration";
 import { getCurrentUser, getUserPaymentInfo } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
 
-// Función hardcode para verificar estados de vista
+// Función para obtener información de cuota (ahora obsoleta, se usa cuotaData)
 function getCuotaInfo(pendiente: boolean) {
     if (pendiente) {
         return {
@@ -39,13 +39,13 @@ export default function Cuota() {
     // Estado para indicar si la cuota está pendiente o no
     const [pendiente, setPendiente] = useState<boolean>(true);
 
-    // Información de cuota basada en el estado `pendiente`
-    const cuota = getCuotaInfo(pendiente);
-
     const router = useRouter();
     const [cuotaData, setCuotaData] = useState(null);
     const [currentUser, setCurrentUser] = useState<ClientUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Información de cuota basada en los datos reales o el estado `pendiente` como fallback
+    const cuota = cuotaData || getCuotaInfo(pendiente);
 
     // Cargar datos del usuario y su información de pago
     useEffect(() => {

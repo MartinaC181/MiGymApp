@@ -443,7 +443,9 @@ export default function Facturacion() {
 
                 <View style={styles.amountContainer}>
                     <Text style={styles.amountLabel}>MONTO A PAGAR</Text>
-                    <Text style={styles.amount}>$10,213.89</Text>
+                    <Text style={styles.amount}>
+                        {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '$10,213.89'}
+                    </Text>
             </View>
 
                 <TouchableOpacity 
@@ -454,7 +456,7 @@ export default function Facturacion() {
                     disabled={!isFormComplete()}
                 >
                     <Text style={globalStyles.buttonText}>
-                        PAGAR $10,213.89
+                        PAGAR {paymentInfo ? `$${paymentInfo.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}` : '$10,213.89'}
                     </Text>
                 </TouchableOpacity>
             </View>

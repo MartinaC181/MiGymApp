@@ -308,6 +308,141 @@ export const saveAvailableClasses = async (classes: any[]) => {
   }
 };
 
+// === FUNCIONES DE CUOTAS DEL GIMNASIO ===
+
+export const getGymQuotaSettings = async (gymId: string) => {
+  try {
+    const key = `@MiGymApp:gymQuota:${gymId}`;
+    const quotaSettings = await AsyncStorage.getItem(key);
+    
+    if (quotaSettings) {
+      return JSON.parse(quotaSettings);
+    }
+    
+    // Configuración por defecto
+    const defaultSettings = {
+      monto: 10213.89,
+      descripcion: "Membresía mensual del gimnasio",
+      fechaActualizacion: new Date().toISOString(),
+    };
+    
+    await AsyncStorage.setItem(key, JSON.stringify(defaultSettings));
+    return defaultSettings;
+  } catch (error) {
+    console.error("Error obteniendo configuración de cuota del gimnasio:", error);
+    return {
+      monto: 10213.89,
+      descripcion: "Membresía mensual del gimnasio",
+      fechaActualizacion: new Date().toISOString(),
+    };
+  }
+};
+
+export const updateGymQuotaSettings = async (gymId: string, quotaSettings: any) => {
+  try {
+    const key = `@MiGymApp:gymQuota:${gymId}`;
+    quotaSettings.fechaActualizacion = new Date().toISOString();
+    await AsyncStorage.setItem(key, JSON.stringify(quotaSettings));
+    
+    // Actualizar todos los clientes del gimnasio con el nuevo monto
+    const clients = await getGymClients(gymId);
+    for (const client of clients) {
+      const currentPaymentInfo = await getUserPaymentInfo(client.id);
+      currentPaymentInfo.monto = quotaSettings.monto;
+      await updateUserPaymentInfo(client.id, currentPaymentInfo);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error actualizando configuración de cuota del gimnasio:", error);
+    return false;
+  }
+};
+
+export const getGymPaymentHistory = async (gymId: string) => {
+  try {
+    const clients = await getGymClients(gymId);
+    const paymentHistory = [];
+    
+    for (const client of clients) {
+      const paymentInfo = await getUserPaymentInfo(client.id);
+      
+      // Si tiene historial de pagos, incluirlo
+      if (paymentInfo.historialPagos) {
+        paymentHistory.push(...paymentInfo.historialPagos.map((pago: any) => ({
+          ...pago,
+          clientId: client.id,
+          clientName: client.name,
+          clientEmail: client.email,
+          clientDni: client.dni || 'No especificado'
+        })));
+      }
+      
+      // Si tiene un pago completado actual, incluirlo
+      if (!paymentInfo.pendiente && paymentInfo.fechaPago) {
+        paymentHistory.push({
+          id: `current_${client.id}`,
+          clientId: client.id,
+          clientName: client.name,
+          clientEmail: client.email,
+          clientDni: client.dni || 'No especificado',
+          monto: paymentInfo.monto,
+          fechaPago: paymentInfo.fechaPago,
+          metodoPago: paymentInfo.metodoPago || 'Mercado Pago',
+          numeroFactura: paymentInfo.numeroFactura,
+          periodo: paymentInfo.periodo,
+          estado: 'completado'
+        });
+      }
+    }
+    
+    // Ordenar por fecha de pago (más recientes primero)
+    paymentHistory.sort((a, b) => new Date(b.fechaPago).getTime() - new Date(a.fechaPago).getTime());
+    
+    return paymentHistory;
+  } catch (error) {
+    console.error("Error obteniendo historial de pagos del gimnasio:", error);
+    return [];
+  }
+};
+
+export const getGymPaymentsSummary = async (gymId: string) => {
+  try {
+    const clients = await getGymClients(gymId);
+    let totalRecaudado = 0;
+    let pagosPendientes = 0;
+    let pagosCompletados = 0;
+    
+    for (const client of clients) {
+      const paymentInfo = await getUserPaymentInfo(client.id);
+      
+      if (paymentInfo.pendiente) {
+        pagosPendientes += paymentInfo.monto;
+      } else {
+        pagosCompletados++;
+        totalRecaudado += paymentInfo.monto;
+      }
+    }
+    
+    return {
+      totalClientes: clients.length,
+      totalRecaudado,
+      pagosPendientes,
+      pagosCompletados,
+      clientesConDeuda: clients.filter(c => c.isPaymentUpToDate === false).length
+    };
+  } catch (error) {
+    console.error("Error obteniendo resumen de pagos del gimnasio:", error);
+    return {
+      totalClientes: 0,
+      totalRecaudado: 0,
+      pagosPendientes: 0,
+      pagosCompletados: 0,
+      clientesConDeuda: 0
+    };
+  }
+};
+
 // === FUNCIONES DE CUOTAS Y PAGOS ===
 
 export const getUserPaymentInfo = async (userId: string) => {
@@ -316,13 +451,36 @@ export const getUserPaymentInfo = async (userId: string) => {
     const payment = await AsyncStorage.getItem(key);
     
     if (payment) {
-      return JSON.parse(payment);
+      const paymentData = JSON.parse(payment);
+      
+      // Obtener el usuario para saber a qué gimnasio pertenece
+      const user = await getCurrentUser();
+      if (user && user.role === 'client' && user.gymId) {
+        // Obtener la configuración de cuota del gimnasio
+        const gymQuotaSettings = await getGymQuotaSettings(user.gymId);
+        paymentData.monto = gymQuotaSettings.monto; // Usar el monto del gimnasio
+      }
+      
+      return paymentData;
     }
     
     // Datos por defecto si no hay información de pago
+    let defaultMonto = 10213.89;
+    
+    // Intentar obtener el monto del gimnasio si el usuario es cliente
+    const user = await getCurrentUser();
+    if (user && user.role === 'client' && user.gymId) {
+      try {
+        const gymQuotaSettings = await getGymQuotaSettings(user.gymId);
+        defaultMonto = gymQuotaSettings.monto;
+      } catch (error) {
+        console.log("No se pudo obtener configuración del gimnasio, usando monto por defecto");
+      }
+    }
+    
     const defaultPayment = {
       pendiente: true,
-      monto: 10213.89,
+      monto: defaultMonto,
       fechaVencimiento: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días desde hoy
       numeroFactura: `#${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
       fechaEmision: new Date().toISOString(),
@@ -895,3 +1053,4 @@ export const clearStopwatchState = async () => {
     console.error('Error clearing stopwatch state:', error);
   }
 };
+

@@ -105,7 +105,7 @@ export default function Navigation() {
   const gymItems = [
     { icon: 'account-group', label: 'Socios', route: '/(gimnasio)/gestion-socios' },
     { icon: 'dumbbell', label: 'Clases', route: '/(gimnasio)/gestion-clases' },
-    { icon: 'wallet', label: 'Cuota', route: '/cuota' },
+    { icon: 'wallet', label: 'Cuotas', route: '/(gimnasio)/gestion-cuotas' },
     { icon: 'account', label: 'Perfil', route: '/perfil' },
   ];
 

@@ -623,4 +623,241 @@ export default StyleSheet.create({
         lineHeight: 20,
         opacity: 0.8,
     },
+
+    // === Estilos centralizados para modales overlay ===
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: theme.spacing.lg,
+    },
+    modalCard: {
+        backgroundColor: theme.colors.background,
+        borderRadius: theme.borderRadius.lg,
+        padding: theme.spacing.lg,
+        width: '100%',
+        maxWidth: 400,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+        elevation: 12,
+    },
+
+    // === Estilos centralizados para botones ===
+    // Botones principales de acción
+    primaryButton: {
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.lg,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: theme.spacing.xs,
+    },
+    primaryButtonText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: '#FFFFFF',
+    },
+
+    // Botones secundarios
+    secondaryButton: {
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        paddingHorizontal: theme.spacing.lg,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    secondaryButtonText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+    },
+
+    // Botones de cancelar centralizados
+    centralCancelButton: {
+        flex: 1,
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    centralCancelButtonText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textSecondary,
+    },
+
+    // Botones de guardar centralizados
+    centralSaveButton: {
+        flex: 1,
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        alignItems: 'center',
+    },
+    centralSaveButtonText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: '#FFFFFF',
+    },
+
+    // Botones de cancelar con borde rojo (para casos especiales)
+    cancelButtonDanger: {
+        flex: 1,
+        marginRight: theme.spacing.sm,
+        backgroundColor: theme.colors.surface,
+        borderWidth: 2,
+        borderColor: theme.colors.error,
+        borderRadius: theme.borderRadius.md,
+        paddingVertical: theme.spacing.sm,
+        alignItems: 'center',
+    },
+    cancelButtonDangerText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.error,
+    },
+
+    // === Estilos centralizados para inputs ===
+    // Input básico
+    baseInput: {
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        backgroundColor: theme.colors.surface,
+    },
+
+    // Input con fondo blanco
+    whiteInput: {
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        backgroundColor: theme.colors.background,
+    },
+
+    // TextArea centralizado
+    centralTextAreaInput: {
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textPrimary,
+        backgroundColor: theme.colors.surface,
+        height: 100,
+        textAlignVertical: 'top',
+    },
+
+    // === Estilos centralizados para contenedores ===
+    // Contenedor de botones horizontales
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: theme.spacing.md,
+        marginTop: theme.spacing.lg,
+    },
+
+    // Contenedor de botones con margen superior extra
+    buttonsContainerXL: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: theme.spacing.md,
+        marginTop: theme.spacing.xl,
+    },
+
+    // Input container con margen
+    inputContainer: {
+        marginBottom: theme.spacing.md,
+    },
+
+    // Input container con margen grande
+    inputContainerLarge: {
+        marginBottom: theme.spacing.lg,
+    },
+
+    // === Títulos y labels centralizados ===
+    // Modal title centrado
+    modalTitleCentered: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.lg,
+        textAlign: 'center',
+    },
+
+    // Section title para formularios centralizados
+    centralFormSectionTitle: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.md,
+    },
+
+    // Input label básico
+    baseInputLabel: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.sm,
+    },
+
+    // Input label pequeño
+    smallInputLabel: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.xs,
+    },
+
+    // Required label (con asterisco rojo)
+    requiredInputLabel: {
+        fontSize: theme.typography.fontSize.small,
+        fontFamily: theme.typography.fontFamily.medium,
+        color: theme.colors.textPrimary,
+        marginBottom: theme.spacing.xs,
+    },
+    requiredLabelHighlight: {
+        color: theme.colors.error,
+    },
+
+    // === Estilos de loading y error centralizados ===
+    loadingText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.textSecondary,
+        textAlign: 'center',
+        marginTop: theme.spacing.md,
+    },
+    errorTitle: {
+        fontSize: theme.typography.fontSize.large,
+        fontFamily: theme.typography.fontFamily.bold,
+        color: theme.colors.error,
+        textAlign: 'center',
+        marginTop: theme.spacing.md,
+        marginBottom: theme.spacing.sm,
+    },
+    centralErrorText: {
+        fontSize: theme.typography.fontSize.medium,
+        fontFamily: theme.typography.fontFamily.regular,
+        color: theme.colors.error,
+        textAlign: 'center',
+    },
 }); 
