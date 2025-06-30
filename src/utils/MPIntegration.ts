@@ -11,7 +11,7 @@ export const handleIntegrationMercadoPago = async () => {
                 "category_id": "other",
                 "quantity": 1,
                 "currency_id": "ARS",
-                "unit_price": 10000
+                "unit_price": 10
             }
         ]
     }
