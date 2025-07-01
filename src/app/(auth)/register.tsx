@@ -135,6 +135,14 @@ export default function Register() {
         setError("Por favor ingresa la dirección");
         return;
       }
+      if (!dni.trim()) {
+        setError("Por favor ingresa el DNI");
+        return;
+      }
+      if (!isValidDni(dni)) {
+        setError("El DNI debe tener entre 7 y 8 dígitos, sin puntos.");
+        return;
+      }
     } else {
       if (!selectedDate) {
         setError("Por favor selecciona tu fecha de nacimiento");
