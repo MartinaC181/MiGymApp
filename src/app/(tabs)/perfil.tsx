@@ -3,7 +3,9 @@ import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityInd
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import { useTheme } from '../../context/ThemeContext';
-import { getCurrentUser, updateUserProfile } from '../../utils/storage';
+import { useUser } from '../../context/UserContext';
+// eslint-disable-next-line import/no-unresolved
+import * as ImagePicker from 'expo-image-picker';
 import { ClientUser, GymUser } from '../../data/Usuario';
 import pesoImg from '../../../assets/profile/bascula.png';
 import alturaImg from '../../../assets/profile/altura.png';
@@ -14,8 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from 'expo-linear-gradient';
-// eslint-disable-next-line import/no-unresolved
-import * as ImagePicker from 'expo-image-picker';
+import { updateUserProfile } from '../../utils/storage';
 
 const iconMap: Record<string, any> = {
     peso: pesoImg,
@@ -27,31 +28,18 @@ const iconMap: Record<string, any> = {
 const Profile = () => {
     const router = useRouter();
     const { theme, isDarkMode } = useTheme();
-    const [userData, setUserData] = useState<ClientUser | GymUser | null>(null);
+    const { user: userData, setUser, refreshUser } = useUser();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadUserData();
-        // Solicitar permisos al montar
+        // Refrescar datos del usuario desde el contexto
+        refreshUser().finally(() => setLoading(false));
         (async () => {
             await ImagePicker.requestCameraPermissionsAsync();
             await ImagePicker.requestMediaLibraryPermissionsAsync();
         })();
     }, []);
 
-
-    const loadUserData = async () => {
-        try {
-            const user = await getCurrentUser();
-            if (user) {
-                setUserData(user);
-            }
-        } catch (error) {
-            console.error('Error cargando datos del usuario:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handlePickImage = async (fromCamera: boolean) => {
         try {
@@ -61,16 +49,10 @@ const Profile = () => {
 
             if (!result.canceled && userData) {
                 const newUri = result.assets[0].uri;
-                
-                // Actualizar estado local
-                setUserData({ ...userData, avatarUri: newUri } as any);
-
-                // Usar updateUserProfile para guardar en la base de datos y actualizar la sesión
+                // Actualizar el usuario globalmente
                 const updatedUser = await updateUserProfile(userData.id, { avatarUri: newUri });
-                
                 if (updatedUser) {
-                    // Actualizar el estado local con el usuario actualizado
-                    setUserData(updatedUser);
+                    setUser(updatedUser); // Actualizar el contexto global
                 }
             }
         } catch (error) {

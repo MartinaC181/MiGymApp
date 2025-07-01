@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   Modal,
+  Pressable,
 } from "react-native";
 import { createGlobalStyles } from "../../styles/global";
 import { useTheme } from "../../context/ThemeContext";
@@ -59,6 +60,8 @@ export default function Register() {
   const [isSelectingGym, setIsSelectingGym] = useState(false);
   const [isEditingGym, setIsEditingGym] = useState(false);
   const [visibleSuccess, setVisibleSuccess] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Campos específicos para gimnasio
@@ -130,6 +133,14 @@ export default function Register() {
       }
       if (!address.trim()) {
         setError("Por favor ingresa la dirección");
+        return;
+      }
+      if (!dni.trim()) {
+        setError("Por favor ingresa el DNI");
+        return;
+      }
+      if (!isValidDni(dni)) {
+        setError("El DNI debe tener entre 7 y 8 dígitos, sin puntos.");
         return;
       }
     } else {
@@ -233,7 +244,7 @@ export default function Register() {
     }
   };
 
-  const isButtonDisabled = getButtonDisabledState();
+  const isButtonDisabled = getButtonDisabledState() || !acceptedTerms;
 
   const handleGymSelect = (gym: string) => {
     setSelectedOption(gym);
@@ -570,6 +581,74 @@ export default function Register() {
         )}
 
         {error ? <Text style={globalStyles.errorText}>{error}</Text> : null}
+
+        {/* Checkbox de aceptación de términos */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16, marginBottom: 8 }}>
+          <TouchableOpacity
+            onPress={() => setAcceptedTerms(!acceptedTerms)}
+            style={{
+              width: 24,
+              height: 24,
+              borderWidth: 2,
+              borderColor: acceptedTerms ? theme.colors.primary : '#ccc',
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 8,
+              backgroundColor: acceptedTerms ? theme.colors.primary : 'transparent',
+            }}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: acceptedTerms }}
+          >
+            {acceptedTerms && (
+              <MaterialIcons name="check" size={18} color="#fff" />
+            )}
+          </TouchableOpacity>
+          <Text style={{ color: theme.colors.textSecondary, fontSize: 14 }}>
+            Acepto los{' '}
+            <Text
+              style={{ color: theme.colors.primary, textDecorationLine: 'underline' }}
+              onPress={() => setShowTermsModal(true)}
+            >
+              Términos y Condiciones
+            </Text>
+          </Text>
+        </View>
+        {/* Modal de Términos y Condiciones */}
+        <Modal
+          visible={showTermsModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowTermsModal(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ backgroundColor: theme.colors.background, borderRadius: 16, padding: 24, width: '90%', maxHeight: '80%' }}>
+              <ScrollView showsVerticalScrollIndicator={true}>
+                <Text style={{ fontSize: 18, fontFamily: 'Roboto-Bold', color: theme.colors.textPrimary, marginBottom: 12, textAlign: 'center' }}>Términos y Condiciones</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>1. Introducción</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>Bienvenido a MiGymApp. Al utilizar nuestra aplicación, aceptas estos términos y condiciones en su totalidad. Si no estás de acuerdo con estos términos o alguna parte de estos términos, no debes utilizar nuestra aplicación.</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>2. Uso de la Aplicación</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>MiGymApp está diseñada para ayudarte a gestionar tu membresía de gimnasio, marcar asistencia y realizar seguimiento de tu progreso físico. Te comprometes a utilizar la aplicación únicamente para estos fines legítimos.</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>3. Privacidad y Datos Personales</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>Tu privacidad es importante para nosotros. Recopilamos y procesamos tus datos personales de acuerdo con nuestra Política de Privacidad. Al usar la aplicación, consientes el procesamiento de tus datos personales.</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>4. Responsabilidades del Usuario</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>Eres responsable de mantener la confidencialidad de tu cuenta y contraseña. También eres responsable de todas las actividades que ocurran bajo tu cuenta. Debes notificarnos inmediatamente de cualquier uso no autorizado.</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>5. Limitaciones de Responsabilidad</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>MiGymApp se proporciona "tal como está" sin garantías de ningún tipo. No seremos responsables por daños directos, indirectos, incidentales o consecuentes que puedan resultar del uso de la aplicación.</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>6. Modificaciones de los Términos</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en la aplicación. Es tu responsabilidad revisar periódicamente estos términos.</Text>
+                <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary, marginTop: 8 }}>7. Contacto</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginBottom: 8 }}>Si tienes alguna pregunta sobre estos términos y condiciones, puedes contactarnos a través de la aplicación o enviando un correo electrónico a nuestro equipo de soporte.</Text>
+              </ScrollView>
+              <TouchableOpacity
+                onPress={() => setShowTermsModal(false)}
+                style={{ marginTop: 16, alignSelf: 'center', backgroundColor: theme.colors.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 32 }}
+              >
+                <Text style={{ color: '#fff', fontFamily: 'Roboto-Bold', fontSize: 16 }}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <TouchableOpacity
           style={
