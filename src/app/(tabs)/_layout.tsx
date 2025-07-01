@@ -53,6 +53,7 @@ export default function TabsLayout() {
     if (path.includes('/gestion-cuotas')) return 'Cuotas';
     // if (path.includes('/socios')) return 'Socios';
     if (path.includes('/calculadora-rpm')) return 'Calculadora 1RM';
+    if (path.includes('/biblioteca-ejercicios')) return 'Biblioteca';
 
     return 'Mi Gym App';
   };

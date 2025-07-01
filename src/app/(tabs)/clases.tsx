@@ -15,7 +15,14 @@ import { useLocalSearchParams } from 'expo-router';
 import useClasesStyles from '../../styles/clases';
 import globalStyles from '../../styles/global';
 import { useTheme } from '../../context/ThemeContext';
-import { getAvailableClasses, getCurrentUser, saveUserClasses, getUserClasses } from '../../utils/storage';
+import { 
+    getAvailableClasses, 
+    getCurrentUser, 
+    saveUserClasses, 
+    getUserClasses,
+    enrollClientToClass,
+    isClientEnrolledInClass
+} from '../../utils/storage';
 
 export default function ClaseDetalle() {
     const params = useLocalSearchParams();
@@ -40,11 +47,22 @@ export default function ClaseDetalle() {
 
     const loadClaseInfo = async () => {
         try {
-            const availableClasses = await getAvailableClasses();
+            // Obtener usuario actual para cargar clases específicas del gimnasio
+            const currentUser = await getCurrentUser();
+            const availableClasses = await getAvailableClasses(currentUser);
             const foundClass = availableClasses.find(clase => clase.id === claseId);
             
             if (foundClass) {
                 setClaseInfo(foundClass);
+                
+                // Si es un usuario cliente, verificar si ya está inscrito
+                if (currentUser && currentUser.role === 'client') {
+                    const gymId = foundClass.gymId || (currentUser as any).gymId;
+                    if (gymId) {
+                        const isEnrolled = await isClientEnrolledInClass(currentUser.id, claseId, gymId);
+                        setClaseInfo(prev => ({ ...prev, isEnrolled }));
+                    }
+                }
             } else {
                 // Fallback si no se encuentra la clase
                 setClaseInfo({
@@ -88,31 +106,46 @@ export default function ClaseDetalle() {
         try {
             // Obtener usuario actual
             const currentUser = await getCurrentUser();
-            if (!currentUser) {
-                Alert.alert("Error", "Debes estar logueado para inscribirte");
+            if (!currentUser || currentUser.role !== 'client') {
+                Alert.alert("Error", "Debes estar logueado como cliente para inscribirte");
                 return;
             }
 
-            // Obtener clases del usuario
-            const userClasses = await getUserClasses(currentUser.id);
-            
-            // Crear nueva inscripción
-            const newInscription = {
-                claseId: claseId,
-                nombreClase: nombreClase,
+            // Determinar el gymId
+            const gymId = claseInfo?.gymId || (currentUser as any).gymId;
+            if (!gymId) {
+                Alert.alert("Error", "No se pudo identificar el gimnasio");
+                return;
+            }
+
+            // Verificar si ya está inscrito
+            const isAlreadyEnrolled = await isClientEnrolledInClass(currentUser.id, claseId, gymId);
+            if (isAlreadyEnrolled) {
+                Alert.alert("Atención", "Ya estás inscrito en esta clase");
+                return;
+            }
+
+            // Inscribir al cliente usando la nueva función
+            const scheduleInfo = {
                 horarios: horariosMarcados,
-                fechaInscripcion: new Date().toISOString()
+                diaSeleccionado: claseInfo?.horarios[diaSeleccionado]?.dia
             };
 
-            // Agregar nueva inscripción
-            const updatedClasses = [...userClasses, newInscription];
-            await saveUserClasses(currentUser.id, updatedClasses);
+            const result = await enrollClientToClass(currentUser.id, claseId, gymId, scheduleInfo);
+            
+            if (result.success) {
+                // Actualizar estado local
+                setClaseInfo(prev => ({ ...prev, isEnrolled: true }));
+                setSeleccionados({});
 
-            Alert.alert(
-                "Inscripción exitosa",
-                `Te has inscrito correctamente a la clase de ${nombreClase}`,
-                [{ text: "Aceptar" }]
-            );
+                Alert.alert(
+                    "Inscripción exitosa",
+                    `Te has inscrito correctamente a la clase de ${nombreClase}`,
+                    [{ text: "Aceptar" }]
+                );
+            } else {
+                Alert.alert("Error", result.message);
+            }
         } catch (error) {
             console.error("Error guardando inscripción:", error);
             Alert.alert("Error", "No se pudo completar la inscripción");
@@ -138,9 +171,9 @@ export default function ClaseDetalle() {
     return (
         <ScrollView style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
             <View style={styles.headerImage}>
-                <Image 
-                    source={{ uri: imagenClase || 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5' }} 
-                    style={styles.headerImage} 
+                <Image
+                    source={{ uri: claseInfo?.imagen }}
+                    style={styles.headerImage}
                     resizeMode="cover"
                 />
                 <View style={styles.overlay}>
@@ -213,11 +246,26 @@ export default function ClaseDetalle() {
                 
                 {/* Botón inscribirse */}
                 <TouchableOpacity 
-                    style={[globalStyles.Button, {marginTop: theme.spacing.lg}]}
+                    style={[
+                        globalStyles.Button, 
+                        {marginTop: theme.spacing.lg},
+                        claseInfo?.isEnrolled && { backgroundColor: theme.colors.success, opacity: 0.7 }
+                    ]}
                     onPress={handleInscripcion}
+                    disabled={claseInfo?.isEnrolled}
                 >
-                    <Text style={[globalStyles.buttonText, { color: '#000000' }]}>Inscribirse</Text>
+                    <Text style={[globalStyles.buttonText, { color: '#FFFFFF' }]}>
+                        {claseInfo?.isEnrolled ? 'Ya inscrito' : 'Inscribirse'}
+                    </Text>
                 </TouchableOpacity>
+                
+                {claseInfo?.isEnrolled && (
+                    <View style={{ marginTop: theme.spacing.md, padding: theme.spacing.md, backgroundColor: theme.colors.success + '20', borderRadius: theme.borderRadius.md }}>
+                        <Text style={{ color: theme.colors.success, textAlign: 'center', fontWeight: 'bold' }}>
+                            ✓ Ya estás inscrito en esta clase
+                        </Text>
+                    </View>
+                )}
             </View>
         </ScrollView>
     );

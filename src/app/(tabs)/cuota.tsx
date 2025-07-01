@@ -6,6 +6,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { createGlobalStyles } from "../../styles/global";
 import { getCurrentUser, getUserPaymentInfo, getGymQuotaSettings } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 
 // Función para obtener información de cuota (ahora obsoleta, se usa cuotaData)
 // Esta función se mantiene solo para compatibilidad en modo desarrollo
@@ -171,71 +173,152 @@ export default function Cuota() {
         }
     };
 
-    // Función para descarga de factura usando datos del localStorage
-    const handleDownloadInvoice = () => {
-        if (!cuotaData || !currentUser) {
-            Alert.alert('Error', 'No se encontraron datos de factura para descargar.');
-            return;
-        }
-
-        // Crear objeto con todos los datos de la factura
-        const invoiceData = {
-            numeroFactura: factura.numeroFactura,
-            fechaEmision: factura.fechaEmision,
-            fechaVencimiento: factura.fechaVencimiento,
-            cliente: factura.cliente,
-            dni: factura.dni,
-            servicio: factura.servicio,
-            total: factura.total,
-            periodo: factura.periodo,
-            estado: cuota.pendiente ? 'PENDIENTE' : 'PAGADO',
-            fechaPago: cuota.ultimoPago?.fecha ? formatDate(cuota.ultimoPago.fecha) : null,
-            metodoPago: cuotaData.metodoPago || 'No especificado'
-        };
-
-        // En una implementación real, aquí se generaría el PDF
-        // Por ahora, mostramos los datos en un alert
-        const invoiceText = `
-FACTURA ${invoiceData.numeroFactura}
-
-Cliente: ${invoiceData.cliente}
-DNI: ${invoiceData.dni}
-Servicio: ${invoiceData.servicio}
-Período: ${invoiceData.periodo}
-
-Fecha de Emisión: ${invoiceData.fechaEmision}
-Fecha de Vencimiento: ${invoiceData.fechaVencimiento}
-Estado: ${invoiceData.estado}
-
-${invoiceData.fechaPago ? `Fecha de Pago: ${invoiceData.fechaPago}` : ''}
-${invoiceData.metodoPago ? `Método de Pago: ${invoiceData.metodoPago}` : ''}
-
-TOTAL: $${invoiceData.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
-        `.trim();
-
-        Alert.alert(
-            'Factura Generada', 
-            'Los datos de la factura han sido preparados para descarga.\n\n' + invoiceText,
-            [
-                { text: 'Copiar al Portapapeles', onPress: () => {
-                    // Aquí se copiaría al portapapeles en una implementación real
-                    Alert.alert('Copiado', 'Datos de factura copiados al portapapeles');
-                }},
-                { text: 'Cerrar', style: 'cancel' }
-            ]
-        );
-    };
-
     // Datos para la factura usando datos reales del localStorage
     const factura = {
         numeroFactura: cuota?.numeroFactura || cuotaData?.numeroFactura || "N/A",
         fechaEmision: formatDate(cuota?.fechaEmision || cuotaData?.fechaEmision || ""),
         fechaVencimiento: formatDate(cuota?.fechaVencimiento || cuotaData?.fechaVencimiento || ""),
         cliente: currentUser?.name || cuota?.nombre || "Usuario no especificado",
-        dni: currentUser?.dni || cuota?.dni || "N/A",
+        dni: currentUser?.dni || cuota?.dni || "No especificado",
         servicio: quotaDescription || cuota?.servicio || "Membresía Gimnasio",
         total: cuota?.monto || cuotaData?.monto || 0,
         periodo: cuota?.periodo || cuotaData?.periodo || "N/A"
+    };
+
+
+
+    // Restaurar la función handleDownloadInvoice original:
+    const handleDownloadInvoice = async () => {
+        if (!cuotaData || !currentUser) {
+            Alert.alert('Error', 'No se encontraron datos de factura para descargar.');
+            return;
+        }
+
+        // HTML estético para la factura
+        const html = `
+            <html>
+                <head>
+                    <meta charset="utf-8" />
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 24px;
+                            background: #f7f7f7;
+                        }
+                        .container {
+                            background: #fff;
+                            border-radius: 12px;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+                            max-width: 480px;
+                            margin: 0 auto;
+                            padding: 32px 24px;
+                        }
+                        .header {
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: 24px;
+                        }
+                        .icon {
+                            font-size: 40px;
+                            color: #1976d2;
+                            margin-right: 12px;
+                        }
+                        .title {
+                            font-size: 28px;
+                            font-weight: bold;
+                            color: #1976d2;
+                        }
+                        .section {
+                            margin-bottom: 18px;
+                        }
+                        .label {
+                            font-weight: bold;
+                            color: #333;
+                        }
+                        .value {
+                            color: #444;
+                        }
+                        .total {
+                            font-size: 22px;
+                            font-weight: bold;
+                            color: #1976d2;
+                            margin-top: 24px;
+                            text-align: right;
+                        }
+                        .footer {
+                            margin-top: 32px;
+                            font-size: 12px;
+                            color: #888;
+                            text-align: center;
+                        }
+                        hr {
+                            border: none;
+                            border-top: 1px solid #eee;
+                            margin: 24px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <span class="icon">🧾</span>
+                            <span class="title">Factura</span>
+                        </div>
+                        <hr />
+                        <div class="section">
+                            <span class="label">N° de Factura:</span>
+                            <span class="value">${factura.numeroFactura}</span>
+                        </div>
+                        <div class="section">
+                            <span class="label">Cliente:</span>
+                            <span class="value">${factura.cliente}</span>
+                        </div>
+                        <div class="section">
+                            <span class="label">DNI:</span>
+                            <span class="value">${factura.dni}</span>
+                        </div>
+                        <div class="section">
+                            <span class="label">Servicio:</span>
+                            <span class="value">${factura.servicio}</span>
+                        </div>
+                        <div class="section">
+                            <span class="label">Período:</span>
+                            <span class="value">${factura.periodo}</span>
+                        </div>
+                        <div class="section">
+                            <span class="label">Fecha de Emisión:</span>
+                            <span class="value">${factura.fechaEmision}</span>
+                        </div>
+                        <div class="section">
+                            <span class="label">Fecha de Vencimiento:</span>
+                            <span class="value">${factura.fechaVencimiento}</span>
+                        </div>
+                        <hr />
+                        <div class="total">
+                            TOTAL: $${factura.total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                        </div>
+                        <div class="footer">
+                            Generado por MiGymApp &middot; ${new Date().toLocaleDateString("es-AR")}
+                        </div>
+                    </div>
+                </body>
+            </html>
+        `;
+
+        try {
+            // Genera el PDF
+            const { uri } = await Print.printToFileAsync({ html, base64: false });
+
+            // Comparte el PDF (esto abre el diálogo de compartir/guardar PDF)
+            await Sharing.shareAsync(uri, {
+                mimeType: 'application/pdf',
+                dialogTitle: 'Compartir factura',
+                UTI: 'com.adobe.pdf'
+            });
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo generar o compartir el PDF.');
+        }
     };
 
     if (isLoading) {
@@ -423,14 +506,6 @@ TOTAL: $${invoiceData.total.toLocaleString("es-AR", { minimumFractionDigits: 2 }
                                         {cuota.ultimoPago?.proximoVencimiento ? formatDate(cuota.ultimoPago.proximoVencimiento) : "15/02/2024"}
                                     </Text>
                                 </View>
-
-                                <TouchableOpacity 
-                                    style={styles.downloadButton}
-                                    onPress={handleDownloadInvoice}
-                                >
-                                    <MaterialIcons name="download" size={20} color={theme.colors.background} />
-                                    <Text style={styles.downloadButtonText}>DESCARGAR FACTURA</Text>
-                                </TouchableOpacity>
                             </View>
                         </>
                     )}

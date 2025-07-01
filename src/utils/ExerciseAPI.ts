@@ -155,6 +155,11 @@ class ExerciseDBService {
 
   async getExercisesByMuscleGroup(muscleGroup: string): Promise<Exercise[]> {
     try {
+      // Si el grupo muscular no es uno de los predefinidos, no llames a la API.
+      if (!BODY_PART_MAPPING[muscleGroup]) {
+        return [];
+      }
+
       // Verificar cache primero
       const cachedExercises = await this.getCachedExercises(muscleGroup);
       if (cachedExercises) {

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image, Switch, TouchableOpacity, Share, Alert, Modal} from 'react-native';
+import {View, Text, StyleSheet, Image, Switch, TouchableOpacity, Share, Alert, Modal, ScrollView} from 'react-native';
 
 import modeIcon from '../../../assets/settings/modoscuro.png';
 import changeIcon from '../../../assets/settings/llave.png';
@@ -93,74 +93,76 @@ const Settings = () => {
 
     return (
         <View style={globalStyles.safeArea}>
-            <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
 
-                <Text style={[styles.groupTitle, { color: theme.colors.textSecondary }]}> Configuración general</Text>
+                    <Text style={[styles.groupTitle, { color: theme.colors.textSecondary }]}> Configuración general</Text>
 
-                <View style={styles.row}>
-                    <View style={styles.rowLeft}>
-                        <Image 
-                            source={modeIcon} 
-                            style={[
-                                styles.icon, 
-                                { tintColor: isDarkMode ? '#ffffff' : undefined }
-                            ]}
-                        />
-                        <Text style={[styles.label, { color: theme.colors.textPrimary }]}> Modo</Text>
-                    </View>
-
-                    <Switch
-                        value={isDarkMode} 
-                        onValueChange={toggleTheme}
-                        trackColor={{false: '#767577', true: '#81b0ff'}}
-                        thumbColor={isDarkMode ? '#f5dd4b' : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
-                    />
-                </View>
-
-                <Text style={[styles.rowDescription, { color: theme.colors.textSecondary }]}>Claro u oscuro</Text>
-
-                <TouchableOpacity style={styles.row} onPress={() => router.push('/reset-password')}>
-                    <View style={styles.rowLeft}>
-                        <Image 
-                            source={changeIcon} 
-                            style={[
-                                styles.icon, 
-                                { tintColor: isDarkMode ? '#ffffff' : undefined }
-                            ]}
-                        />
-                        <Text style={[styles.label, { color: theme.colors.textPrimary }]}>Cambiar contraseña</Text>
-
-                    </View>
-                    <MaterialCommunityIcons name="chevron-right" size={24} color={theme.colors.textSecondary}/>
-
-                </TouchableOpacity>
-
-                <Text style={[styles.groupTitle, {marginTop: theme.spacing.lg, color: theme.colors.textSecondary}]}>Información</Text>
-                {items.map((item) => (
-                    <TouchableOpacity key={item.label} style={styles.row} onPress={item.onPress}>
+                    <View style={styles.row}>
                         <View style={styles.rowLeft}>
                             <Image 
-                                source={item.icon} 
+                                source={modeIcon} 
                                 style={[
                                     styles.icon, 
                                     { tintColor: isDarkMode ? '#ffffff' : undefined }
-                                ]}
+                            ]}
                             />
-                            <Text style={[styles.label, { color: theme.colors.textPrimary }]}>{item.label}</Text>
+                            <Text style={[styles.label, { color: theme.colors.textPrimary }]}> Modo</Text>
+                        </View>
+
+                        <Switch
+                            value={isDarkMode} 
+                            onValueChange={toggleTheme}
+                            trackColor={{false: '#767577', true: '#81b0ff'}}
+                            thumbColor={isDarkMode ? '#f5dd4b' : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                        />
+                    </View>
+
+                    <Text style={[styles.rowDescription, { color: theme.colors.textSecondary }]}>Claro u oscuro</Text>
+
+                    <TouchableOpacity style={styles.row} onPress={() => router.push('/reset-password')}>
+                        <View style={styles.rowLeft}>
+                            <Image 
+                                source={changeIcon} 
+                                style={[
+                                    styles.icon, 
+                                    { tintColor: isDarkMode ? '#ffffff' : undefined }
+                            ]}
+                            />
+                            <Text style={[styles.label, { color: theme.colors.textPrimary }]}>Cambiar contraseña</Text>
+
                         </View>
                         <MaterialCommunityIcons name="chevron-right" size={24} color={theme.colors.textSecondary}/>
-                    </TouchableOpacity>))
-                }
 
-                {/* Botón Cerrar sesión */}
-                <View style={[styles.logoutContainer, {marginTop: theme.spacing.xl}]}>
-                    <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.colors.primary }]} onPress={() => setShowLogoutModal(true)}>
-                        <Text style={[styles.logoutButtonText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>Cerrar sesión</Text>
                     </TouchableOpacity>
-                </View>
 
-            </View>
+                    <Text style={[styles.groupTitle, {marginTop: theme.spacing.lg, color: theme.colors.textSecondary}]}>Información</Text>
+                    {items.map((item) => (
+                        <TouchableOpacity key={item.label} style={styles.row} onPress={item.onPress}>
+                            <View style={styles.rowLeft}>
+                                <Image 
+                                    source={item.icon} 
+                                    style={[
+                                        styles.icon, 
+                                        { tintColor: isDarkMode ? '#ffffff' : undefined }
+                                    ]}
+                                />
+                                <Text style={[styles.label, { color: theme.colors.textPrimary }]}>{item.label}</Text>
+                            </View>
+                            <MaterialCommunityIcons name="chevron-right" size={24} color={theme.colors.textSecondary}/>
+                        </TouchableOpacity>))
+                    }
+
+                    {/* Botón Cerrar sesión */}
+                    <View style={[styles.logoutContainer, {marginTop: theme.spacing.xl}]}>
+                        <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.colors.primary }]} onPress={() => setShowLogoutModal(true)}>
+                            <Text style={[styles.logoutButtonText, { color: '#FFFFFF' }]}>Cerrar sesión</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+            </ScrollView>
 
             {/* Modal de confirmación de logout */}
             <Modal
@@ -229,7 +231,6 @@ const Settings = () => {
                     </View>
                 </View>
             </Modal>
-
         </View>
     )
         ;

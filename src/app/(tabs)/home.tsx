@@ -13,6 +13,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import styles, { CARD_WIDTH, CARD_SPACING } from "../../styles/home";
 import globalStyles from "../../styles/global";
 import Racha from "../../components/Racha";
+import MisClases from "../../components/MisClases";
 import theme from "../../constants/theme";
 import { getCurrentUser, getAvailableClasses } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
@@ -59,13 +60,13 @@ export default function Home() {
 
     const loadData = async () => {
         try {
-            // Cargar clases disponibles
-            const availableClases = await getAvailableClasses();
-            setClases(availableClases);
-
-            // Cargar usuario actual
+            // Cargar usuario actual primero
             const user = await getCurrentUser() as ClientUser;
+
+            // Cargar clases disponibles basadas en el usuario
+            const clases = await getAvailableClasses(user);
             setCurrentUser(user);
+            setClases(clases);
         } catch (error) {
             console.error("Error cargando datos del home:", error);
         }
@@ -134,8 +135,14 @@ export default function Home() {
         return "Usuario";
     };
 
+    // Envuelve todo el contenido en un ScrollView vertical para permitir desplazamiento
     return (
-        <View style={[globalStyles.container, styles.homeContainer, { backgroundColor: currentTheme.colors.background }]}>
+        <ScrollView
+            style={{ flex: 1, backgroundColor: currentTheme.colors.background }}
+            contentContainerStyle={[styles.homeContainer, { paddingBottom: theme.spacing.xl }]}
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
+        >
             <View style={styles.greetingContainer}>
                 <Text style={[styles.greeting, { color: currentTheme.colors.primary }]}>Hola, <Text style={[styles.name, { color: currentTheme.colors.primary }]}>{getUserName()}!</Text></Text>
                 <Text style={[styles.subGreeting, { color: currentTheme.colors.textSecondary }]}>¿Listo para entrenar?</Text>
@@ -145,6 +152,9 @@ export default function Home() {
             <View style={styles.rachaContainer}>
                 <Racha />
             </View>
+
+            {/* Mis Clases */}
+            <MisClases />
 
             {/* Contenedor relativo para posicionar las sugerencias */}
             <View style={styles.searchWrapper}>
@@ -239,7 +249,7 @@ export default function Home() {
                         key={clase.id} 
                         style={index === filteredClases.length - 1 ? styles.lastCardContainer : styles.cardContainer}
                     >
-                        <View style={[styles.card, { 
+                        <View style={[styles.cardShadow, {
                             shadowColor: isDarkMode ? "#000" : "#000",
                             backgroundColor: isDarkMode ? "#2A2A2A" : "#000",
                             borderWidth: isDarkMode ? 1 : 0,
@@ -248,35 +258,37 @@ export default function Home() {
                             shadowOpacity: isDarkMode ? 0.3 : 0.2,
                             shadowRadius: isDarkMode ? 8 : 6,
                             elevation: isDarkMode ? 10 : 6
-                        }]}>
-                            <Image
-                                source={{ uri: clase.imagen }}
-                                style={styles.cardImage}
-                            />
-                            <View style={[styles.cardOverlay, { 
-                                backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.4)'
-                            }]} />
-                            <View style={styles.cardContent}>
-                                <Text style={[styles.cardTitle, { 
-                                    color: isDarkMode ? '#E0E0E0' : currentTheme.colors.background,
-                                    textShadowColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
-                                    textShadowOffset: { width: 1, height: 1 },
-                                    textShadowRadius: isDarkMode ? 4 : 3
-                                }]}>{clase.nombre}</Text>
-                                <TouchableOpacity 
-                                    style={[styles.verMasButton, { 
-                                        backgroundColor: isDarkMode ? 'rgba(0, 191, 255, 0.95)' : 'rgba(0, 191, 255, 0.9)',
-                                        shadowColor: isDarkMode ? "#000" : "#000",
-                                        shadowOffset: { width: 0, height: 2 },
-                                        shadowOpacity: isDarkMode ? 0.4 : 0.25,
-                                        shadowRadius: isDarkMode ? 6 : 4,
-                                        elevation: isDarkMode ? 8 : 4
-                                    }]}
-                                    onPress={() => handleVerMas(clase)}
-                                >
-                                    <Text style={[styles.verMasText, { color: currentTheme.colors.background }]}>Ver más</Text>
-                                    <MaterialIcons name="keyboard-arrow-down" size={20} color={currentTheme.colors.background} />
-                                </TouchableOpacity>
+                        }]}> 
+                            <View style={styles.card}>
+                                <Image
+                                    source={{ uri: clase.imagen }}
+                                    style={styles.cardImage}
+                                />
+                                <View style={[styles.cardOverlay, { 
+                                    backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.4)'
+                                }]} />
+                                <View style={styles.cardContent}>
+                                    <Text style={[styles.cardTitle, { 
+                                        color: isDarkMode ? '#E0E0E0' : currentTheme.colors.background,
+                                        textShadowColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
+                                        textShadowOffset: { width: 1, height: 1 },
+                                        textShadowRadius: isDarkMode ? 4 : 3
+                                    }]}>{clase.nombre}</Text>
+                                    <TouchableOpacity 
+                                        style={[styles.verMasButton, { 
+                                            backgroundColor: isDarkMode ? 'rgba(0, 191, 255, 0.95)' : 'rgba(0, 191, 255, 0.9)',
+                                            shadowColor: isDarkMode ? "#000" : "#000",
+                                            shadowOffset: { width: 0, height: 2 },
+                                            shadowOpacity: isDarkMode ? 0.4 : 0.25,
+                                            shadowRadius: isDarkMode ? 6 : 4,
+                                            elevation: isDarkMode ? 8 : 4
+                                        }]}
+                                        onPress={() => handleVerMas(clase)}
+                                    >
+                                        <Text style={[styles.verMasText, { color: currentTheme.colors.background }]}>Ver más</Text>
+                                        <MaterialIcons name="keyboard-arrow-down" size={20} color={currentTheme.colors.background} />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
                     </View>
@@ -305,7 +317,7 @@ export default function Home() {
                     </Text>
                 </View>
             )}
-        </View>
+        </ScrollView>
     );
 }
 

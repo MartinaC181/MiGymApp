@@ -13,6 +13,7 @@ import { createGlobalStyles } from "../../styles/global";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import React from "react";
+import { getCurrentUser, updateUserProfile } from "../../utils/storage";
 
 export default function ResetPassword() {
   const { theme } = useTheme();
@@ -23,13 +24,18 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [visibleSuccess, setVisibleSuccess] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!password || !confirmPassword) {
       setError("Por favor, complete ambos campos.");
     } else if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
     } else {
       setError("");
+      // Actualizar la contraseña en el storage
+      const user = await getCurrentUser();
+      if (user) {
+        await updateUserProfile(user.id, { password });
+      }
       setVisibleSuccess(true);
 
     }

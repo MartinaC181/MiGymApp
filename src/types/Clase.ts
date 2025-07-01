@@ -6,6 +6,7 @@ export interface Clase {
     diasHorarios: { [key: string]: string[] };
     activa: boolean;
     cupoMaximo: number;
+    imagen?: string; // URI de la imagen o require
 }
 
 // Tipos para el formulario

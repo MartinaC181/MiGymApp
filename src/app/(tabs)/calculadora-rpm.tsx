@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import globalStyles from '../../styles/global';
+import homeStyles from '../../styles/home';
 import { useTheme } from '../../context/ThemeContext';
 
 // Fórmulas de 1RM más utilizadas
@@ -128,40 +129,22 @@ export default function CalculadoraRPM() {
   };
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
     scrollContent: {
-      padding: theme.spacing.lg,
-      paddingBottom: 100,
-    },
-    header: {
-      alignItems: 'center',
-      marginBottom: theme.spacing.xl,
-    },
-    headerTitle: {
-      fontSize: theme.typography.fontSize.title,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.textPrimary,
-      marginTop: theme.spacing.sm,
-    },
-    headerSubtitle: {
-      fontSize: theme.typography.fontSize.medium,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      marginTop: theme.spacing.xs,
+      paddingBottom: 32,
     },
     inputSection: {
-      backgroundColor: theme.colors.background,
+      marginHorizontal: 24,
       borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.lg,
       marginBottom: theme.spacing.lg,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
+      overflow: 'hidden',
+    },
+    inputGradient: {
+      padding: theme.spacing.lg,
     },
     inputContainer: {
       marginBottom: theme.spacing.lg,
@@ -178,7 +161,7 @@ export default function CalculadoraRPM() {
       borderWidth: 1,
       borderColor: theme.colors.border,
       borderRadius: theme.borderRadius.md,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.background,
     },
     input: {
       flex: 1,
@@ -202,10 +185,11 @@ export default function CalculadoraRPM() {
       gap: theme.spacing.xs,
     },
     clearButtonText: {
-      color: theme.colors.textSecondary,
+      color: theme.colors.textPrimary,
       fontSize: theme.typography.fontSize.medium,
     },
     averageSection: {
+      marginHorizontal: 24,
       marginBottom: theme.spacing.lg,
     },
     averageGradient: {
@@ -242,6 +226,7 @@ export default function CalculadoraRPM() {
       flexWrap: 'wrap',
     },
     resultsSection: {
+      marginHorizontal: 24,
       marginBottom: theme.spacing.lg,
     },
     sectionTitle: {
@@ -291,6 +276,7 @@ export default function CalculadoraRPM() {
       color: theme.colors.textSecondary,
     },
     intensitySection: {
+      marginHorizontal: 24,
       backgroundColor: theme.colors.background,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
@@ -341,6 +327,7 @@ export default function CalculadoraRPM() {
       color: theme.colors.textSecondary,
     },
     notesSection: {
+      marginHorizontal: 24,
       marginBottom: theme.spacing.lg,
     },
     noteCard: {
@@ -367,6 +354,7 @@ export default function CalculadoraRPM() {
       lineHeight: 18,
     },
     infoSection: {
+      marginHorizontal: 24,
       alignItems: 'center',
       padding: theme.spacing.xl,
     },
@@ -387,8 +375,9 @@ export default function CalculadoraRPM() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[globalStyles.safeArea, { flex: 1, backgroundColor: theme.colors.background }]}>
       <ScrollView 
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -402,53 +391,61 @@ export default function CalculadoraRPM() {
           />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <MaterialCommunityIcons name="calculator" size={32} color={theme.colors.primary} />
-          <Text style={styles.headerTitle}>Calculadora 1RM</Text>
-          <Text style={styles.headerSubtitle}>
+        {/* Header Section - usando estilos unificados */}
+        <View style={homeStyles.greetingContainer}>
+          <Text style={homeStyles.greeting}>
+            Calculadora 1RM
+          </Text>
+          <Text style={[homeStyles.subGreeting, { color: theme.colors.textSecondary }]}>
             Calcula tu repetición máxima estimada
           </Text>
         </View>
 
         {/* Inputs */}
         <View style={styles.inputSection}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>PESO LEVANTADO (kg)</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                value={peso}
-                onChangeText={(text) => setPeso(validarEntrada(text, 'peso'))}
-                placeholder="Ej: 80"
-                placeholderTextColor="#999"
-                keyboardType="decimal-pad"
-                maxLength={6}
-              />
-              <Text style={styles.inputUnit}>kg</Text>
+          <LinearGradient
+            colors={isDarkMode ? ['#10344A', '#0C2434'] : ['#b3dcec', '#EAF7FF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.inputGradient}
+          >
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>PESO LEVANTADO (kg)</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.input}
+                  value={peso}
+                  onChangeText={(text) => setPeso(validarEntrada(text, 'peso'))}
+                  placeholder="Ej: 80"
+                  placeholderTextColor="#999"
+                  keyboardType="decimal-pad"
+                  maxLength={6}
+                />
+                <Text style={styles.inputUnit}>kg</Text>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>REPETICIONES REALIZADAS</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                value={repeticiones}
-                onChangeText={(text) => setRepeticiones(validarEntrada(text, 'reps'))}
-                placeholder="Ej: 8"
-                placeholderTextColor="#999"
-                keyboardType="number-pad"
-                maxLength={2}
-              />
-              <Text style={styles.inputUnit}>reps</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>REPETICIONES REALIZADAS</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.input}
+                  value={repeticiones}
+                  onChangeText={(text) => setRepeticiones(validarEntrada(text, 'reps'))}
+                  placeholder="Ej: 8"
+                  placeholderTextColor="#999"
+                  keyboardType="number-pad"
+                  maxLength={2}
+                />
+                <Text style={styles.inputUnit}>reps</Text>
+              </View>
             </View>
-          </View>
 
-          <TouchableOpacity style={styles.clearButton} onPress={limpiarCampos}>
-            <MaterialIcons name="clear" size={20} color={theme.colors.textSecondary} />
-            <Text style={styles.clearButtonText}>Limpiar</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.clearButton} onPress={limpiarCampos}>
+              <MaterialIcons name="clear" size={20} color={theme.colors.textPrimary} />
+              <Text style={styles.clearButtonText}>Limpiar</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
 
         {/* Resultados */}
@@ -553,7 +550,7 @@ export default function CalculadoraRPM() {
             </Text>
           </View>
         )}
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </View>
   );
 } 

@@ -12,6 +12,7 @@ import {
 } from "@expo-google-fonts/roboto";
 
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
+import { UserProvider } from "../context/UserContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -55,7 +56,9 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
     </ThemeProvider>
   );
 }

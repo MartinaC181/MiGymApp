@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         marginBottom: theme.spacing.md,
     },
     greeting: {
-        fontSize: theme.typography.fontSize.large,
+        fontSize: theme.typography.fontSize.title,
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.primary,
     },
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
         marginRight: CARD_SPACING,
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: theme.spacing.md,
     },
     // Último card sin margen derecho
     lastCardContainer: {
@@ -67,19 +68,26 @@ const styles = StyleSheet.create({
         marginRight: 0,
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: theme.spacing.md,
     },
-    card: {
+    // Contenedor con sombra (no oculta overflow)
+    cardShadow: {
         width: '100%',
         height: 320,
         borderRadius: theme.borderRadius.lg,
-        overflow: 'hidden',
-        position: 'relative',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.5,
         shadowRadius: 6,
-        elevation: 6,
+        elevation: 10,
         backgroundColor: '#000',
+    },
+    // Card interna que recorta la imagen y el contenido
+    card: {
+        flex: 1,
+        borderRadius: theme.borderRadius.lg,
+        overflow: 'hidden',
+        position: 'relative',
     },
     cardImage: {
         width: '100%',

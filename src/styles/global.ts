@@ -125,7 +125,7 @@ export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.creat
     elevation: 6,
   },
   buttonText: {
-    color: theme.colors.background === '#0A0A0A' ? '#FFFFFF' : theme.colors.background,
+    color: '#FFFFFF',
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.bold,
     textTransform: "uppercase",
@@ -612,7 +612,7 @@ export const createGlobalStyles = (theme: typeof lightTheme) => StyleSheet.creat
   modalButtonSecondaryText: {
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.medium,
-    color: theme.colors.textSecondary,
+    color: '#FFFFFF',
   },
   modalButtonPrimary: {
     paddingVertical: theme.spacing.sm,

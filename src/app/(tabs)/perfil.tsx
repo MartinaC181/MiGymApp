@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Alert} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import { useTheme } from '../../context/ThemeContext';
-import { getCurrentUser } from '../../utils/storage';
+import { useUser } from '../../context/UserContext';
+// eslint-disable-next-line import/no-unresolved
+import * as ImagePicker from 'expo-image-picker';
 import { ClientUser, GymUser } from '../../data/Usuario';
 import pesoImg from '../../../assets/profile/bascula.png';
 import alturaImg from '../../../assets/profile/altura.png';
@@ -14,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from 'expo-linear-gradient';
+import { updateUserProfile } from '../../utils/storage';
 
 const iconMap: Record<string, any> = {
     peso: pesoImg,
@@ -25,37 +28,61 @@ const iconMap: Record<string, any> = {
 const Profile = () => {
     const router = useRouter();
     const { theme, isDarkMode } = useTheme();
-    const [userData, setUserData] = useState<ClientUser | GymUser | null>(null);
+    const { user: userData, setUser, refreshUser } = useUser();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadUserData();
+        // Refrescar datos del usuario desde el contexto
+        refreshUser().finally(() => setLoading(false));
+        (async () => {
+            await ImagePicker.requestCameraPermissionsAsync();
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+        })();
     }, []);
 
-    const loadUserData = async () => {
+
+    const handlePickImage = async (fromCamera: boolean) => {
         try {
-            const user = await getCurrentUser();
-            if (user) {
-                setUserData(user);
+            const result = fromCamera
+                ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 })
+                : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.6 });
+
+            if (!result.canceled && userData) {
+                const newUri = result.assets[0].uri;
+                // Actualizar el usuario globalmente
+                const updatedUser = await updateUserProfile(userData.id, { avatarUri: newUri });
+                if (updatedUser) {
+                    setUser(updatedUser); // Actualizar el contexto global
+                }
             }
         } catch (error) {
-            console.error('Error cargando datos del usuario:', error);
-        } finally {
-            setLoading(false);
+            console.error('Error seleccionando imagen:', error);
         }
+    };
+
+    const openPickerMenu = () => {
+        Alert.alert(
+            'Foto de perfil',
+            'Selecciona una opción',
+            [
+                { text: 'Cámara', onPress: () => handlePickImage(true) },
+                { text: 'Galería', onPress: () => handlePickImage(false) },
+                { text: 'Cancelar', style: 'cancel' },
+            ],
+        );
     };
 
     // Si es un usuario de gimnasio, mostrar el perfil de gimnasio
     if (userData?.role === 'gym') {
-        return <GymProfileView gymData={userData as GymUser} />;
+        return <GymProfileView gymData={userData} />;
     }
 
     // Usar datos del estado o valores por defecto para clientes
-    const name = (userData as ClientUser)?.name || 'Sin nombre';
-    const email = (userData as ClientUser)?.email || 'Sin correo';
-    const weight = (userData as ClientUser)?.weight || '0';
-    const idealWeight = (userData as ClientUser)?.idealWeight || '0';
-    const height = (userData as ClientUser)?.height || '0';
+    const name = userData?.name || 'Sin nombre';
+    const email = userData?.email || 'Sin correo';
+    const weight = (userData as any)?.weight || '0';
+    const idealWeight = (userData as any)?.idealWeight || '0';
+    const height = (userData as any)?.height || '0';
 
     const imc = (parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2)).toFixed(2);
     const heightInMeters = (parseFloat(height) / 100).toFixed(2);
@@ -77,17 +104,16 @@ const Profile = () => {
         >
             <View style={[globalStyles.container, { backgroundColor: theme.colors.background }]}>
                 {/* Contenedor para avatar, nombre y email */}
-                <View style={[styles.profileSection, { 
-                    backgroundColor: theme.colors.surface,
-                    shadowColor: isDarkMode ? '#ffffff' : '#000000',
-                    shadowOpacity: isDarkMode ? 0.1 : 0.1
-                }]}>
+                <View style={styles.profileSection}>
                     {/* Avatar con fondo y botón de edición*/}
-                    <View style={[styles.avatarWrapper, { backgroundColor: theme.colors.surface }]}>
-                        <Image source={perfilMirtho} style={styles.avatar}/>
+                    <View style={styles.avatarWrapper}>
+                        <Image
+                            source={userData && (userData as any).avatarUri ? { uri: (userData as any).avatarUri } : perfilMirtho}
+                            style={styles.avatar}
+                        />
                         <TouchableOpacity 
-                            style={[styles.editIcon, { backgroundColor: theme.colors.primary, borderColor: theme.colors.surface }]}
-                            onPress={() => router.push('EditProfile')}>
+                            style={[styles.editIcon, { backgroundColor: theme.colors.primary, borderColor: theme.colors.background }]}
+                            onPress={openPickerMenu}>
                             <MaterialCommunityIcons name="pencil" size={16} color="white"/>
                         </TouchableOpacity>
                     </View>
@@ -109,19 +135,19 @@ const Profile = () => {
                         icon="altura" 
                         label="Altura" 
                         value={`${heightInMeters || '---'} m`} 
-                        gradientColors={theme.colors.gradient2} 
+                        gradientColors={theme.colors.gradient1} 
                     />
                     <InfoBox 
                         icon="ideal" 
                         label="Peso ideal" 
                         value={`${idealWeight || '---'} kg`} 
-                        gradientColors={theme.colors.gradient3} 
+                        gradientColors={theme.colors.gradient1} 
                     />
                     <InfoBox 
                         icon="imc" 
                         label="IMC" 
                         value={`${imc || '---'}`} 
-                        gradientColors={theme.colors.gradient4} 
+                        gradientColors={theme.colors.gradient1} 
                         onPress={() => router.push({
                             pathname: '/Imc',
                             params: { weight, height }
@@ -142,11 +168,11 @@ const Profile = () => {
                     ]}
                     onPress={() => router.push('EditProfile')}
                 >
-                    <Text style={[globalStyles.buttonText, { color: '#000000' }]}>Editar</Text>
+                    <Text style={[globalStyles.buttonText, { color: '#FFFFFF' }]}>Editar</Text>
                 </TouchableOpacity>
 
                 {/* Botón para ver perfil del gimnasio */}
-                {(userData as ClientUser)?.gymId && (
+                {(userData as any)?.gymId && (
                     <TouchableOpacity 
                         style={[styles.gymButton, { 
                             width: 280, 
@@ -172,7 +198,7 @@ const Profile = () => {
 };
 
 // Componente para mostrar el perfil de gimnasio
-const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
+const GymProfileView = ({ gymData }: { gymData: any }) => {
     const router = useRouter();
     const { theme, isDarkMode } = useTheme();
 
@@ -255,15 +281,13 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
             flex: 1,
         },
         infoCardTitle: {
-            fontSize: theme.typography.fontSize.small,
-            fontFamily: theme.typography.fontFamily.medium,
-            color: 'rgba(255,255,255,0.8)',
+            fontSize: 13,
+            fontFamily: 'Roboto-Regular',
             marginBottom: 2,
         },
         infoCardValue: {
-            fontSize: theme.typography.fontSize.medium,
-            fontFamily: theme.typography.fontFamily.bold,
-            color: 'white',
+            fontSize: 16,
+            fontFamily: 'Roboto-Bold',
         },
         infoCardChevron: {
             marginLeft: 'auto',
@@ -302,15 +326,13 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
             padding: theme.spacing.md,
         },
         statCardValue: {
-            fontSize: theme.typography.fontSize.title,
-            fontFamily: theme.typography.fontFamily.bold,
-            color: 'white',
+            fontSize: 16,
+            fontFamily: 'Roboto-Bold',
             marginTop: theme.spacing.xs,
         },
         statCardTitle: {
-            fontSize: theme.typography.fontSize.small,
-            fontFamily: theme.typography.fontFamily.medium,
-            color: 'rgba(255,255,255,0.8)',
+            fontSize: 13,
+            fontFamily: 'Roboto-Regular',
             marginTop: 2,
         },
         planCard: {
@@ -376,7 +398,7 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
                             icon="phone" 
                             title="Teléfono" 
                             value={gymData.phone}
-                            gradientColors={theme.colors.gradient2}
+                            gradientColors={theme.colors.gradient1}
                         />
                     )}
                     
@@ -384,7 +406,7 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
                         icon="email" 
                         title="Email" 
                         value={gymData.email}
-                        gradientColors={theme.colors.gradient3}
+                        gradientColors={theme.colors.gradient1}
                     />
                 </View>
 
@@ -406,13 +428,13 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
                             icon="account-group" 
                             title="Clientes" 
                             value={`${getClientCount()}`}
-                            gradientColors={theme.colors.gradient4}
+                            gradientColors={theme.colors.gradient1}
                         />
                         <StatCard 
                             icon="dumbbell" 
                             title="Clases" 
                             value={`${getClassCount()}`}
-                            gradientColors={theme.colors.gradient5}
+                            gradientColors={theme.colors.gradient1}
                         />
                     </View>
                 </View>
@@ -464,16 +486,16 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
                     colors={gradientColors}
                     style={styles.infoCardGradient}
                     start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
+                    end={{ x: 1, y: 0 }}
                 >
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={24} 
-                        color="white" 
+                        color={theme.colors.primary} 
                     />
                     <View style={styles.infoCardContent}>
-                        <Text style={styles.infoCardTitle}>{title}</Text>
-                        <Text style={styles.infoCardValue}>{value}</Text>
+                        <Text style={[styles.infoCardTitle, { color: theme.colors.textSecondary }]}>{title}</Text>
+                        <Text style={[styles.infoCardValue, { color: theme.colors.textPrimary }]}>{value}</Text>
                     </View>
                 </LinearGradient>
             </View>
@@ -493,15 +515,15 @@ const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
                     colors={gradientColors}
                     style={styles.statCardGradient}
                     start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
+                    end={{ x: 1, y: 0 }}
                 >
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={32} 
-                        color="white" 
+                        color={theme.colors.primary} 
                     />
-                    <Text style={styles.statCardValue}>{value}</Text>
-                    <Text style={styles.statCardTitle}>{title}</Text>
+                    <Text style={[styles.statCardValue, { color: theme.colors.textPrimary }]}>{value}</Text>
+                    <Text style={[styles.statCardTitle, { color: theme.colors.textSecondary }]}>{title}</Text>
                 </LinearGradient>
             </View>
         );
@@ -514,34 +536,38 @@ const InfoBox = ({icon, value, label, gradientColors, onPress}: {
     label: string;
     gradientColors: [string, string];
     onPress?: () => void;
-}) => (
-    <TouchableOpacity 
-        style={styles.box} 
-        onPress={onPress}
-        activeOpacity={onPress ? 0.8 : 1}
-    >
-        <LinearGradient
-            colors={gradientColors}
-            style={styles.boxGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+}) => {
+    const { isDarkMode, theme } = useTheme();
+    
+    return (
+        <TouchableOpacity 
+            style={styles.box} 
+            onPress={onPress}
+            activeOpacity={onPress ? 0.8 : 1}
         >
-            <View style={styles.iconCircle}>
-                <Image source={iconMap[icon]} style={styles.iconImage}/>
-            </View>
-            <Text style={styles.boxValue}>{value}</Text>
-            <Text style={styles.boxLabel}>{label}</Text>
-            {onPress && (
-                <MaterialCommunityIcons 
-                    name="chevron-right" 
-                    size={16} 
-                    color="rgba(255,255,255,0.8)" 
-                    style={styles.chevronIcon}
-                />
-            )}
-        </LinearGradient>
-    </TouchableOpacity>
-);
+            <LinearGradient
+                colors={isDarkMode ? ['#10344A', '#0C2434'] : ['#b3dcec', '#EAF7FF']}
+                style={styles.boxGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+            >
+                <View style={[styles.iconCircle, { backgroundColor: theme.colors.primary }]}>
+                    <Image source={iconMap[icon]} style={styles.iconImage}/>
+                </View>
+                <Text style={[styles.boxValue, { color: theme.colors.textPrimary }]}>{value}</Text>
+                <Text style={[styles.boxLabel, { color: theme.colors.textSecondary }]}>{label}</Text>
+                {onPress && (
+                    <MaterialCommunityIcons 
+                        name="chevron-right" 
+                        size={16} 
+                        color={theme.colors.textSecondary} 
+                        style={styles.chevronIcon}
+                    />
+                )}
+            </LinearGradient>
+        </TouchableOpacity>
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -566,7 +592,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         width: 110,
         height: 110,
-        borderRadius: 55,
     },
     avatar: {
         width: 100,
@@ -620,7 +645,6 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
-        backgroundColor: 'rgba(255,255,255,0.2)',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 4,
@@ -632,18 +656,16 @@ const styles = StyleSheet.create({
         tintColor: 'white',
     },
     boxValue: {
-        fontSize: 20,
+        fontSize: 16,
         fontFamily: 'Roboto-Bold',
-        color: 'white',
         marginTop: 4,
         textShadowColor: 'rgba(0,0,0,0.3)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
     },
     boxLabel: {
-        fontSize: 12,
-        fontFamily: 'Roboto-Medium',
-        color: 'rgba(255,255,255,0.9)',
+        fontSize: 13,
+        fontFamily: 'Roboto-Regular',
         marginTop: 4,
     },
     boxGradient: {
@@ -683,11 +705,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 24,
-        padding: 24,
-        borderRadius: 16,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 12,
-        elevation: 8,
         width: '100%',
         maxWidth: 320,
     },

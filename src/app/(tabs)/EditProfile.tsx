@@ -1,38 +1,39 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, TouchableOpacity, ScrollView} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert} from 'react-native';
 import globalStyles from '../../styles/global';
 import { useTheme } from '../../context/ThemeContext';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateUserProfile } from '../../utils/storage';
+// eslint-disable-next-line import/no-unresolved
+import * as ImagePicker from 'expo-image-picker';
+import { useUser } from '../../context/UserContext';
 
 const EditProfile = ({navigation}: any) => {
     const { theme, isDarkMode } = useTheme();
+    const { user, setUser, refreshUser } = useUser();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [weight, setWeight] = useState('');
     const [idealWeight, setIdealWeight] = useState('');
     const [height, setHeight] = useState('');
     const [dni, setDni] = useState('');
+    const [avatarUri, setAvatarUri] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Cargar datos del usuario actual
+    // Cargar datos del usuario actual desde el contexto
     useEffect(() => {
-        loadUserData();
-    }, []);
-
-    const loadUserData = async () => {
-        const userData = await AsyncStorage.getItem('@MiGymApp:currentUser');
-        const user = userData ? JSON.parse(userData) : null;
         if (user) {
             setName(user.name || '');
             setEmail(user.email || '');
-            setWeight(user.weight?.toString() || '');
-            setIdealWeight(user.idealWeight?.toString() || '');
-            setHeight(user.height?.toString() || '');
-            setDni(user.dni?.toString() || '');
+            setWeight((user as any).weight?.toString() || '');
+            setIdealWeight((user as any).idealWeight?.toString() || '');
+            setHeight((user as any).height?.toString() || '');
+            setDni((user as any).dni?.toString() || '');
+            setAvatarUri((user as any).avatarUri || null);
         }
-    };
+    }, [user]);
 
     const validateEmail = (email: string) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -79,21 +80,68 @@ const EditProfile = ({navigation}: any) => {
         if (hasError) return;
         setIsLoading(true);
         try {
+            if (!user) {
+                throw new Error('No se pudo obtener el usuario actual');
+            }
             const updates = {
                 name,
                 email,
                 weight,
                 idealWeight,
                 height,
-                dni
+                dni,
+                avatarUri,
             };
-            await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
-            router.push('/perfil');
+            // Usar updateUserProfile para guardar en la base de datos y actualizar la sesión
+            const updatedUser = await updateUserProfile(user.id, updates);
+            if (updatedUser) {
+                setUser(updatedUser); // Actualizar el contexto global
+                router.push('/perfil');
+            } else {
+                throw new Error('No se pudo actualizar el perfil');
+            }
         } catch (error) {
             console.error('Error guardando perfil:', error);
+            Alert.alert('Error', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // ------------------  Imagen de perfil ------------------ //
+    const requestPermissions = async () => {
+        await ImagePicker.requestCameraPermissionsAsync();
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+    };
+
+    useEffect(() => {
+        requestPermissions();
+    }, []);
+
+    const handlePickImage = async (fromCamera: boolean) => {
+        try {
+            const result = fromCamera
+                ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 })
+                : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.6 });
+
+            if (!result.canceled) {
+                setAvatarUri(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Error al seleccionar imagen:', error);
+        }
+    };
+
+    const openPickerMenu = () => {
+        Alert.alert(
+            'Foto de perfil',
+            'Selecciona una opción',
+            [
+                { text: 'Cámara', onPress: () => handlePickImage(true) },
+                { text: 'Galería', onPress: () => handlePickImage(false) },
+                { text: 'Cancelar', style: 'cancel' },
+            ],
+        );
     };
 
     return (
@@ -187,7 +235,7 @@ const EditProfile = ({navigation}: any) => {
                     style={[globalStyles.LoginButton, { backgroundColor: theme.colors.primary }]} 
                     onPress={handleSave} 
                     disabled={isLoading}>
-                    <Text style={[globalStyles.buttonText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>
+                    <Text style={[globalStyles.buttonText, { color: '#FFFFFF' }]}>
                         Guardar cambios
                     </Text>
                 </TouchableOpacity>
