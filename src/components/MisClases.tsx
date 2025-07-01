@@ -3,7 +3,13 @@ import { View, Text, TouchableOpacity, Animated, StyleSheet, Alert } from 'react
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
-import { getCurrentUser, getUserClasses, saveUserClasses } from '../utils/storage';
+import { 
+  getCurrentUser, 
+  getUserClasses, 
+  saveUserClasses,
+  getClientEnrolledClassesWithDetails,
+  cancelEnrollment
+} from '../utils/storage';
 import { useRouter } from 'expo-router';
 
 interface Clase {
@@ -25,9 +31,20 @@ const MisClases: React.FC = () => {
     const cargarClases = async () => {
       try {
         const user = await getCurrentUser();
-        if (user) {
-          const stored = await getUserClasses(user.id);
-          setClases(stored);
+        if (user && user.role === 'client') {
+          // Cargar clases usando el nuevo sistema de inscripciones
+          const enrolledClasses = await getClientEnrolledClassesWithDetails(user.id);
+          
+          // Mantener compatibilidad con el sistema anterior
+          const legacyClasses = await getUserClasses(user.id);
+          
+          // Combinar ambos sistemas y eliminar duplicados
+          const allClasses = [...enrolledClasses, ...legacyClasses];
+          const uniqueClasses = allClasses.filter((clase, index, self) => 
+            index === self.findIndex(c => c.id === clase.id || c.claseId === clase.claseId)
+          );
+          
+          setClases(uniqueClasses);
         }
       } catch (error) {
         console.error('Error cargando clases:', error);
@@ -68,10 +85,25 @@ const MisClases: React.FC = () => {
   const darseDeBaja = async (claseId: number | string) => {
     try {
       const user = await getCurrentUser();
-      if (!user) return;
-      const filtradas = clases.filter(c => c.claseId !== claseId);
+      if (!user || user.role !== 'client') return;
+      
+      // Encontrar la clase para obtener el gymId
+      const clase = clases.find(c => c.id === claseId || c.claseId === claseId);
+      const gymId = clase?.gymId || clase?.enrollmentInfo?.gymId || (user as any).gymId;
+      
+      if (gymId) {
+        // Cancelar inscripción usando el nuevo sistema
+        const result = await cancelEnrollment(user.id, Number(claseId), gymId);
+        if (result.success) {
+          console.log('Inscripción cancelada exitosamente');
+        }
+      }
+      
+      // Mantener compatibilidad con el sistema anterior
+      const filtradas = clases.filter(c => c.claseId !== claseId && c.id !== claseId);
       await saveUserClasses(user.id, filtradas);
       setClases(filtradas);
+      
     } catch (error) {
       console.error('Error al darse de baja:', error);
     }

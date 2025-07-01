@@ -60,13 +60,13 @@ export default function Home() {
 
     const loadData = async () => {
         try {
-            // Cargar clases disponibles
-            const availableClases = await getAvailableClasses();
-            setClases(availableClases);
-
-            // Cargar usuario actual
+            // Cargar usuario actual primero
             const user = await getCurrentUser() as ClientUser;
             setCurrentUser(user);
+
+            // Cargar clases disponibles basadas en el usuario
+            const availableClases = await getAvailableClasses(user);
+            setClases(availableClases);
         } catch (error) {
             console.error("Error cargando datos del home:", error);
         }

@@ -227,8 +227,27 @@ export const getUserClasses = async (userId: string) => {
 
 // === FUNCIONES DE CLASES DISPONIBLES ===
 
-export const getAvailableClasses = async () => {
+export const getAvailableClasses = async (currentUser?: ClientUser | GymUser | null) => {
   try {
+    // Si es un usuario cliente y tiene gymId, obtener las clases de su gimnasio
+    if (currentUser && currentUser.role === 'client' && (currentUser as ClientUser).gymId) {
+      const clientUser = currentUser as ClientUser;
+      const gymClasses = await getGymClasses(clientUser.gymId!);
+      
+      // Si el gimnasio tiene clases, convertirlas al formato esperado y retornarlas
+      if (gymClasses && gymClasses.length > 0) {
+        const formattedClasses = gymClasses
+          .filter((clase: any) => clase.activa) // Solo clases activas
+          .map((clase: any) => convertGymClassToHomeFormat(clase));
+        
+        // Si hay clases del gimnasio, retornarlas
+        if (formattedClasses.length > 0) {
+          return formattedClasses;
+        }
+      }
+    }
+    
+    // Fallback: obtener clases por defecto si no hay clases del gimnasio o no es cliente
     const classes = await AsyncStorage.getItem('@MiGymApp:availableClasses');
     if (classes) {
       return JSON.parse(classes);
@@ -301,6 +320,87 @@ export const getAvailableClasses = async () => {
     console.error("Error obteniendo clases disponibles:", error);
     return [];
   }
+};
+
+// Nueva función para convertir las clases del gimnasio al formato esperado por el home
+const convertGymClassToHomeFormat = (gymClass: any) => {
+  // Mapeo de días de la semana
+  const diasMap: { [key: string]: string } = {
+    lunes: "Lunes",
+    martes: "Martes",
+    miercoles: "Miércoles",
+    jueves: "Jueves",
+    viernes: "Viernes",
+    sabado: "Sábado",
+    domingo: "Domingo"
+  };
+
+  // Generar imagen por defecto basada en el nombre de la clase
+  const getDefaultImage = (nombre: string): string => {
+    const nombreLower = nombre.toLowerCase();
+    
+    if (nombreLower.includes('funcional') || nombreLower.includes('hit') || nombreLower.includes('hiit')) {
+      return "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('crossfit') || nombreLower.includes('cross')) {
+      return "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('yoga')) {
+      return "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('spinning') || nombreLower.includes('bike') || nombreLower.includes('ciclo')) {
+      return "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('pilates')) {
+      return "https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('boxeo') || nombreLower.includes('box')) {
+      return "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('natacion') || nombreLower.includes('aqua')) {
+      return "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('zumba') || nombreLower.includes('baile')) {
+      return "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('pesas') || nombreLower.includes('musculacion') || nombreLower.includes('fuerza')) {
+      return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    if (nombreLower.includes('cardio') || nombreLower.includes('aerobico')) {
+      return "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+    }
+    
+    // Imagen por defecto genérica para ejercicio
+    return "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+  };
+
+  // Convertir diasHorarios del gimnasio al formato esperado por el home
+  const horarios = Object.entries(gymClass.diasHorarios || {})
+    .filter(([dia, horarios]) => Array.isArray(horarios) && horarios.length > 0)
+    .map(([dia, horarios]) => ({
+      dia: diasMap[dia] || dia.charAt(0).toUpperCase() + dia.slice(1),
+      horas: (horarios as string[]).map(horario => {
+        // Convertir formato "08:00-10:00" a "08:00 a 10:00"
+        if (horario.includes('-')) {
+          const [inicio, fin] = horario.split('-');
+          return `${inicio} a ${fin}`;
+        }
+        return horario;
+      })
+    }));
+
+  return {
+    id: gymClass.id,
+    nombre: gymClass.nombre,
+    imagen: gymClass.imagen || getDefaultImage(gymClass.nombre),
+    descripcion: gymClass.descripcion,
+    horarios: horarios,
+    cupoMaximo: gymClass.cupoMaximo,
+    activa: gymClass.activa,
+    // Información adicional del gimnasio
+    isGymClass: true,
+    gymId: gymClass.gymId
+  };
 };
 
 export const saveAvailableClasses = async (classes: any[]) => {
@@ -745,8 +845,14 @@ export const getGymClasses = async (gymUserId: string) => {
 
 export const addGymClass = async (gymUserId: string, newClass: any) => {
   try {
+    // Asegurar que la clase incluya el gymId
+    const classWithGymId = {
+      ...newClass,
+      gymId: gymUserId
+    };
+    
     const existingClasses = await getGymClasses(gymUserId);
-    const updatedClasses = [...existingClasses, newClass];
+    const updatedClasses = [...existingClasses, classWithGymId];
     return await saveGymClasses(gymUserId, updatedClasses);
   } catch (error) {
     console.error("Error agregando clase del gimnasio:", error);
@@ -756,9 +862,15 @@ export const addGymClass = async (gymUserId: string, newClass: any) => {
 
 export const updateGymClass = async (gymUserId: string, classId: number, updatedClass: any) => {
   try {
+    // Asegurar que la clase actualizada incluya el gymId
+    const classWithGymId = {
+      ...updatedClass,
+      gymId: gymUserId
+    };
+    
     const existingClasses = await getGymClasses(gymUserId);
     const updatedClasses = existingClasses.map((clase: any) => 
-      clase.id === classId ? updatedClass : clase
+      clase.id === classId ? classWithGymId : clase
     );
     return await saveGymClasses(gymUserId, updatedClasses);
   } catch (error) {
@@ -1056,6 +1168,116 @@ export const clearStopwatchState = async () => {
     await AsyncStorage.removeItem('@MiGymApp:stopwatchState');
   } catch (error) {
     console.error('Error clearing stopwatch state:', error);
+  }
+};
+
+// === FUNCIONES DE INSCRIPCIONES A CLASES ===
+
+// Función para inscribir a un cliente a una clase específica
+export const enrollClientToClass = async (clientId: string, classId: number, gymId: string, scheduleInfo?: any) => {
+  try {
+    const key = `@MiGymApp:clientEnrollments:${clientId}`;
+    const enrollments = await AsyncStorage.getItem(key);
+    const currentEnrollments = enrollments ? JSON.parse(enrollments) : [];
+    
+    // Verificar si ya está inscrito en esta clase
+    const isAlreadyEnrolled = currentEnrollments.some((enrollment: any) => 
+      enrollment.classId === classId && enrollment.gymId === gymId
+    );
+    
+    if (isAlreadyEnrolled) {
+      return { success: false, message: 'Ya estás inscrito en esta clase' };
+    }
+    
+    // Agregar nueva inscripción
+    const newEnrollment = {
+      classId,
+      gymId,
+      enrollmentDate: new Date().toISOString(),
+      scheduleInfo: scheduleInfo || null,
+      status: 'active'
+    };
+    
+    currentEnrollments.push(newEnrollment);
+    await AsyncStorage.setItem(key, JSON.stringify(currentEnrollments));
+    
+    return { success: true, message: 'Inscripción exitosa' };
+  } catch (error) {
+    console.error('Error inscribiendo cliente a clase:', error);
+    return { success: false, message: 'Error al procesar la inscripción' };
+  }
+};
+
+// Función para obtener las inscripciones de un cliente
+export const getClientEnrollments = async (clientId: string) => {
+  try {
+    const key = `@MiGymApp:clientEnrollments:${clientId}`;
+    const enrollments = await AsyncStorage.getItem(key);
+    return enrollments ? JSON.parse(enrollments) : [];
+  } catch (error) {
+    console.error('Error obteniendo inscripciones del cliente:', error);
+    return [];
+  }
+};
+
+// Función para cancelar inscripción a una clase
+export const cancelEnrollment = async (clientId: string, classId: number, gymId: string) => {
+  try {
+    const key = `@MiGymApp:clientEnrollments:${clientId}`;
+    const enrollments = await AsyncStorage.getItem(key);
+    const currentEnrollments = enrollments ? JSON.parse(enrollments) : [];
+    
+    // Filtrar la inscripción a cancelar
+    const updatedEnrollments = currentEnrollments.filter((enrollment: any) => 
+      !(enrollment.classId === classId && enrollment.gymId === gymId)
+    );
+    
+    await AsyncStorage.setItem(key, JSON.stringify(updatedEnrollments));
+    return { success: true, message: 'Inscripción cancelada' };
+  } catch (error) {
+    console.error('Error cancelando inscripción:', error);
+    return { success: false, message: 'Error al cancelar la inscripción' };
+  }
+};
+
+// Función para verificar si un cliente está inscrito en una clase
+export const isClientEnrolledInClass = async (clientId: string, classId: number, gymId: string) => {
+  try {
+    const enrollments = await getClientEnrollments(clientId);
+    return enrollments.some((enrollment: any) => 
+      enrollment.classId === classId && enrollment.gymId === gymId && enrollment.status === 'active'
+    );
+  } catch (error) {
+    console.error('Error verificando inscripción:', error);
+    return false;
+  }
+};
+
+// Función para obtener las clases en las que está inscrito un cliente con detalles completos
+export const getClientEnrolledClassesWithDetails = async (clientId: string) => {
+  try {
+    const enrollments = await getClientEnrollments(clientId);
+    const enrolledClasses = [];
+    
+    for (const enrollment of enrollments) {
+      if (enrollment.status === 'active') {
+        // Obtener las clases del gimnasio correspondiente
+        const gymClasses = await getGymClasses(enrollment.gymId);
+        const classDetails = gymClasses.find((clase: any) => clase.id === enrollment.classId);
+        
+        if (classDetails) {
+          enrolledClasses.push({
+            ...classDetails,
+            enrollmentInfo: enrollment
+          });
+        }
+      }
+    }
+    
+    return enrolledClasses;
+  } catch (error) {
+    console.error('Error obteniendo clases inscritas con detalles:', error);
+    return [];
   }
 };
 

@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     TextInput,
     Switch,
-    Alert
+    Alert,
+    Image
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +16,7 @@ import { Clase, ClaseFormData, diasSemana } from '../types/Clase';
 import theme from '../constants/theme';
 import styles from '../styles/gestion-gimnasio';
 import globalStyles from '../styles/global';
+import * as ImagePicker from 'expo-image-picker';
 
 interface ClassFormModalProps {
     visible: boolean;
@@ -51,6 +53,7 @@ export default function ClassFormModal({
     const [horarioFin, setHorarioFin] = useState('22:00');
     const [duracionClase, setDuracionClase] = useState('60'); // en minutos
     const [diasFlexibles, setDiasFlexibles] = useState<{ [key: string]: boolean }>({});
+    const [imagen, setImagen] = useState<string | null>(null);
 
     // Resetear formulario cuando se abre/cierra el modal
     useEffect(() => {
@@ -78,6 +81,7 @@ export default function ClassFormModal({
                     horariosInput: horariosConfig
                 });
                 setModalidadClase('personalizada');
+                setImagen(editingClass.imagen || null);
             } else {
                 // Resetear formulario para nueva clase
                 setFormData({
@@ -93,6 +97,7 @@ export default function ClassFormModal({
                 setHorarioFin('22:00');
                 setDuracionClase('60');
                 setDiasFlexibles({});
+                setImagen(null);
             }
         }
     }, [visible, editingClass]);
@@ -266,7 +271,8 @@ export default function ClassFormModal({
             descripcion: formData.descripcion.trim(),
             cupoMaximo: parseInt(formData.cupoMaximo),
             activa: formData.activa,
-            diasHorarios
+            diasHorarios,
+            imagen: imagen || require('../../assets/icon.png'),
         };
         
         onSave(clase);
@@ -355,6 +361,46 @@ export default function ClassFormModal({
                                 />
                                 {errors.nombre && (
                                     <Text style={styles.errorText}>{errors.nombre}</Text>
+                                )}
+                            </View>
+
+                            <View style={{ marginBottom: 16 }}>
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        const result = await ImagePicker.launchImageLibraryAsync({
+                                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                                            allowsEditing: true,
+                                            quality: 0.7,
+                                        });
+                                        if (!result.canceled && result.assets && result.assets.length > 0) {
+                                            setImagen(result.assets[0].uri);
+                                        }
+                                    }}
+                                    style={{
+                                        backgroundColor: '#e0e0e0',
+                                        padding: 10,
+                                        borderRadius: 8,
+                                        alignItems: 'center',
+                                        marginBottom: 8,
+                                    }}
+                                >
+                                    <Text style={{ color: '#333' }}>
+                                        {imagen ? 'Cambiar imagen' : 'Seleccionar imagen (opcional)'}
+                                    </Text>
+                                </TouchableOpacity>
+                                {imagen && (
+                                    <Image
+                                        source={{ uri: imagen }}
+                                        style={{ width: 120, height: 80, borderRadius: 8, alignSelf: 'center' }}
+                                        resizeMode="cover"
+                                    />
+                                )}
+                                {!imagen && (
+                                    <Image
+                                        source={require('../../assets/icon.png')}
+                                        style={{ width: 60, height: 60, borderRadius: 12, alignSelf: 'center', opacity: 0.5 }}
+                                        resizeMode="contain"
+                                    />
                                 )}
                             </View>
 
