@@ -93,7 +93,6 @@ export default function GrupoDetalle() {
       '¿Cómo deseas agregar un ejercicio?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Desde biblioteca', onPress: () => router.push('/biblioteca-ejercicios') },
         { text: 'Crear ejercicio', onPress: () => setShowCreateExerciseModal(true) },
       ]
     );

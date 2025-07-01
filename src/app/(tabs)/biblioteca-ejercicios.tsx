@@ -320,6 +320,7 @@ export default function BibliotecaEjercicios() {
           </View>
           
           <View style={styles.cardActions}>
+            {/*
             <TouchableOpacity
               style={[styles.addBtn, { backgroundColor: theme.colors.primary }]}
               onPress={() => addToRoutine(ejercicio)}
@@ -327,6 +328,7 @@ export default function BibliotecaEjercicios() {
               <MaterialIcons name="add" size={14} color="white" />
               <Text style={styles.addBtnText}>Agregar</Text>
             </TouchableOpacity>
+            */}
           </View>
         </View>
       </TouchableOpacity>
