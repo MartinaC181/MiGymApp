@@ -24,6 +24,7 @@ import {
   getGymNames,
   getGymUserByBusinessName,
   addGymClient,
+  getRegisteredGyms,
 } from "../../utils/storage";
 
 function isValidEmail(email: string) {
@@ -188,6 +189,14 @@ export default function Register() {
         // Recargar lista de gimnasios para futuros registros de clientes
         await reloadGyms();
       } else {
+        // Buscar el id real del gimnasio seleccionado
+        let gymId: string | undefined = undefined;
+        if (selectedOption) {
+          const gyms = await getRegisteredGyms();
+          const gym = gyms.find(g => g.businessName.trim().toLowerCase() === selectedOption.trim().toLowerCase());
+          gymId = gym ? gym.id : undefined;
+        }
+
         const newClientUser: ClientUser = {
           id: newUserId,
           email,
@@ -197,15 +206,15 @@ export default function Register() {
           weeklyGoal: 3,
           attendance: [],
           weeklyStreak: 0,
-          gymId: selectedOption || undefined,
+          gymId: gymId,
           birthDate: selectedDate?.toISOString() || undefined,
           dni: dni,
         };
 
         await saveUser(newClientUser);
-        if (selectedOption) {
+        if (gymId) {
           // Asociar cliente al gimnasio
-          const gym = await getGymUserByBusinessName(selectedOption);
+          const gym = await getRegisteredGyms().then(gs => gs.find(g => g.id === gymId));
           if (gym) {
             // Actualizar lista de IDs en el usuario gym
             const updatedGym: GymUser = {
@@ -213,7 +222,6 @@ export default function Register() {
               clients: [...(gym.clients || []), newClientUser.id],
             };
             await saveUser(updatedGym);
-
             // Guardar datos completos del cliente en la lista de clientes del gimnasio
             await addGymClient(gym.id, newClientUser);
           }
