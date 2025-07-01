@@ -118,23 +118,21 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
               </View>
             </View>
           </ScrollView>
-          {onAddToRoutine && (
-            <View style={styles(theme).exerciseModalActions}>
-              <TouchableOpacity style={styles(theme).addToRoutineBtn} onPress={() => onAddToRoutine(exercise)}>
-                <LinearGradient 
-                  colors={
-                    Array.isArray(theme.colors.gradient1) && theme.colors.gradient1.length >= 2
-                      ? (theme.colors.gradient1 as [string, string, ...string[]])
-                      : ['#007AFF', '#00C6FF']
-                  }
-                  style={styles(theme).addToRoutineBtnGradient}
-                >
-                  <MaterialIcons name="add" size={20} color="white" />
-                  <Text style={styles(theme).addToRoutineBtnText}>Agregar a Rutina</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          )}
+          {/*
+          <TouchableOpacity style={styles(theme).addToRoutineBtn} onPress={() => onAddToRoutine(exercise)}>
+            <LinearGradient 
+              colors={
+                Array.isArray(theme.colors.gradient1) && theme.colors.gradient1.length >= 2
+                  ? (theme.colors.gradient1 as [string, string, ...string[]])
+                  : ['#007AFF', '#00C6FF']
+              }
+              style={styles(theme).addToRoutineBtnGradient}
+            >
+              <MaterialIcons name="add" size={20} color="white" />
+              <Text style={styles(theme).addToRoutineBtnText}>Agregar a Rutina</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          */}
         </View>
       </View>
     </Modal>
