@@ -491,7 +491,7 @@ const GymProfileView = ({ gymData }: { gymData: any }) => {
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={24} 
-                        color={theme.colors.primary} 
+                        color="white" 
                     />
                     <View style={styles.infoCardContent}>
                         <Text style={[styles.infoCardTitle, { color: theme.colors.textSecondary }]}>{title}</Text>
@@ -520,7 +520,7 @@ const GymProfileView = ({ gymData }: { gymData: any }) => {
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={32} 
-                        color={theme.colors.primary} 
+                        color="white" 
                     />
                     <Text style={[styles.statCardValue, { color: theme.colors.textPrimary }]}>{value}</Text>
                     <Text style={[styles.statCardTitle, { color: theme.colors.textSecondary }]}>{title}</Text>

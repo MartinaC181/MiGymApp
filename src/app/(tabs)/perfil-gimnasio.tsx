@@ -518,7 +518,7 @@ const GymProfile = () => {
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={24} 
-                        color={theme.colors.primary} 
+                        color="white" 
                     />
                     <View style={styles.infoCardContent}>
                         <Text style={styles.infoCardTitle}>{title}</Text>
@@ -528,7 +528,7 @@ const GymProfile = () => {
                         <MaterialCommunityIcons 
                             name="chevron-right" 
                             size={20} 
-                            color={theme.colors.textSecondary} 
+                            color="white" 
                             style={styles.infoCardChevron}
                         />
                     )}
@@ -555,7 +555,7 @@ const GymProfile = () => {
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={32} 
-                        color={theme.colors.primary} 
+                        color="white" 
                     />
                     <Text style={styles.statCardValue}>{value}</Text>
                     <Text style={styles.statCardTitle}>{title}</Text>
