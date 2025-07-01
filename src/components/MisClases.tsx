@@ -182,7 +182,12 @@ const MisClases: React.FC = () => {
                 >
                   <TouchableOpacity 
                     style={styles.claseInfo} 
-                    onPress={() => router.push({ pathname: '/clases', params: { id: clase.claseId, nombre: clase.nombreClase }})}
+                    onPress={() => {
+                      const classIdParam = (clase.claseId ?? clase.id).toString();
+                      const nombreParam = clase.nombre || clase.nombreClase;
+                      const imagenParam = clase.imagen ?? undefined;
+                      router.push({ pathname: '/clases', params: { id: classIdParam, nombre: nombreParam, imagen: imagenParam } });
+                    }}
                     activeOpacity={0.7}
                   >
                     <View style={[styles.claseIconContainer, { backgroundColor: isDarkMode ? '#00BFFF20' : '#00BFFF10' }]}>
@@ -197,7 +202,24 @@ const MisClases: React.FC = () => {
                         {clase.nombre || clase.nombreClase || 'Clase'}
                       </Text>
                       <Text style={[styles.claseHorario, { color: theme.colors.textSecondary }]}>
-                        {clase.horarios?.join(', ') || 'Horarios no definidos'}
+                        {(() => {
+                          // 1) Horarios seleccionados por el usuario en la inscripción
+                          const inscritos = clase.enrollmentInfo?.scheduleInfo?.horarios;
+                          if (inscritos && inscritos.length > 0) {
+                            return inscritos.join(', ');
+                          }
+                          // 2) Si la clase tiene array simple de strings
+                          if (Array.isArray(clase.horarios) && typeof clase.horarios[0] === 'string') {
+                            return clase.horarios.join(', ');
+                          }
+                          // 3) Si la clase tiene array de objetos {dia, horas}
+                          if (Array.isArray(clase.horarios) && typeof clase.horarios[0] === 'object') {
+                            const primera = clase.horarios[0];
+                            // Mostrar primer día y primer horario a modo resumen
+                            return `${primera.dia}-${primera.horas?.[0] || ''}`;
+                          }
+                          return 'Horarios no definidos';
+                        })()}
                       </Text>
                     </View>
                   </TouchableOpacity>

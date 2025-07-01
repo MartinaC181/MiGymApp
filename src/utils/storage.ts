@@ -229,31 +229,7 @@ export const getUserClasses = async (userId: string) => {
 
 export const getAvailableClasses = async (currentUser?: ClientUser | GymUser | null) => {
   try {
-    // Si es un usuario cliente y tiene gymId, obtener las clases de su gimnasio
-    if (currentUser && currentUser.role === 'client' && (currentUser as ClientUser).gymId) {
-      const clientUser = currentUser as ClientUser;
-      const gymClasses = await getGymClasses(clientUser.gymId!);
-      
-      // Si el gimnasio tiene clases, convertirlas al formato esperado y retornarlas
-      if (gymClasses && gymClasses.length > 0) {
-        const formattedClasses = gymClasses
-          .filter((clase: any) => clase.activa) // Solo clases activas
-          .map((clase: any) => convertGymClassToHomeFormat(clase));
-        
-        // Si hay clases del gimnasio, retornarlas
-        if (formattedClasses.length > 0) {
-          return formattedClasses;
-        }
-      }
-    }
-    
-    // Fallback: obtener clases por defecto si no hay clases del gimnasio o no es cliente
-    const classes = await AsyncStorage.getItem('@MiGymApp:availableClasses');
-    if (classes) {
-      return JSON.parse(classes);
-    }
-    
-    // Datos por defecto si no hay clases guardadas
+    // Obtener clases hardcodeadas (por defecto)
     const defaultClasses = [
       {
         id: 1,
@@ -312,9 +288,26 @@ export const getAvailableClasses = async (currentUser?: ClientUser | GymUser | n
         ]
       },
     ];
-    
-    // Guardar las clases por defecto
-    await AsyncStorage.setItem('@MiGymApp:availableClasses', JSON.stringify(defaultClasses));
+
+    // Si es un usuario cliente y tiene gymId, obtener las clases de su gimnasio
+    if (currentUser && currentUser.role === 'client' && (currentUser as ClientUser).gymId) {
+      const clientUser = currentUser as ClientUser;
+      const gymClasses = await getGymClasses(clientUser.gymId!);
+      let formattedClasses: any[] = [];
+      if (gymClasses && gymClasses.length > 0) {
+        formattedClasses = gymClasses
+          .filter((clase: any) => clase.activa)
+          .map((clase: any) => convertGymClassToHomeFormat(clase));
+      }
+      // Unir hardcodeadas + gym, evitando duplicados por id
+      const allClasses = [...defaultClasses, ...formattedClasses];
+      const uniqueClasses = allClasses.filter((clase, idx, arr) =>
+        idx === arr.findIndex(c => c.id === clase.id)
+      );
+      return uniqueClasses;
+    }
+
+    // Fallback: obtener solo las hardcodeadas
     return defaultClasses;
   } catch (error) {
     console.error("Error obteniendo clases disponibles:", error);

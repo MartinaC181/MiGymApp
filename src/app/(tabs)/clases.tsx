@@ -134,18 +134,6 @@ export default function ClaseDetalle() {
             const result = await enrollClientToClass(currentUser.id, claseId, gymId, scheduleInfo);
             
             if (result.success) {
-                // Mantener compatibilidad con el sistema anterior
-                const userClasses = await getUserClasses(currentUser.id);
-                const newInscription = {
-                    claseId: claseId,
-                    nombreClase: nombreClase,
-                    horarios: horariosMarcados,
-                    fechaInscripcion: new Date().toISOString(),
-                    gymId: gymId
-                };
-                const updatedClasses = [...userClasses, newInscription];
-                await saveUserClasses(currentUser.id, updatedClasses);
-
                 // Actualizar estado local
                 setClaseInfo(prev => ({ ...prev, isEnrolled: true }));
                 setSeleccionados({});
@@ -183,9 +171,9 @@ export default function ClaseDetalle() {
     return (
         <ScrollView style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
             <View style={styles.headerImage}>
-                <Image 
-                    source={{ uri: imagenClase || 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5' }} 
-                    style={styles.headerImage} 
+                <Image
+                    source={{ uri: claseInfo?.imagen }}
+                    style={styles.headerImage}
                     resizeMode="cover"
                 />
                 <View style={styles.overlay}>
