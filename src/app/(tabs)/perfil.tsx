@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityInd
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import globalStyles from "../../styles/global";
 import { useTheme } from '../../context/ThemeContext';
-import { getCurrentUser } from '../../utils/storage';
+import { getCurrentUser, updateUserProfile } from '../../utils/storage';
 import { ClientUser, GymUser } from '../../data/Usuario';
 import pesoImg from '../../../assets/profile/bascula.png';
 import alturaImg from '../../../assets/profile/altura.png';
@@ -39,6 +39,7 @@ const Profile = () => {
         })();
     }, []);
 
+
     const loadUserData = async () => {
         try {
             const user = await getCurrentUser();
@@ -60,12 +61,17 @@ const Profile = () => {
 
             if (!result.canceled && userData) {
                 const newUri = result.assets[0].uri;
+                
                 // Actualizar estado local
-                setUserData({ ...(userData as any), avatarUri: newUri } as any);
+                setUserData({ ...userData, avatarUri: newUri } as any);
 
-                // Persistir en AsyncStorage
-                const updates = { ...(userData as any), avatarUri: newUri };
-                await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
+                // Usar updateUserProfile para guardar en la base de datos y actualizar la sesión
+                const updatedUser = await updateUserProfile(userData.id, { avatarUri: newUri });
+                
+                if (updatedUser) {
+                    // Actualizar el estado local con el usuario actualizado
+                    setUserData(updatedUser);
+                }
             }
         } catch (error) {
             console.error('Error seleccionando imagen:', error);
@@ -86,15 +92,15 @@ const Profile = () => {
 
     // Si es un usuario de gimnasio, mostrar el perfil de gimnasio
     if (userData?.role === 'gym') {
-        return <GymProfileView gymData={userData as GymUser} />;
+        return <GymProfileView gymData={userData} />;
     }
 
     // Usar datos del estado o valores por defecto para clientes
-    const name = (userData as ClientUser)?.name || 'Sin nombre';
-    const email = (userData as ClientUser)?.email || 'Sin correo';
-    const weight = (userData as ClientUser)?.weight || '0';
-    const idealWeight = (userData as ClientUser)?.idealWeight || '0';
-    const height = (userData as ClientUser)?.height || '0';
+    const name = userData?.name || 'Sin nombre';
+    const email = userData?.email || 'Sin correo';
+    const weight = (userData as any)?.weight || '0';
+    const idealWeight = (userData as any)?.idealWeight || '0';
+    const height = (userData as any)?.height || '0';
 
     const imc = (parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2)).toFixed(2);
     const heightInMeters = (parseFloat(height) / 100).toFixed(2);
@@ -188,7 +194,7 @@ const Profile = () => {
                 </TouchableOpacity>
 
                 {/* Botón para ver perfil del gimnasio */}
-                {(userData as ClientUser)?.gymId && (
+                {(userData as any)?.gymId && (
                     <TouchableOpacity 
                         style={[styles.gymButton, { 
                             width: 280, 
@@ -214,7 +220,7 @@ const Profile = () => {
 };
 
 // Componente para mostrar el perfil de gimnasio
-const GymProfileView = ({ gymData }: { gymData: GymUser }) => {
+const GymProfileView = ({ gymData }: { gymData: any }) => {
     const router = useRouter();
     const { theme, isDarkMode } = useTheme();
 

@@ -165,11 +165,16 @@ export const authenticateUser = async (email: string, password: string): Promise
 export const updateUserProfile = async (userId: string, updates: Partial<ClientUser | GymUser>) => {
   try {
     const usersDB = await getUsersDB();
+    
+    // Buscar usuario por ID en los valores de la base de datos
     const user = Object.values(usersDB).find(u => u.id === userId);
     
     if (user) {
       const updatedUser = { ...user, ...updates } as ClientUser | GymUser;
-      await saveUser(updatedUser);
+      
+      // Guardar usando el email como clave (como hace saveUser)
+      usersDB[user.email] = updatedUser;
+      await AsyncStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(usersDB));
       
       // Si es el usuario actual, actualizar sesión
       const currentUser = await getCurrentUser();

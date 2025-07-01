@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateUserProfile, getCurrentUser } from '../../utils/storage';
 // eslint-disable-next-line import/no-unresolved
 import * as ImagePicker from 'expo-image-picker';
 
@@ -25,16 +26,19 @@ const EditProfile = ({navigation}: any) => {
     }, []);
 
     const loadUserData = async () => {
-        const userData = await AsyncStorage.getItem('@MiGymApp:currentUser');
-        const user = userData ? JSON.parse(userData) : null;
-        if (user) {
-            setName(user.name || '');
-            setEmail(user.email || '');
-            setWeight(user.weight?.toString() || '');
-            setIdealWeight(user.idealWeight?.toString() || '');
-            setHeight(user.height?.toString() || '');
-            setDni(user.dni?.toString() || '');
-            setAvatarUri(user.avatarUri || null);
+        try {
+            const user = await getCurrentUser();
+            if (user) {
+                setName(user.name || '');
+                setEmail(user.email || '');
+                setWeight((user as any).weight?.toString() || '');
+                setIdealWeight((user as any).idealWeight?.toString() || '');
+                setHeight((user as any).height?.toString() || '');
+                setDni((user as any).dni?.toString() || '');
+                setAvatarUri(user.avatarUri || null);
+            }
+        } catch (error) {
+            console.error('Error cargando datos del usuario:', error);
         }
     };
 
@@ -83,6 +87,11 @@ const EditProfile = ({navigation}: any) => {
         if (hasError) return;
         setIsLoading(true);
         try {
+            const currentUser = await getCurrentUser();
+            if (!currentUser) {
+                throw new Error('No se pudo obtener el usuario actual');
+            }
+
             const updates = {
                 name,
                 email,
@@ -92,10 +101,18 @@ const EditProfile = ({navigation}: any) => {
                 dni,
                 avatarUri,
             };
-            await AsyncStorage.setItem('@MiGymApp:currentUser', JSON.stringify(updates));
-            router.push('/perfil');
+
+            // Usar updateUserProfile para guardar en la base de datos y actualizar la sesión
+            const updatedUser = await updateUserProfile(currentUser.id, updates);
+            
+            if (updatedUser) {
+                router.push('/perfil');
+            } else {
+                throw new Error('No se pudo actualizar el perfil');
+            }
         } catch (error) {
             console.error('Error guardando perfil:', error);
+            Alert.alert('Error', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
         } finally {
             setIsLoading(false);
         }
