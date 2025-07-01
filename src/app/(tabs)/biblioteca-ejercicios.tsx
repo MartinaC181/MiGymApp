@@ -21,6 +21,7 @@ import globalStyles from '../../styles/global';
 import { useTheme } from '../../context/ThemeContext';
 import { exerciseAPI, Exercise, ExerciseFilter, getAvailableMuscleGroups, getCommonEquipment } from '../../utils/ExerciseAPI';
 import { translateText } from '../../utils/translator';
+import ExerciseDetailModal from '../../components/ExerciseDetailModal';
 
 const { width } = Dimensions.get('window');
 
@@ -1257,103 +1258,17 @@ export default function BibliotecaEjercicios() {
       </Modal>
 
       {/* Modal de detalles del ejercicio mejorado */}
-      <Modal visible={showExerciseModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.exerciseModal}>
-            {selectedExercise && (
-              <>
-                <View style={styles.exerciseModalHeader}>
-                  <TouchableOpacity onPress={() => setShowExerciseModal(false)} style={styles.closeModalBtn}>
-                    <MaterialIcons name="close" size={24} color="white" />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.favoriteModalBtn}
-                    onPress={() => toggleFavorite(selectedExercise.id)}
-                  >
-                    <MaterialIcons 
-                      name={favoriteExercises.includes(selectedExercise.id) ? "favorite" : "favorite-border"} 
-                      size={24} 
-                      color={favoriteExercises.includes(selectedExercise.id) ? "#FF6B6B" : "white"} 
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <ScrollView style={styles.exerciseDetails} showsVerticalScrollIndicator={false}>
-                  {selectedExercise.gifUrl && (
-                    <View style={styles.exerciseImageModal}>
-                      <Image source={{ uri: selectedExercise.gifUrl }} style={styles.exerciseDetailImage} />
-                    </View>
-                  )}
-
-                  <View style={styles.exerciseInfo}>
-                    <Text style={styles.exerciseModalTitle}>{selectedExercise.name}</Text>
-                    
-                    <View style={styles.exerciseMetrics}>
-                      <View style={styles.metricCard}>
-                        <MaterialCommunityIcons name="target" size={20} color={theme.colors.primary} />
-                        <Text style={styles.metricLabel}>Músculo</Text>
-                        <Text style={styles.metricValue}>{selectedExercise.target}</Text>
-                      </View>
-                      
-                      <View style={styles.metricCard}>
-                        <MaterialCommunityIcons name="dumbbell" size={20} color={theme.colors.primary} />
-                        <Text style={styles.metricLabel}>Equipo</Text>
-                        <Text style={styles.metricValue}>{selectedExercise.equipment}</Text>
-                      </View>
-                    </View>
-
-                    {selectedExercise.secondaryMuscles && selectedExercise.secondaryMuscles.length > 0 && (
-                      <View style={styles.detailSection}>
-                        <Text style={styles.detailLabel}>Músculos Secundarios</Text>
-                        <View style={styles.muscleChips}>
-                          {selectedExercise.secondaryMuscles.map((muscle, index) => (
-                            <View key={index} style={styles.muscleChip}>
-                              <Text style={styles.muscleChipText}>{muscle}</Text>
-                            </View>
-                          ))}
-                        </View>
-                      </View>
-                    )}
-
-                    <View style={styles.detailSection}>
-                      <Text style={styles.detailLabel}>Instrucciones</Text>
-                      <View style={styles.instructionsList}>
-                        {selectedExercise.instructions.map((instruction, index) => (
-                          <View key={index} style={styles.instructionItem}>
-                            <View style={styles.instructionNumber}>
-                              <Text style={styles.instructionNumberText}>{index + 1}</Text>
-                            </View>
-                            <Text style={styles.instructionText}>{instruction}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
-
-                <View style={styles.exerciseModalActions}>
-                  <TouchableOpacity
-                    style={styles.addToRoutineBtn}
-                    onPress={() => {
-                      addToRoutine(selectedExercise);
-                      setShowExerciseModal(false);
-                    }}
-                  >
-                    <LinearGradient
-                      colors={theme.colors.gradient1}
-                      style={styles.addToRoutineBtnGradient}
-                    >
-                      <MaterialIcons name="add" size={20} color="white" />
-                      <Text style={styles.addToRoutineBtnText}>Agregar a Rutina</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
+      <ExerciseDetailModal
+        visible={showExerciseModal}
+        exercise={selectedExercise}
+        onClose={() => setShowExerciseModal(false)}
+        onAddToRoutine={ex => {
+          addToRoutine(ex);
+          setShowExerciseModal(false);
+        }}
+        favoriteExercises={favoriteExercises}
+        onToggleFavorite={toggleFavorite}
+      />
     </View>
   );
 } 
