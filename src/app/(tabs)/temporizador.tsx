@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import globalStyles from "../../styles/global";
+import homeStyles from "../../styles/home";
 import { useTheme } from "../../context/ThemeContext";
 import Timer from "../../components/Timer";
 import Stopwatch from "../../components/Stopwatch";
@@ -51,23 +52,18 @@ export default function TemporizadorScreen() {
 
   // Pantalla de selección
   return (
-    <ScrollView 
-      contentContainerStyle={dynamicStyles(theme, isDarkMode).scrollContent}
-      showsVerticalScrollIndicator={false}
-      style={{ backgroundColor: theme.colors.background }}
-    >
-      {/* Header Section */}
-      <View style={dynamicStyles(theme, isDarkMode).headerSection}>
-        <MaterialCommunityIcons 
-          name="timer-outline" 
-          size={64} 
-          color={theme.colors.primary} 
-          style={dynamicStyles(theme, isDarkMode).headerIcon}
-        />
-        <Text style={dynamicStyles(theme, isDarkMode).title}>
+    <View style={[globalStyles.safeArea, { flex: 1, backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={dynamicStyles(theme, isDarkMode).scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+      {/* Header Section - usando estilos unificados */}
+      <View style={homeStyles.greetingContainer}>
+        <Text style={homeStyles.greeting}>
           Herramientas de Tiempo
         </Text>
-        <Text style={dynamicStyles(theme, isDarkMode).subtitle}>
+        <Text style={[homeStyles.subGreeting, { color: theme.colors.textSecondary }]}>
           Elige la herramienta que necesitas para tu entrenamiento
         </Text>
       </View>
@@ -87,7 +83,7 @@ export default function TemporizadorScreen() {
             end={{ x: 1, y: 1 }}
           >
             <View style={dynamicStyles(theme, isDarkMode).cardHeader}>
-              <View style={dynamicStyles(theme, isDarkMode).iconContainer}>
+              <View style={[dynamicStyles(theme, isDarkMode).iconContainer, { backgroundColor: theme.colors.primary }]}>
                 <MaterialCommunityIcons 
                   name="timer" 
                   size={32} 
@@ -104,15 +100,15 @@ export default function TemporizadorScreen() {
               
               <View style={dynamicStyles(theme, isDarkMode).featuresContainer}>
                 <View style={dynamicStyles(theme, isDarkMode).featureItem}>
-                  <MaterialCommunityIcons name="clock-outline" size={16} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons name="clock-outline" size={16} color={theme.colors.textPrimary} />
                   <Text style={dynamicStyles(theme, isDarkMode).featureText}>Cuenta regresiva</Text>
                 </View>
                 <View style={dynamicStyles(theme, isDarkMode).featureItem}>
-                  <MaterialCommunityIcons name="bell-outline" size={16} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons name="bell-outline" size={16} color={theme.colors.textPrimary} />
                   <Text style={dynamicStyles(theme, isDarkMode).featureText}>Alarma al finalizar</Text>
                 </View>
                 <View style={dynamicStyles(theme, isDarkMode).featureItem}>
-                  <MaterialCommunityIcons name="tune" size={16} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons name="tune" size={16} color={theme.colors.textPrimary} />
                   <Text style={dynamicStyles(theme, isDarkMode).featureText}>Tiempo personalizable</Text>
                 </View>
               </View>
@@ -120,7 +116,7 @@ export default function TemporizadorScreen() {
             
             <View style={dynamicStyles(theme, isDarkMode).cardFooter}>
               <Text style={dynamicStyles(theme, isDarkMode).actionText}>Usar Temporizador</Text>
-              <MaterialCommunityIcons name="chevron-right" size={20} color="white" />
+              <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.textPrimary} />
             </View>
           </LinearGradient>
         </TouchableOpacity>
@@ -132,13 +128,13 @@ export default function TemporizadorScreen() {
           activeOpacity={0.85}
         >
           <LinearGradient
-            colors={theme.colors.gradient2}
+            colors={theme.colors.gradient1}
             style={dynamicStyles(theme, isDarkMode).cardGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
             <View style={dynamicStyles(theme, isDarkMode).cardHeader}>
-              <View style={dynamicStyles(theme, isDarkMode).iconContainer}>
+              <View style={[dynamicStyles(theme, isDarkMode).iconContainer, { backgroundColor: theme.colors.primary }]}>
                 <MaterialCommunityIcons 
                   name="timer-sand" 
                   size={32} 
@@ -155,15 +151,15 @@ export default function TemporizadorScreen() {
               
               <View style={dynamicStyles(theme, isDarkMode).featuresContainer}>
                 <View style={dynamicStyles(theme, isDarkMode).featureItem}>
-                  <MaterialCommunityIcons name="play-outline" size={16} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons name="play-outline" size={16} color={theme.colors.textPrimary} />
                   <Text style={dynamicStyles(theme, isDarkMode).featureText}>Cuenta progresiva</Text>
                 </View>
                 <View style={dynamicStyles(theme, isDarkMode).featureItem}>
-                  <MaterialCommunityIcons name="flag-outline" size={16} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons name="flag-outline" size={16} color={theme.colors.textPrimary} />
                   <Text style={dynamicStyles(theme, isDarkMode).featureText}>Registro de vueltas</Text>
                 </View>
                 <View style={dynamicStyles(theme, isDarkMode).featureItem}>
-                  <MaterialCommunityIcons name="speedometer" size={16} color="rgba(255,255,255,0.8)" />
+                  <MaterialCommunityIcons name="speedometer" size={16} color={theme.colors.textPrimary} />
                   <Text style={dynamicStyles(theme, isDarkMode).featureText}>Precisión de centésimas</Text>
                 </View>
               </View>
@@ -171,7 +167,7 @@ export default function TemporizadorScreen() {
             
             <View style={dynamicStyles(theme, isDarkMode).cardFooter}>
               <Text style={dynamicStyles(theme, isDarkMode).actionText}>Usar Cronómetro</Text>
-              <MaterialCommunityIcons name="chevron-right" size={20} color="white" />
+              <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.textPrimary} />
             </View>
           </LinearGradient>
         </TouchableOpacity>
@@ -185,38 +181,17 @@ export default function TemporizadorScreen() {
           y el cronómetro para medir el tiempo de ejecución de ejercicios específicos.
         </Text>
       </View>
-    </ScrollView>
+        </ScrollView>
+      </View>
   );
 }
 
 const dynamicStyles = (theme: any, isDarkMode: boolean) => StyleSheet.create({
   scrollContent: {
-    flexGrow: 1,
-    padding: theme.spacing.lg,
-    paddingBottom: 100,
-  },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: theme.spacing.xl,
-    paddingVertical: theme.spacing.lg,
-  },
-  headerIcon: {
-    marginBottom: theme.spacing.md,
-  },
-  title: {
-    fontSize: theme.typography.fontSize.title,
-    fontFamily: theme.typography.fontFamily.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.sm,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: theme.typography.fontSize.medium,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
+    paddingBottom: 32,
   },
   optionsContainer: {
+    paddingHorizontal: 24,
     gap: theme.spacing.lg,
     marginBottom: theme.spacing.xl,
   },
@@ -241,7 +216,6 @@ const dynamicStyles = (theme: any, isDarkMode: boolean) => StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -252,12 +226,12 @@ const dynamicStyles = (theme: any, isDarkMode: boolean) => StyleSheet.create({
   cardTitle: {
     fontSize: theme.typography.fontSize.large,
     fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
+    color: theme.colors.textPrimary,
     marginBottom: theme.spacing.xs,
   },
   cardDescription: {
     fontSize: theme.typography.fontSize.medium,
-    color: 'rgba(255,255,255,0.9)',
+    color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
     lineHeight: 20,
   },
@@ -271,7 +245,7 @@ const dynamicStyles = (theme: any, isDarkMode: boolean) => StyleSheet.create({
   },
   featureText: {
     fontSize: theme.typography.fontSize.small,
-    color: 'rgba(255,255,255,0.8)',
+    color: theme.colors.textPrimary,
     fontFamily: theme.typography.fontFamily.medium,
   },
   cardFooter: {
@@ -282,9 +256,10 @@ const dynamicStyles = (theme: any, isDarkMode: boolean) => StyleSheet.create({
   actionText: {
     fontSize: theme.typography.fontSize.medium,
     fontFamily: theme.typography.fontFamily.bold,
-    color: 'white',
+    color: theme.colors.textPrimary,
   },
   infoSection: {
+    marginHorizontal: 24,
     backgroundColor: isDarkMode ? 'rgba(0, 191, 255, 0.1)' : 'rgba(0, 191, 255, 0.05)',
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,

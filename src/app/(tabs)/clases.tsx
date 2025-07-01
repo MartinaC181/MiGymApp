@@ -216,7 +216,7 @@ export default function ClaseDetalle() {
                     style={[globalStyles.Button, {marginTop: theme.spacing.lg}]}
                     onPress={handleInscripcion}
                 >
-                    <Text style={[globalStyles.buttonText, { color: '#000000' }]}>Inscribirse</Text>
+                    <Text style={[globalStyles.buttonText, { color: '#FFFFFF' }]}>Inscribirse</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>

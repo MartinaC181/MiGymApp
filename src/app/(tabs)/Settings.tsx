@@ -156,7 +156,7 @@ const Settings = () => {
                 {/* Botón Cerrar sesión */}
                 <View style={[styles.logoutContainer, {marginTop: theme.spacing.xl}]}>
                     <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.colors.primary }]} onPress={() => setShowLogoutModal(true)}>
-                        <Text style={[styles.logoutButtonText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>Cerrar sesión</Text>
+                        <Text style={[styles.logoutButtonText, { color: '#FFFFFF' }]}>Cerrar sesión</Text>
                     </TouchableOpacity>
                 </View>
 

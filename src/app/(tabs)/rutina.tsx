@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import globalStyles from '../../styles/global';
+
+import homeStyles from '../../styles/home';
 import { useTheme } from '../../context/ThemeContext';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -13,28 +14,24 @@ export default function Rutina() {
     {
       nombre: 'Piernas',
       icon: 'run',
-      gradient: theme.colors.gradient1,
       ejercicios: 12,
       descripcion: 'Cuádriceps, glúteos y pantorrillas'
     },
     {
       nombre: 'Brazos',
       icon: 'arm-flex',
-      gradient: theme.colors.gradient2,
       ejercicios: 8,
       descripcion: 'Bíceps, tríceps y antebrazos'
     },
     {
       nombre: 'Pecho',
       icon: 'weight-lifter',
-      gradient: theme.colors.gradient3,
       ejercicios: 6,
       descripcion: 'Pectorales mayor y menor'
     },
     {
       nombre: 'Espalda',
       icon: 'human-handsup',
-      gradient: theme.colors.gradient4,
       ejercicios: 10,
       descripcion: 'Dorsales, romboides y trapecio'
     },
@@ -43,23 +40,23 @@ export default function Rutina() {
   const renderGrupoCard = (grupo: any, index: number) => (
     <TouchableOpacity
       key={grupo.nombre}
-      style={[styles.grupoCard, { backgroundColor: theme.colors.card }]}
+      style={styles.grupoCard}
       onPress={() => {
         router.push({
           pathname: '/GrupoDetalle',  
           params: { grupo: grupo.nombre }
         });
       }}
-      activeOpacity={0.85}
+      activeOpacity={0.9}
     >
       <LinearGradient
-        colors={grupo.gradient}
+        colors={isDarkMode ? ['#10344A', '#0C2434'] : ['#b3dcec', '#EAF7FF']}
         style={styles.cardGradient}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 1, y: 0 }}
       >
         <View style={styles.cardHeader}>
-          <View style={styles.iconContainer}>
+          <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary }]}>
             <MaterialCommunityIcons 
               name={grupo.icon} 
               size={28} 
@@ -75,25 +72,33 @@ export default function Rutina() {
               });
             }}
           >
-            <MaterialIcons name="edit" size={18} color="white" />
+            <MaterialIcons name="edit" size={18} color={theme.colors.textSecondary} />
           </TouchableOpacity>
         </View>
         
         <View style={styles.cardContent}>
-          <Text style={styles.grupoNombre}>{grupo.nombre}</Text>
-          <Text style={styles.grupoDescripcion}>{grupo.descripcion}</Text>
+          <Text style={[styles.grupoNombre, { color: theme.colors.textPrimary }]}>{grupo.nombre}</Text>
+          <Text style={[styles.grupoDescripcion, { color: theme.colors.textSecondary }]}>{grupo.descripcion}</Text>
           
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="dumbbell" size={16} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.statText}>{grupo.ejercicios} ejercicios</Text>
+              <MaterialCommunityIcons 
+                name="dumbbell" 
+                size={16} 
+                color={theme.colors.textSecondary} 
+              />
+              <Text style={[styles.statText, { color: theme.colors.textSecondary }]}>{grupo.ejercicios} ejercicios</Text>
             </View>
           </View>
         </View>
         
         <View style={styles.cardFooter}>
-          <Text style={styles.verMasText}>Ver rutina</Text>
-          <MaterialIcons name="keyboard-arrow-right" size={20} color="white" />
+          <Text style={[styles.verMasText, { color: theme.colors.textSecondary }]}>Ver rutina</Text>
+          <MaterialIcons 
+            name="keyboard-arrow-right" 
+            size={20} 
+            color={theme.colors.textSecondary} 
+          />
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -101,15 +106,19 @@ export default function Rutina() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.headerContainer}>
-        <Text style={[styles.title, { color: theme.colors.textPrimary }]}>Mis Rutinas</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Selecciona el grupo muscular a entrenar</Text>
-      </View>
-      
       <ScrollView 
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
       >
+        <View style={homeStyles.greetingContainer}>
+          <Text style={[homeStyles.greeting, { color: theme.colors.primary }]}>
+            Mis Rutinas
+          </Text>
+          <Text style={[homeStyles.subGreeting, { color: theme.colors.textSecondary }]}>
+            Selecciona el grupo muscular a entrenar
+          </Text>
+        </View>
+        
         <View style={styles.gruposContainer}>
           {grupos.map((grupo, index) => renderGrupoCard(grupo, index))}
         </View>
@@ -135,30 +144,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerContainer: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: 'Roboto-Bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    fontFamily: 'Roboto-Medium',
-  },
   scrollContent: {
-    width: '100%',
-    alignItems: 'center',
     paddingBottom: 32,
   },
   gruposContainer: {
-    width: '100%',
-    padding: 16,
+    paddingHorizontal: 24,
+    gap: 12,
   },
   grupoCard: {
-    width: '100%',
     borderRadius: 16,
-    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginBottom: 8,
   },
   cardGradient: {
     flex: 1,
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 40,
     height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -183,14 +184,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   grupoNombre: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Roboto-Bold',
-    color: 'white',
   },
   grupoDescripcion: {
-    fontSize: 12,
-    fontFamily: 'Roboto-Medium',
-    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13,
+    fontFamily: 'Roboto-Regular',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -204,8 +203,8 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    fontFamily: 'Roboto-Medium',
-    color: 'rgba(255,255,255,0.8)',
+    fontFamily: 'Roboto-Regular',
+    marginLeft: 4,
   },
   cardFooter: {
     flexDirection: 'row',
@@ -215,14 +214,12 @@ const styles = StyleSheet.create({
   },
   verMasText: {
     fontSize: 12,
-    fontFamily: 'Roboto-Medium',
-    color: 'rgba(255,255,255,0.8)',
+    fontFamily: 'Roboto-Regular',
   },
   addRoutineButton: {
-    width: '100%',
-    padding: 16,
-    borderRadius: 16,
+    marginHorizontal: 24,
     marginTop: 16,
+    borderRadius: 16,
   },
   addButtonGradient: {
     flexDirection: 'row',

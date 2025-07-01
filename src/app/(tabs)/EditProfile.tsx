@@ -245,7 +245,7 @@ const EditProfile = ({navigation}: any) => {
                     style={[globalStyles.LoginButton, { backgroundColor: theme.colors.primary }]} 
                     onPress={handleSave} 
                     disabled={isLoading}>
-                    <Text style={[globalStyles.buttonText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>
+                    <Text style={[globalStyles.buttonText, { color: '#FFFFFF' }]}>
                         Guardar cambios
                     </Text>
                 </TouchableOpacity>

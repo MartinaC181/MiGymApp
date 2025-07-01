@@ -31,6 +31,7 @@ export default function BibliotecaEjercicios() {
   // Estados existentes
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedMuscle, setSelectedMuscle] = useState<string>('');
   const [selectedEquipment, setSelectedEquipment] = useState<string>('');
@@ -44,12 +45,12 @@ export default function BibliotecaEjercicios() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
   const [quickCategories] = useState([
-    { id: 'Pecho', name: 'Pecho', icon: 'dumbbell', gradient: theme.colors.gradient1 },
+    { id: 'Pecho', name: 'Pecho', icon: 'dumbbell', gradient: theme.colors.gradient4 },
     { id: 'Piernas', name: 'Piernas', icon: 'run', gradient: theme.colors.gradient2 },
     { id: 'Brazos', name: 'Brazos', icon: 'arm-flex', gradient: theme.colors.gradient3 },
-    { id: 'Espalda', name: 'Espalda', icon: 'human-handsup', gradient: theme.colors.gradient4 },
-    { id: 'Hombros', name: 'Hombros', icon: 'weight-lifter', gradient: theme.colors.gradient5 },
-    { id: 'Core', name: 'Core', icon: 'karate', gradient: theme.colors.gradient6 }
+    { id: 'Espalda', name: 'Espalda', icon: 'human-handsup', gradient: theme.colors.gradient5 },
+    { id: 'Hombros', name: 'Hombros', icon: 'weight-lifter', gradient: theme.colors.gradient6 },
+    { id: 'Core', name: 'Core', icon: 'karate', gradient: theme.colors.gradient7 }
   ]);
 
   // Listas en español para los filtros
@@ -356,48 +357,31 @@ export default function BibliotecaEjercicios() {
       backgroundColor: theme.colors.background,
     },
     
-    // Header mejorado
-    header: {
+    // Controles y filtros
+    controlsSection: {
+      backgroundColor: theme.colors.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+      paddingTop: 16,
+      paddingBottom: 16,
+    },
+    controlsRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 20,
-      paddingVertical: 16,
-      backgroundColor: theme.colors.card,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-      elevation: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
+      paddingTop: 12,
     },
-    backBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: isDarkMode ? '#2A2A2A' : '#F1F5F9',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    headerCenter: {
-      flex: 1,
-      alignItems: 'center',
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.textPrimary,
-    },
-    headerSubtitle: {
+    exercisesCount: {
       fontSize: 12,
       color: theme.colors.textSecondary,
-      marginTop: 2,
+      fontFamily: theme.typography.fontFamily.medium,
     },
-    headerActions: {
+    controlsActions: {
       flexDirection: 'row',
       gap: 8,
     },
+
     viewModeBtn: {
       width: 40,
       height: 40,
@@ -415,44 +399,59 @@ export default function BibliotecaEjercicios() {
       justifyContent: 'center',
     },
 
-    // Búsqueda mejorada
+    // Búsqueda unificada con estilo de gestión
     searchSection: {
-      flexDirection: 'row',
-      alignItems: 'center',
       paddingHorizontal: 20,
       paddingVertical: 16,
       backgroundColor: theme.colors.card,
-      gap: 12,
     },
-    searchContainer: {
-      flex: 1,
+    searchSectionRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: isDarkMode ? '#1A1A1A' : '#F8FAFC',
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      paddingBottom: 4,
+      backgroundColor: theme.colors.background,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#fff',
       borderRadius: 12,
       paddingHorizontal: 16,
-      height: 48,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 6,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: '#E8E8E8',
+      minHeight: 48,
+    },
+    searchContainerFocused: {
+      borderWidth: 2,
+      borderColor: theme.colors.primary,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8,
     },
     searchIcon: {
       marginRight: 8,
     },
     searchInput: {
       flex: 1,
+      height: 40,
       fontSize: 16,
+      fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.textPrimary,
+      paddingRight: 8,
     },
-    clearBtn: {
+    clearSearchButton: {
       padding: 4,
-    },
-    searchBtn: {
-      width: 48,
-      height: 48,
-      borderRadius: 12,
-      backgroundColor: theme.colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
+      borderRadius: 4,
+      backgroundColor: '#F5F5F5',
     },
 
     // Categorías
@@ -497,7 +496,7 @@ export default function BibliotecaEjercicios() {
       paddingHorizontal: 20,
       paddingBottom: 12,
       flexWrap: 'wrap',
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.background,
     },
     filterChip: {
       flexDirection: 'row',
@@ -518,6 +517,7 @@ export default function BibliotecaEjercicios() {
     clearFiltersBtn: {
       paddingHorizontal: 12,
       paddingVertical: 6,
+      backgroundColor: theme.colors.background,
     },
     clearFiltersText: {
       color: theme.colors.textSecondary,
@@ -973,24 +973,50 @@ export default function BibliotecaEjercicios() {
       fontFamily: theme.typography.fontFamily.bold,
       color: 'white',
     },
+    controlsActionsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginLeft: 10,
+      gap: 8,
+    },
+    exercisesCountBelow: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      fontFamily: theme.typography.fontFamily.medium,
+      marginLeft: 28,
+      marginBottom: 8,
+    },
   });
 
   const styles = getDynamicStyles();
 
   return (
     <View style={styles.container}>
-      {/* Header mejorado */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <MaterialIcons name="arrow-back" size={24} color={theme.colors.textPrimary} />
-        </TouchableOpacity>
-        
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Biblioteca</Text>
-          <Text style={styles.headerSubtitle}>+1300 ejercicios</Text>
+      {/* Barra de búsqueda y controles */}
+      <View style={styles.searchSectionRow}>
+        <View style={[
+          styles.searchContainer,
+          searchFocused && styles.searchContainerFocused,
+          { flex: 1 }
+        ]}>
+          <MaterialIcons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar ejercicios..."
+            placeholderTextColor={theme.colors.textSecondary}
+            value={searchText}
+            onChangeText={setSearchText}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            onSubmitEditing={handleSearch}
+          />
+          {searchText.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchText('')} style={styles.clearSearchButton}>
+              <MaterialIcons name="close" size={16} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
-        
-        <View style={styles.headerActions}>
+        <View style={styles.controlsActionsRow}>
           <TouchableOpacity 
             onPress={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             style={styles.viewModeBtn}
@@ -1001,39 +1027,14 @@ export default function BibliotecaEjercicios() {
               color={theme.colors.primary} 
             />
           </TouchableOpacity>
-          
           <TouchableOpacity onPress={() => setShowFilters(true)} style={styles.filterBtn}>
             <MaterialIcons name="tune" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Barra de búsqueda mejorada */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchContainer}>
-          <MaterialIcons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar ejercicios..."
-            placeholderTextColor={theme.colors.textSecondary}
-            value={searchText}
-            onChangeText={setSearchText}
-            onSubmitEditing={handleSearch}
-          />
-          {searchText.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchText('')} style={styles.clearBtn}>
-              <MaterialIcons name="close" size={16} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
-          )}
-        </View>
-        
-        <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
-          <MaterialIcons name="search" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
-
       {/* Categorías rápidas */}
-      <View style={styles.categoriesSection}>
+      <View style={[styles.categoriesSection, { backgroundColor: theme.colors.background }]}> 
         <Text style={styles.sectionTitle}>Categorías</Text>
         <FlatList
           data={quickCategories}
@@ -1072,12 +1073,6 @@ export default function BibliotecaEjercicios() {
 
       {/* Lista de ejercicios */}
       <View style={styles.exercisesSection}>
-        <View style={styles.exercisesHeader}>
-          <Text style={styles.sectionTitle}>
-            {selectedMuscle ? `${selectedMuscle} (${ejercicios.length})` : `Ejercicios (${ejercicios.length})`}
-          </Text>
-        </View>
-
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -1101,6 +1096,13 @@ export default function BibliotecaEjercicios() {
                 title="Actualizando ejercicios..."
                 titleColor={theme.colors.textSecondary}
               />
+            }
+            ListHeaderComponent={
+              <View style={styles.exercisesHeader}>
+                <Text style={styles.sectionTitle}>
+                  {selectedMuscle ? `${selectedMuscle} (${ejercicios.length})` : `Ejercicios (${ejercicios.length})`}
+                </Text>
+              </View>
             }
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>

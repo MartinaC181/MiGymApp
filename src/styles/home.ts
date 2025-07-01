@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         marginBottom: theme.spacing.md,
     },
     greeting: {
-        fontSize: theme.typography.fontSize.large,
+        fontSize: theme.typography.fontSize.title,
         fontFamily: theme.typography.fontFamily.bold,
         color: theme.colors.primary,
     },

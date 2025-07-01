@@ -21,10 +21,6 @@ interface MenuOption {
   title: string;
   description: string;
   icon: string;
-  colors: {
-    light: [string, string];
-    dark: [string, string];
-  };
   route?: string;
 }
 
@@ -38,10 +34,6 @@ export default function Entrenamiento() {
       title: 'Rutina',
       description: 'Crea y personaliza tus rutinas de entrenamiento',
       icon: 'fitness-center',
-      colors: {
-        light: theme.colors.gradient1,
-        dark: theme.colors.gradient1
-      },
       route: '/rutina'
     },
     {
@@ -49,10 +41,6 @@ export default function Entrenamiento() {
       title: 'Reloj',
       description: 'Controla el tiempo de tus series y descansos',
       icon: 'timer',
-      colors: {
-        light: theme.colors.gradient2,
-        dark: theme.colors.gradient2
-      },
       route: '/temporizador'
     },
     {
@@ -60,10 +48,6 @@ export default function Entrenamiento() {
       title: 'Biblioteca de Ejercicios',
       description: 'Explora más de 1300 ejercicios con videos',
       icon: 'menu-book',
-      colors: {
-        light: theme.colors.gradient3,
-        dark: theme.colors.gradient3
-      },
       route: '/biblioteca-ejercicios'
     },
     {
@@ -71,10 +55,6 @@ export default function Entrenamiento() {
       title: 'Calculadora RPM',
       description: 'Calcula tu ritmo y repeticiones máximas',
       icon: 'calculate',
-      colors: {
-        light: theme.colors.gradient4,
-        dark: theme.colors.gradient4
-      },
       route: '/calculadora-rpm'
     }
   ];
@@ -88,46 +68,47 @@ export default function Entrenamiento() {
   };
 
   const renderMenuCard = (option: MenuOption, index: number) => {
-    const currentColors = isDarkMode ? option.colors.dark : option.colors.light;
-    
     return (
       <TouchableOpacity
         key={option.id}
-        style={[styles.menuCard, { backgroundColor: theme.colors.card }]}
+        style={styles.menuCard}
         onPress={() => handleMenuPress(option)}
-        activeOpacity={0.85}
+        activeOpacity={0.9}
       >
+        {/* Gradiente de fondo - igual que "Mis clases" */}
         <LinearGradient
-          colors={currentColors}
-          style={styles.cardGradient}
+          colors={isDarkMode ? ['#10344A', '#0C2434'] : ['#b3dcec', '#EAF7FF']}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <View style={styles.cardContent}>
-            <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary }]}>
-              <MaterialIcons 
-                name={option.icon as any} 
-                size={26} 
-                color="white" 
-              />
-            </View>
-            <View style={styles.textContainer}>
-              <Text style={[styles.cardTitle, { color: theme.colors.textPrimary }]}>
-                {option.title}
-              </Text>
-              <Text style={[styles.cardDescription, { color: theme.colors.textSecondary }]}>
-                {option.description}
-              </Text>
-            </View>
-            <View style={styles.arrowContainer}>
-              <MaterialIcons 
-                name="keyboard-arrow-right" 
-                size={24} 
-                color="rgba(255,255,255,0.8)" 
-              />
-            </View>
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFillObject as any}
+        />
+        
+        <View style={styles.cardContent}>
+          <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary }]}>
+            <MaterialIcons 
+              name={option.icon as any} 
+              size={24} 
+              color="white" 
+            />
           </View>
-        </LinearGradient>
+          
+          <View style={styles.textContainer}>
+            <Text style={[styles.cardTitle, { color: theme.colors.textPrimary }]}>
+              {option.title}
+            </Text>
+            <Text style={[styles.cardDescription, { color: theme.colors.textSecondary }]}>
+              {option.description}
+            </Text>
+          </View>
+          
+          <View style={styles.arrowContainer}>
+            <MaterialIcons 
+              name="keyboard-arrow-right" 
+              size={24} 
+              color={theme.colors.textSecondary}
+            />
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -168,13 +149,12 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 32,
   },
-
   menuContainer: {
     paddingHorizontal: 24,
     gap: 16,
   },
   menuCard: {
-    borderRadius: 8,
+    borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -182,11 +162,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginBottom: 8,
-    height: 75, // Altura un poco mayor
-  },
-  cardGradient: {
-    flex: 1,
-    height: 75, // Altura un poco mayor
+    height: 85,
   },
   cardContent: {
     flexDirection: 'row',
@@ -194,7 +170,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 16,
     flex: 1,
-    height: 75, // Altura un poco mayor
+    height: 75,
+    zIndex: 1,
   },
   iconContainer: {
     width: 40,
@@ -209,14 +186,14 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   cardTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Roboto-Bold',
     marginBottom: 2,
   },
   cardDescription: {
-    fontSize: 11,
+    fontSize: 13,
     fontFamily: 'Roboto-Regular',
-    lineHeight: 14,
+    lineHeight: 16,
   },
   arrowContainer: {
     width: 30,
