@@ -205,14 +205,20 @@ export default function RachaModal({
                 styles.successOverlay,
                 {
                   opacity: successAnimation,
-                  transform: [{ scale: successAnimation }]
+                  transform: [{ scale: successAnimation }],
+                  backgroundColor: isDarkMode ? 'rgba(30,30,30,0.92)' : 'rgba(255,255,255,0.92)',
+                  borderColor: isDarkMode ? currentTheme.colors.primary : currentTheme.colors.primary,
+                  borderWidth: 2,
                 }
               ]}
             >
-              <MaterialIcons name="check-circle" size={80} color={currentTheme.colors.primary} />
+              <MaterialIcons name="check-circle" size={80} color={isDarkMode ? '#00FFB0' : currentTheme.colors.primary} />
               <Text style={[styles.successText, { 
                 color: isDarkMode ? '#FFFFFF' : currentTheme.colors.textPrimary,
-                fontWeight: isDarkMode ? '600' : 'normal'
+                fontWeight: isDarkMode ? '600' : 'normal',
+                textShadowColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'transparent',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 2
               }]}>¡Asistencia marcada!</Text>
             </Animated.View>
           )}
