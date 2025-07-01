@@ -56,8 +56,12 @@ const darkColors = {
   buttonBackground: '#00BFFF',
   socialButtonBackground: '#2A2A2A',
   shadowColor: '#000000',
-  // Gradiente unificado para consistencia visual
+  // Gradientes para modo oscuro
   gradient1: ['#10344A', '#0C2434'] as [string, string],
+  gradient2: ['#232526', '#414345'] as [string, string],
+  gradient3: ['#434343', '#262626'] as [string, string],
+  gradient4: ['#232526', '#1a1a1a'] as [string, string],
+  gradient5: ['#141E30', '#243B55'] as [string, string],
 };
 
 const spacing = {

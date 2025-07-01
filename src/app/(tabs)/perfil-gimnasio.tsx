@@ -15,6 +15,13 @@ const GymProfile = () => {
     const [gymData, setGymData] = useState<GymUser | null>(null);
     const [loading, setLoading] = useState(true);
 
+    // Gradientes según el modo
+    const gradient1 = isDarkMode ? theme.colors.gradient1 : theme.colors.gradient1;
+    const gradient2 = isDarkMode ? theme.colors.gradient2 : theme.colors.gradient2;
+    const gradient3 = isDarkMode ? theme.colors.gradient3 : theme.colors.gradient3;
+    const gradient4 = isDarkMode ? theme.colors.gradient4 : theme.colors.gradient4;
+    const gradient5 = isDarkMode ? theme.colors.gradient5 : theme.colors.gradient5;
+
     useEffect(() => {
         loadGymData();
     }, []);
@@ -381,7 +388,7 @@ const GymProfile = () => {
             {/* Header con logo del gimnasio */}
             <View style={styles.header}>
                 <LinearGradient
-                    colors={theme.colors.gradient1}
+                    colors={gradient1}
                     style={styles.headerGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -408,7 +415,7 @@ const GymProfile = () => {
                         icon="map-marker" 
                         title="Dirección" 
                         value={gymData.address || "No especificada"}
-                        gradientColors={theme.colors.gradient1}
+                        gradientColors={gradient1}
                         onPress={handleAddressPress}
                     />
                     
@@ -417,7 +424,7 @@ const GymProfile = () => {
                             icon="phone" 
                             title="Teléfono" 
                             value={gymData.phone}
-                            gradientColors={theme.colors.gradient2}
+                            gradientColors={gradient2}
                             onPress={handlePhonePress}
                         />
                     )}
@@ -426,7 +433,7 @@ const GymProfile = () => {
                         icon="email" 
                         title="Email" 
                         value={gymData.email}
-                        gradientColors={theme.colors.gradient3}
+                        gradientColors={gradient3}
                         onPress={handleEmailPress}
                     />
                 </View>
@@ -449,13 +456,13 @@ const GymProfile = () => {
                             icon="account-group" 
                             title="Clientes" 
                             value={`${getClientCount()}`}
-                            gradientColors={theme.colors.gradient4}
+                            gradientColors={gradient4}
                         />
                         <StatCard 
                             icon="dumbbell" 
                             title="Clases" 
                             value={`${getClassCount()}`}
-                            gradientColors={theme.colors.gradient5}
+                            gradientColors={gradient5}
                         />
                     </View>
                 </View>
