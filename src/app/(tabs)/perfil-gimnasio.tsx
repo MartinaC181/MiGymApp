@@ -204,7 +204,7 @@ const GymProfile = () => {
             width: 80,
             height: 80,
             borderRadius: 40,
-            backgroundColor: 'rgba(255,255,255,0.2)',
+            backgroundColor: theme.colors.surface,
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: theme.spacing.md,
@@ -212,14 +212,14 @@ const GymProfile = () => {
         gymName: {
             fontSize: theme.typography.fontSize.title,
             fontFamily: theme.typography.fontFamily.bold,
-            color: 'white',
+            color: theme.colors.textPrimary,
             textAlign: 'center',
             marginBottom: theme.spacing.xs,
         },
         gymType: {
             fontSize: theme.typography.fontSize.medium,
             fontFamily: theme.typography.fontFamily.regular,
-            color: 'rgba(255,255,255,0.8)',
+            color: theme.colors.textSecondary,
             textAlign: 'center',
         },
         content: {
@@ -256,13 +256,13 @@ const GymProfile = () => {
         infoCardTitle: {
             fontSize: theme.typography.fontSize.small,
             fontFamily: theme.typography.fontFamily.medium,
-            color: 'rgba(255,255,255,0.8)',
+            color: theme.colors.textSecondary,
             marginBottom: 2,
         },
         infoCardValue: {
             fontSize: theme.typography.fontSize.medium,
             fontFamily: theme.typography.fontFamily.bold,
-            color: 'white',
+            color: theme.colors.textPrimary,
         },
         infoCardChevron: {
             marginLeft: 'auto',
@@ -303,13 +303,13 @@ const GymProfile = () => {
         statCardValue: {
             fontSize: theme.typography.fontSize.title,
             fontFamily: theme.typography.fontFamily.bold,
-            color: 'white',
+            color: theme.colors.textPrimary,
             marginTop: theme.spacing.xs,
         },
         statCardTitle: {
             fontSize: theme.typography.fontSize.small,
             fontFamily: theme.typography.fontFamily.medium,
-            color: 'rgba(255,255,255,0.8)',
+            color: theme.colors.textSecondary,
             marginTop: 2,
         },
         planCard: {
@@ -518,7 +518,7 @@ const GymProfile = () => {
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={24} 
-                        color="white" 
+                        color={theme.colors.primary} 
                     />
                     <View style={styles.infoCardContent}>
                         <Text style={styles.infoCardTitle}>{title}</Text>
@@ -528,7 +528,7 @@ const GymProfile = () => {
                         <MaterialCommunityIcons 
                             name="chevron-right" 
                             size={20} 
-                            color="rgba(255,255,255,0.8)" 
+                            color={theme.colors.textSecondary} 
                             style={styles.infoCardChevron}
                         />
                     )}
@@ -555,7 +555,7 @@ const GymProfile = () => {
                     <MaterialCommunityIcons 
                         name={icon as any} 
                         size={32} 
-                        color="white" 
+                        color={theme.colors.primary} 
                     />
                     <Text style={styles.statCardValue}>{value}</Text>
                     <Text style={styles.statCardTitle}>{title}</Text>
