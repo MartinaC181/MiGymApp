@@ -483,7 +483,7 @@ const GymProfileView = ({ gymData }: { gymData: any }) => {
         return (
             <View style={styles.infoCard}>
                 <LinearGradient
-                    colors={isDarkMode ? ['#10344A', '#0C2434'] : ['#b3dcec', '#EAF7FF']}
+                    colors={gradientColors}
                     style={styles.infoCardGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
@@ -512,7 +512,7 @@ const GymProfileView = ({ gymData }: { gymData: any }) => {
         return (
             <View style={styles.statCard}>
                 <LinearGradient
-                    colors={isDarkMode ? ['#10344A', '#0C2434'] : ['#b3dcec', '#EAF7FF']}
+                    colors={gradientColors}
                     style={styles.statCardGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}

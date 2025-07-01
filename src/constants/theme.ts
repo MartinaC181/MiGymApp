@@ -23,13 +23,13 @@ const lightColors = {
   socialButtonBackground: '#ffffff',
   shadowColor: '#000000',
 
-  gradient1: ['#b3dcec', '#EAF7FF'] as [string, string],
-  gradient2: ['#4DD0FF', '#66D9FF'] as [string, string],
-  gradient3: ['#00BFFF', '#33CCFF'] as [string, string],  
-  gradient4: ['#0099CC', '#00BFFF'] as [string, string],  
-  gradient5: ['#33CCFF', '#66D9FF'] as [string, string],
-  gradient6: ['#1E88E5', '#42A5F5'] as [string, string], 
-  gradient7: ['#1AC6FF', '#4DD0FF'] as [string, string],
+  gradient1: ['#00BFFF', '#0099CC'] as [string, string],
+  gradient2: ['#00BFFF', '#0099CC'] as [string, string],
+  gradient3: ['#00BFFF', '#0099CC'] as [string, string],
+  gradient4: ['#00BFFF', '#0099CC'] as [string, string],
+  gradient5: ['#00BFFF', '#0099CC'] as [string, string],
+  gradient6: ['#00BFFF', '#0099CC'] as [string, string],
+  gradient7: ['#00BFFF', '#0099CC'] as [string, string],
 };
 
 const darkColors = {
