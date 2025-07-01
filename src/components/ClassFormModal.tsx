@@ -17,6 +17,7 @@ import theme from '../constants/theme';
 import styles from '../styles/gestion-gimnasio';
 import globalStyles from '../styles/global';
 import * as ImagePicker from 'expo-image-picker';
+import { useTheme } from '../context/ThemeContext';
 
 interface ClassFormModalProps {
     visible: boolean;
@@ -33,6 +34,8 @@ export default function ClassFormModal({
     editingClass = null,
     title
 }: ClassFormModalProps) {
+    // Hook de theme
+    const { theme, isDarkMode } = useTheme();
     // Estados del formulario
     const [formData, setFormData] = useState<ClaseFormData>({
         nombre: '',
@@ -54,6 +57,11 @@ export default function ClassFormModal({
     const [duracionClase, setDuracionClase] = useState('60'); // en minutos
     const [diasFlexibles, setDiasFlexibles] = useState<{ [key: string]: boolean }>({});
     const [imagen, setImagen] = useState<string | null>(null);
+
+    // Definir colores de contraste para inputs y tarjetas
+    const inputBg = isDarkMode ? theme.colors.surfaceLight : theme.colors.inputBackground;
+    const cardBg = isDarkMode ? theme.colors.surface : theme.colors.card;
+    const placeholderColor = isDarkMode ? '#B0B0B0' : '#999';
 
     // Resetear formulario cuando se abre/cierra el modal
     useEffect(() => {
@@ -327,8 +335,8 @@ export default function ClassFormModal({
                 presentationStyle="pageSheet"
                 onRequestClose={onClose}
             >
-                <SafeAreaView style={styles.modalContainer}>
-                    <View style={styles.modalHeader}>
+                <SafeAreaView style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
+                    <View style={[styles.modalHeader, { backgroundColor: cardBg }]}>
                         <TouchableOpacity 
                             onPress={onClose}
                             style={styles.modalCloseButton}
@@ -336,31 +344,32 @@ export default function ClassFormModal({
                             <MaterialIcons name="close" size={24} color={theme.colors.textSecondary} />
                         </TouchableOpacity>
                         <View style={styles.modalTitleContainer}>
-                            <Text style={styles.modalTitle}>
+                            <Text style={[styles.modalTitle, { color: theme.colors.textPrimary }]}>
                                 {modalTitle}
                             </Text>
                         </View>
                         <View style={styles.modalSpacerButton} />
                     </View>
 
-                    <ScrollView style={styles.modalContent}>
-                        <View style={styles.formSection}>
-                            <Text style={styles.formSectionTitle}>Información General</Text>
+                    <ScrollView style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+                        <View style={[styles.formSection, { backgroundColor: cardBg, borderRadius: theme.borderRadius.md }]}>
+                            <Text style={[styles.formSectionTitle, { color: theme.colors.textPrimary }]}>Información General</Text>
                             
                             <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>Nombre de la clase</Text>
+                                <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Nombre de la clase</Text>
                                 <TextInput
                                     style={[
                                         styles.textInput,
+                                        { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border },
                                         errors.nombre && styles.inputError
                                     ]}
                                     value={formData.nombre}
                                     onChangeText={(text) => updateFormData('nombre', text)}
                                     placeholder="Ej: FUNCIONAL HIIT"
-                                    placeholderTextColor="#999"
+                                    placeholderTextColor={placeholderColor}
                                 />
                                 {errors.nombre && (
-                                    <Text style={styles.errorText}>{errors.nombre}</Text>
+                                    <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.nombre}</Text>
                                 )}
                             </View>
 
@@ -377,14 +386,14 @@ export default function ClassFormModal({
                                         }
                                     }}
                                     style={{
-                                        backgroundColor: '#e0e0e0',
+                                        backgroundColor: isDarkMode ? theme.colors.surfaceLight : '#e0e0e0',
                                         padding: 10,
                                         borderRadius: 8,
                                         alignItems: 'center',
                                         marginBottom: 8,
                                     }}
                                 >
-                                    <Text style={{ color: '#333' }}>
+                                    <Text style={{ color: theme.colors.textPrimary }}>
                                         {imagen ? 'Cambiar imagen' : 'Seleccionar imagen (opcional)'}
                                     </Text>
                                 </TouchableOpacity>
@@ -405,74 +414,78 @@ export default function ClassFormModal({
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>Descripción</Text>
+                                <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Descripción</Text>
                                 <TextInput
                                     style={[
                                         styles.textInput, 
                                         styles.textAreaInput,
+                                        { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border },
                                         errors.descripcion && styles.inputError
                                     ]}
                                     value={formData.descripcion}
                                     onChangeText={(text) => updateFormData('descripcion', text)}
                                     placeholder="Describe los beneficios y características de la clase"
-                                    placeholderTextColor="#999"
+                                    placeholderTextColor={placeholderColor}
                                     multiline
                                     numberOfLines={3}
                                 />
                                 {errors.descripcion && (
-                                    <Text style={styles.errorText}>{errors.descripcion}</Text>
+                                    <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.descripcion}</Text>
                                 )}
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>Cupo máximo</Text>
+                                <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Cupo máximo</Text>
                                 <TextInput
                                     style={[
                                         styles.textInput,
+                                        { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border },
                                         errors.cupoMaximo && styles.inputError
                                     ]}
                                     value={formData.cupoMaximo}
                                     onChangeText={(text) => updateFormData('cupoMaximo', text)}
                                     placeholder="20"
-                                    placeholderTextColor="#999"
+                                    placeholderTextColor={placeholderColor}
                                     keyboardType="numeric"
                                 />
                                 {errors.cupoMaximo && (
-                                    <Text style={styles.errorText}>{errors.cupoMaximo}</Text>
+                                    <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.cupoMaximo}</Text>
                                 )}
                             </View>
 
                             <View style={styles.switchContainer}>
-                                <Text style={styles.inputLabel}>Clase activa</Text>
+                                <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Clase activa</Text>
                                 <Switch
                                     value={formData.activa}
                                     onValueChange={(value) => updateFormData('activa', value)}
                                     trackColor={{ false: '#E0E0E0', true: theme.colors.primary }}
-                                    thumbColor={formData.activa ? '#FFFFFF' : '#F4F3F4'}
+                                    thumbColor={formData.activa ? (isDarkMode ? '#fff' : '#fff') : (isDarkMode ? '#888' : '#F4F3F4')}
                                 />
                             </View>
                         </View>
 
-                        <View style={styles.formSection}>
-                            <Text style={styles.formSectionTitle}>Configuración de Horarios</Text>
+                        <View style={[styles.formSection, { backgroundColor: cardBg, borderRadius: theme.borderRadius.md }]}>
+                            <Text style={[styles.formSectionTitle, { color: theme.colors.textPrimary }]}>Configuración de Horarios</Text>
                             
                             {/* Selector de modalidad */}
                             <View style={styles.modalidadContainer}>
                                 <TouchableOpacity
                                     style={[
                                         styles.modalidadButton,
-                                        modalidadClase === 'personalizada' && styles.modalidadButtonActive
+                                        modalidadClase === 'personalizada' && styles.modalidadButtonActive,
+                                        { backgroundColor: modalidadClase === 'personalizada' ? theme.colors.primary : cardBg }
                                     ]}
                                     onPress={() => setModalidadClase('personalizada')}
                                 >
                                     <MaterialIcons 
                                         name="schedule" 
                                         size={20} 
-                                        color={modalidadClase === 'personalizada' ? theme.colors.primary : '#999'} 
+                                        color={modalidadClase === 'personalizada' ? '#fff' : theme.colors.textSecondary} 
                                     />
                                     <Text style={[
                                         styles.modalidadText,
-                                        modalidadClase === 'personalizada' && styles.modalidadTextActive
+                                        modalidadClase === 'personalizada' && styles.modalidadTextActive,
+                                        { color: modalidadClase === 'personalizada' ? '#fff' : theme.colors.textSecondary }
                                     ]}>
                                         Horarios Específicos
                                     </Text>
@@ -481,18 +494,20 @@ export default function ClassFormModal({
                                 <TouchableOpacity
                                     style={[
                                         styles.modalidadButton,
-                                        modalidadClase === 'flexible' && styles.modalidadButtonActive
+                                        modalidadClase === 'flexible' && styles.modalidadButtonActive,
+                                        { backgroundColor: modalidadClase === 'flexible' ? theme.colors.primary : cardBg }
                                     ]}
                                     onPress={() => setModalidadClase('flexible')}
                                 >
                                     <MaterialIcons 
                                         name="today" 
                                         size={20} 
-                                        color={modalidadClase === 'flexible' ? theme.colors.primary : '#999'} 
+                                        color={modalidadClase === 'flexible' ? '#fff' : theme.colors.textSecondary} 
                                     />
                                     <Text style={[
                                         styles.modalidadText,
-                                        modalidadClase === 'flexible' && styles.modalidadTextActive
+                                        modalidadClase === 'flexible' && styles.modalidadTextActive,
+                                        { color: modalidadClase === 'flexible' ? '#fff' : theme.colors.textSecondary }
                                     ]}>
                                         Horarios Automáticos
                                     </Text>
@@ -501,12 +516,10 @@ export default function ClassFormModal({
 
                             {modalidadClase === 'personalizada' ? (
                                 <>
-                                    <Text style={styles.formSectionSubtitle}>
-                                        Selecciona los días y especifica los horarios (formato: 08:00-10:00, 14:00-16:00)
-                                    </Text>
+                                    <Text style={[styles.formSectionSubtitle, { color: theme.colors.textSecondary }]}>Selecciona los días y especifica los horarios (formato: 08:00-10:00, 14:00-16:00)</Text>
                                     
                                     {errors.dias && (
-                                        <Text style={styles.errorText}>{errors.dias}</Text>
+                                        <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.dias}</Text>
                                     )}
                                     
                                     {diasSemana.map((dia) => (
@@ -519,11 +532,12 @@ export default function ClassFormModal({
                                                     <MaterialIcons 
                                                         name={formData.diasSeleccionados[dia.key] ? "check-box" : "check-box-outline-blank"} 
                                                         size={24} 
-                                                        color={formData.diasSeleccionados[dia.key] ? theme.colors.primary : "#999"} 
+                                                        color={formData.diasSeleccionados[dia.key] ? theme.colors.primary : theme.colors.textSecondary} 
                                                     />
                                                     <Text style={[
                                                         styles.diaLabel, 
-                                                        formData.diasSeleccionados[dia.key] && styles.diaLabelSelected
+                                                        formData.diasSeleccionados[dia.key] && styles.diaLabelSelected,
+                                                        { color: formData.diasSeleccionados[dia.key] ? theme.colors.primary : theme.colors.textSecondary }
                                                     ]}>
                                                         {dia.label}
                                                     </Text>
@@ -535,6 +549,7 @@ export default function ClassFormModal({
                                                     <TextInput
                                                         style={[
                                                             styles.horarioInput,
+                                                            { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border },
                                                             errors[`horario_${dia.key}`] && styles.inputError
                                                         ]}
                                                         value={formData.horariosInput[dia.key] || ''}
@@ -543,10 +558,10 @@ export default function ClassFormModal({
                                                             clearFieldError(`horario_${dia.key}`);
                                                         }}
                                                         placeholder="08:00-10:00, 14:00-16:00"
-                                                        placeholderTextColor="#999"
+                                                        placeholderTextColor={placeholderColor}
                                                     />
                                                     {errors[`horario_${dia.key}`] && (
-                                                        <Text style={[styles.errorText, { marginLeft: theme.spacing.xl }]}>
+                                                        <Text style={[styles.errorText, { marginLeft: theme.spacing.xl, color: theme.colors.error }]}> 
                                                             {errors[`horario_${dia.key}`]}
                                                         </Text>
                                                     )}
@@ -557,26 +572,26 @@ export default function ClassFormModal({
                                 </>
                             ) : (
                                 <>
-                                    <Text style={styles.formSectionSubtitle}>
-                                        Selecciona los días que opera tu gimnasio y configura horarios automáticos
-                                    </Text>
+                                    <Text style={[styles.formSectionSubtitle, { color: theme.colors.textSecondary }]}>Selecciona los días que opera tu gimnasio y configura horarios automáticos</Text>
                                     
                                     {/* Selector de días para modo flexible */}
                                     <View style={styles.diasFlexiblesContainer}>
-                                        <Text style={styles.inputLabel}>Días de funcionamiento</Text>
+                                        <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Días de funcionamiento</Text>
                                         <View style={styles.diasFlexiblesGrid}>
                                             {diasSemana.map((dia) => (
                                                 <TouchableOpacity
                                                     key={dia.key}
                                                     style={[
                                                         styles.diaFlexibleButton,
-                                                        diasFlexibles[dia.key] && styles.diaFlexibleButtonActive
+                                                        diasFlexibles[dia.key] && styles.diaFlexibleButtonActive,
+                                                        { backgroundColor: diasFlexibles[dia.key] ? theme.colors.primary : cardBg }
                                                     ]}
                                                     onPress={() => toggleDiaFlexible(dia.key)}
                                                 >
                                                     <Text style={[
                                                         styles.diaFlexibleText,
-                                                        diasFlexibles[dia.key] && styles.diaFlexibleTextActive
+                                                        diasFlexibles[dia.key] && styles.diaFlexibleTextActive,
+                                                        { color: diasFlexibles[dia.key] ? '#fff' : theme.colors.textSecondary }
                                                     ]}>
                                                         {dia.label.substring(0, 3)}
                                                     </Text>
@@ -584,37 +599,44 @@ export default function ClassFormModal({
                                             ))}
                                         </View>
                                         {errors.dias && (
-                                            <Text style={styles.errorText}>{errors.dias}</Text>
+                                            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.dias}</Text>
                                         )}
                                     </View>
                                     
                                     <View style={styles.inputGroup}>
-                                        <Text style={styles.inputLabel}>Horario de inicio (primera clase del día)</Text>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            value={horarioInicio}
-                                            onChangeText={setHorarioInicio}
-                                            placeholder="08:00"
-                                            placeholderTextColor="#999"
-                                        />
-                                    </View>
-
-                                    <View style={styles.inputGroup}>
-                                        <Text style={styles.inputLabel}>Horario de fin (última clase del día)</Text>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            value={horarioFin}
-                                            onChangeText={setHorarioFin}
-                                            placeholder="22:00"
-                                            placeholderTextColor="#999"
-                                        />
-                                    </View>
-
-                                    <View style={styles.inputGroup}>
-                                        <Text style={styles.inputLabel}>Duración de cada clase (minutos)</Text>
+                                        <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Horario de inicio (primera clase del día)</Text>
                                         <TextInput
                                             style={[
                                                 styles.textInput,
+                                                { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border }
+                                            ]}
+                                            value={horarioInicio}
+                                            onChangeText={setHorarioInicio}
+                                            placeholder="08:00"
+                                            placeholderTextColor={placeholderColor}
+                                        />
+                                    </View>
+
+                                    <View style={styles.inputGroup}>
+                                        <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Horario de fin (última clase del día)</Text>
+                                        <TextInput
+                                            style={[
+                                                styles.textInput,
+                                                { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border }
+                                            ]}
+                                            value={horarioFin}
+                                            onChangeText={setHorarioFin}
+                                            placeholder="22:00"
+                                            placeholderTextColor={placeholderColor}
+                                        />
+                                    </View>
+
+                                    <View style={styles.inputGroup}>
+                                        <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>Duración de cada clase (minutos)</Text>
+                                        <TextInput
+                                            style={[
+                                                styles.textInput,
+                                                { color: theme.colors.textPrimary, backgroundColor: inputBg, borderColor: theme.colors.border },
                                                 errors.duracionClase && styles.inputError
                                             ]}
                                             value={duracionClase}
@@ -623,18 +645,18 @@ export default function ClassFormModal({
                                                 clearFieldError('duracionClase');
                                             }}
                                             placeholder="60"
-                                            placeholderTextColor="#999"
+                                            placeholderTextColor={placeholderColor}
                                             keyboardType="numeric"
                                         />
                                         {errors.duracionClase && (
-                                            <Text style={styles.errorText}>{errors.duracionClase}</Text>
+                                            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.duracionClase}</Text>
                                         )}
                                     </View>
 
                                     {Object.keys(diasFlexibles).some(dia => diasFlexibles[dia]) && (
                                         <View style={styles.previsualizacionContainer}>
-                                            <Text style={styles.previsualizacionTitle}>Vista previa de horarios:</Text>
-                                            <Text style={styles.previsualizacionText}>
+                                            <Text style={[styles.previsualizacionTitle, { color: theme.colors.textPrimary }]}>Vista previa de horarios:</Text>
+                                            <Text style={[styles.previsualizacionText, { color: theme.colors.textSecondary }]}>
                                                 {generarHorariosDiarios().join(', ')}
                                             </Text>
                                         </View>
@@ -645,12 +667,12 @@ export default function ClassFormModal({
                     </ScrollView>
 
                     {/* Botón de guardar usando estilos existentes */}
-                    <View style={styles.modalFooter}>
+                    <View style={[styles.modalFooter, { backgroundColor: cardBg }]}>
                         <TouchableOpacity 
-                            style={globalStyles.LoginButton}
+                            style={[globalStyles.LoginButton, { backgroundColor: theme.colors.primary }]}
                             onPress={handleSave}
                         >
-                            <Text style={globalStyles.buttonText}>
+                            <Text style={[globalStyles.buttonText, { color: isDarkMode ? '#111' : '#fff' }]}>
                                 {editingClass ? 'ACTUALIZAR CLASE' : 'CREAR CLASE'}
                             </Text>
                         </TouchableOpacity>

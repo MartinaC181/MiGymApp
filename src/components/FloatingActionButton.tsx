@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import theme from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface FloatingActionButtonProps {
     onPress: () => void;
@@ -19,13 +20,18 @@ export default function FloatingActionButton({
     onPress,
     icon = 'library-add',
     size = 28,
-    backgroundColor = theme.colors.primary,
-    iconColor = '#FFFFFF',
+    backgroundColor,
+    iconColor,
     bottom = 50,
     right = 24,
     showLabel = true,
     label = 'Nueva Clase'
 }: FloatingActionButtonProps) {
+    const { theme, isDarkMode } = useTheme();
+    // Color de fondo por defecto
+    const fabBackgroundColor = backgroundColor || theme.colors.primary;
+    // Color de ícono: negro en darkmode, blanco en lightmode
+    const fabIconColor = iconColor || (isDarkMode ? '#111111' : '#FFFFFF');
     return (
         <View style={[styles.fabContainer, { bottom, right }]}>
             {showLabel && (
@@ -37,12 +43,12 @@ export default function FloatingActionButton({
                 style={[
                     styles.fabButton,
                     {
-                        backgroundColor,
+                        backgroundColor: fabBackgroundColor,
                     }
                 ]}
                 onPress={onPress}
             >
-                <MaterialIcons name={icon} size={size} color={iconColor} />
+                <MaterialIcons name={icon} size={size} color={fabIconColor} />
             </TouchableOpacity>
         </View>
     );
