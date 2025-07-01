@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     View, 
     Text, 
@@ -12,24 +12,17 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 import { useLocalSearchParams } from 'expo-router';
-import styles from '../../styles/clases';
+import useClasesStyles from '../../styles/clases';
 import globalStyles from '../../styles/global';
-import theme from '../../constants/theme';
-
-// Datos de ejemplo para los horarios disponibles
-const horariosPorClase = {
-    1: { // FUNCIONAL HIIT
-        descripcion: "Entrenamiento de alta intensidad que combina fuerza y cardio para mejorar resistencia, quemar grasa y tonificar el cuerpo.",
-        horarios: [
-            {dia: "Lunes", horas: ["08:00 a 10:00", "14:00 a 16:00"]},
-            {dia: "Martes", horas: ["08:00 a 10:00", "14:00 a 16:00"]},
-            {dia: "Miércoles", horas: ["08:00 a 10:00", "14:00 a 16:00"]},
-            {dia: "Jueves", horas: ["08:00 a 10:00", "14:00 a 16:00"]},
-            {dia: "Viernes", horas: ["08:00 a 10:00", "14:00 a 16:00"]},
-        ]
-    },
-    // ... resto de clases igual que antes
-};
+import { useTheme } from '../../context/ThemeContext';
+import { 
+    getAvailableClasses, 
+    getCurrentUser, 
+    saveUserClasses, 
+    getUserClasses,
+    enrollClientToClass,
+    isClientEnrolledInClass
+} from '../../utils/storage';
 
 export default function ClaseDetalle() {
     const params = useLocalSearchParams();
@@ -37,14 +30,60 @@ export default function ClaseDetalle() {
     const nombreClase = params.nombre?.toString() || "Clase";
     const imagenClase = params.imagen?.toString();
     
-    // Obtener la información de la clase según el ID
-    const claseInfo = horariosPorClase[claseId] || horariosPorClase[1];
-    
-    // Estado para los horarios seleccionados
+    // Estados
+    const [claseInfo, setClaseInfo] = useState(null);
     const [seleccionados, setSeleccionados] = useState({});
-    
-    // Añadir estado para el día seleccionado
     const [diaSeleccionado, setDiaSeleccionado] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Estilos y tema
+    const styles = useClasesStyles();
+    const { theme } = useTheme();
+
+    // Cargar información de la clase desde AsyncStorage
+    useEffect(() => {
+        loadClaseInfo();
+    }, [claseId]);
+
+    const loadClaseInfo = async () => {
+        try {
+            // Obtener usuario actual para cargar clases específicas del gimnasio
+            const currentUser = await getCurrentUser();
+            const availableClasses = await getAvailableClasses(currentUser);
+            const foundClass = availableClasses.find(clase => clase.id === claseId);
+            
+            if (foundClass) {
+                setClaseInfo(foundClass);
+                
+                // Si es un usuario cliente, verificar si ya está inscrito
+                if (currentUser && currentUser.role === 'client') {
+                    const gymId = foundClass.gymId || (currentUser as any).gymId;
+                    if (gymId) {
+                        const isEnrolled = await isClientEnrolledInClass(currentUser.id, claseId, gymId);
+                        setClaseInfo(prev => ({ ...prev, isEnrolled }));
+                    }
+                }
+            } else {
+                // Fallback si no se encuentra la clase
+                setClaseInfo({
+                    descripcion: "Información de la clase no disponible.",
+                    horarios: [
+                        {dia: "Lunes", horas: ["Horario no disponible"]},
+                    ]
+                });
+            }
+        } catch (error) {
+            console.error("Error cargando información de la clase:", error);
+            setClaseInfo({
+                descripcion: "Error cargando información de la clase.",
+                horarios: [
+                    {dia: "Lunes", horas: ["Error de carga"]},
+                ]
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
     
     // Toggle selección de horario
     const toggleSeleccion = (dia, hora) => {
@@ -56,27 +95,85 @@ export default function ClaseDetalle() {
     };
     
     // Función para inscribirse
-    const handleInscripcion = () => {
+    const handleInscripcion = async () => {
         const horariosMarcados = Object.keys(seleccionados).filter(key => seleccionados[key]);
         
         if (horariosMarcados.length === 0) {
             Alert.alert("Atención", "Por favor selecciona al menos un horario");
             return;
         }
-        
-        Alert.alert(
-            "Inscripción exitosa",
-            `Te has inscrito correctamente a la clase de ${nombreClase}`,
-            [{ text: "Aceptar" }]
-        );
+
+        try {
+            // Obtener usuario actual
+            const currentUser = await getCurrentUser();
+            if (!currentUser || currentUser.role !== 'client') {
+                Alert.alert("Error", "Debes estar logueado como cliente para inscribirte");
+                return;
+            }
+
+            // Determinar el gymId
+            const gymId = claseInfo?.gymId || (currentUser as any).gymId;
+            if (!gymId) {
+                Alert.alert("Error", "No se pudo identificar el gimnasio");
+                return;
+            }
+
+            // Verificar si ya está inscrito
+            const isAlreadyEnrolled = await isClientEnrolledInClass(currentUser.id, claseId, gymId);
+            if (isAlreadyEnrolled) {
+                Alert.alert("Atención", "Ya estás inscrito en esta clase");
+                return;
+            }
+
+            // Inscribir al cliente usando la nueva función
+            const scheduleInfo = {
+                horarios: horariosMarcados,
+                diaSeleccionado: claseInfo?.horarios[diaSeleccionado]?.dia
+            };
+
+            const result = await enrollClientToClass(currentUser.id, claseId, gymId, scheduleInfo);
+            
+            if (result.success) {
+                // Actualizar estado local
+                setClaseInfo(prev => ({ ...prev, isEnrolled: true }));
+                setSeleccionados({});
+
+                Alert.alert(
+                    "Inscripción exitosa",
+                    `Te has inscrito correctamente a la clase de ${nombreClase}`,
+                    [{ text: "Aceptar" }]
+                );
+            } else {
+                Alert.alert("Error", result.message);
+            }
+        } catch (error) {
+            console.error("Error guardando inscripción:", error);
+            Alert.alert("Error", "No se pudo completar la inscripción");
+        }
     };
 
+    if (isLoading) {
+        return (
+            <View style={[globalStyles.container, { justifyContent: 'center', backgroundColor: theme.colors.background }]}>
+                <Text style={{ color: theme.colors.textPrimary }}>Cargando información de la clase...</Text>
+            </View>
+        );
+    }
+
+    if (!claseInfo || !claseInfo.horarios || claseInfo.horarios.length === 0) {
+        return (
+            <View style={[globalStyles.container, { justifyContent: 'center', backgroundColor: theme.colors.background }]}>
+                <Text style={{ color: theme.colors.textPrimary }}>No hay información disponible para esta clase</Text>
+            </View>
+        );
+    }
+
     return (
-        <ScrollView style={globalStyles.safeArea}>
+        <ScrollView style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
             <View style={styles.headerImage}>
-                <Image 
-                    source={{ uri: imagenClase || 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5' }} 
-                    style={styles.headerImage} 
+                <Image
+                    source={{ uri: claseInfo?.imagen }}
+                    style={styles.headerImage}
                     resizeMode="cover"
                 />
                 <View style={styles.overlay}>
@@ -88,7 +185,7 @@ export default function ClaseDetalle() {
             </View>
             
             <View style={styles.contentContainer}>
-                <Text style={globalStyles.title}>Días y horarios</Text>
+                <Text style={[globalStyles.title, { color: theme.colors.textPrimary }]}>Días y horarios</Text>
                 
                 {/* Selector de días como pestañas */}
                 <ScrollView 
@@ -149,11 +246,26 @@ export default function ClaseDetalle() {
                 
                 {/* Botón inscribirse */}
                 <TouchableOpacity 
-                    style={[globalStyles.Button, {marginTop: theme.spacing.lg}]}
+                    style={[
+                        globalStyles.Button, 
+                        {marginTop: theme.spacing.lg},
+                        claseInfo?.isEnrolled && { backgroundColor: theme.colors.success, opacity: 0.7 }
+                    ]}
                     onPress={handleInscripcion}
+                    disabled={claseInfo?.isEnrolled}
                 >
-                    <Text style={globalStyles.buttonText}>Inscribirse</Text>
+                    <Text style={[globalStyles.buttonText, { color: '#FFFFFF' }]}>
+                        {claseInfo?.isEnrolled ? 'Ya inscrito' : 'Inscribirse'}
+                    </Text>
                 </TouchableOpacity>
+                
+                {claseInfo?.isEnrolled && (
+                    <View style={{ marginTop: theme.spacing.md, padding: theme.spacing.md, backgroundColor: theme.colors.success + '20', borderRadius: theme.borderRadius.md }}>
+                        <Text style={{ color: theme.colors.success, textAlign: 'center', fontWeight: 'bold' }}>
+                            ✓ Ya estás inscrito en esta clase
+                        </Text>
+                    </View>
+                )}
             </View>
         </ScrollView>
     );

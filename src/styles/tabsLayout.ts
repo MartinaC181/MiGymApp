@@ -1,15 +1,19 @@
 // src/styles/tabsLayoutStyles.ts
 import { StyleSheet } from 'react-native';
-import theme from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
-export default StyleSheet.create({
-  container: {
-    flex: 1,                        
-    backgroundColor: theme.colors.surface,
-    zIndex: 0,
-  },
-  content: {
-    flex: 1,  
-    paddingBottom: 56 + theme.spacing.sm,                   
-  },
-});
+export default function useTabsLayoutStyles() {
+  const { theme } = useTheme();
+  
+  return StyleSheet.create({
+    container: {
+      flex: 1,                        
+      backgroundColor: theme.colors.background,
+      zIndex: 0,
+    },
+    content: {
+      flex: 1,  
+      paddingBottom: 70 + theme.spacing.md,
+    },
+  });
+}

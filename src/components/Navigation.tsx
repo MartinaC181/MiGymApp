@@ -1,17 +1,20 @@
-// src/components/Navigation.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Pressable, Text, Keyboard } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Pressable, Text, Keyboard, Animated } from 'react-native';
+import { useRouter, usePathname } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../styles/navigation';
-import theme from '../constants/theme';
+import useNavigationStyles from '../styles/navigation';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Navigation() {
   const router = useRouter();
+  const pathname = usePathname();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const styles = useNavigationStyles();
+  const { theme, isDarkMode } = useTheme();
+  const { user } = useAuth();
 
-  // Añadir listeners para el teclado
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardVisible(true);
@@ -26,35 +29,88 @@ export default function Navigation() {
     };
   }, []);
 
-  // Función auxiliar para crear cada botón con su texto
   const NavItem = ({
     iconName,
-    route,
     label,
+    route,
   }: {
     iconName: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-    route: string;
     label: string;
-  }) => (
-    <View style={styles.navItemWrapper}>
-      <Pressable
-        style={({ pressed }) => [
-          styles.iconContainer,
-          pressed ? styles.iconContainerPressed : {},
-        ]}
-        onPress={() => router.push(route)}
-      >
-        <MaterialCommunityIcons
-          name={iconName}
-          size={32}
-          color={theme.colors.primary}
-        />
-      </Pressable>
-      <Text style={styles.iconText}>{label}</Text>
-    </View>
-  );
+    route: string;
+  }) => {
+    const isActive = pathname === route;
+    const scaleAnim = useRef(new Animated.Value(isActive ? 1.08 : 1)).current;
+    
+    useEffect(() => {
+      Animated.spring(scaleAnim, {
+        toValue: isActive ? 1.08 : 1,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }).start();
+    }, [isActive, scaleAnim]);
+    
+    const handlePressIn = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 0.95,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }).start();
+    };
 
-  // Si el teclado está visible, no mostrar la navegación
+    const handlePressOut = () => {
+      Animated.spring(scaleAnim, {
+        toValue: isActive ? 1.08 : 1,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }).start();
+    };
+
+    const handlePress = () => {
+      router.push(route);
+    };
+    
+    return (
+      <View style={styles.navItemWrapper}>
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          <Pressable
+            style={[
+              styles.iconContainer,
+              isActive && styles.iconContainerActive,
+            ]}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={handlePress}
+          >
+            <MaterialCommunityIcons
+              name={iconName}
+              size={isActive ? 38 : 36}
+              color={isDarkMode ? '#000000' : theme.colors.primary}
+            />
+          </Pressable>
+        </Animated.View>
+      </View>
+    );
+  };
+
+  const gymItems = [
+    { icon: 'account-group', label: 'Socios', route: '/gestion-socios' },
+    { icon: 'dumbbell', label: 'Clases', route: '/gestion-clases' },
+    { icon: 'wallet', label: 'Cuotas', route: '/gestion-cuotas' },
+    { icon: 'account', label: 'Perfil', route: '/perfil' },
+  ];
+
+  const clientItems = [
+    { icon: 'home', label: 'Inicio', route: '/home' },
+    { icon: 'weight-lifter', label: 'Entrenamiento', route: '/entrenamiento' },
+    { icon: 'wallet', label: 'Cuota', route: '/cuota' },
+    { icon: 'account', label: 'Perfil', route: '/perfil' },
+  ];
+
+  const navItems = user?.role === 'gym' ? gymItems : clientItems;
+
   if (keyboardVisible) {
     return null;
   }
@@ -62,10 +118,14 @@ export default function Navigation() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <View style={styles.container}>
-        <NavItem iconName="home" route="/home" label="Inicio" />
-        <NavItem iconName="weight-lifter" route="/rutina" label="Rutina" />
-        <NavItem iconName="wallet" route="/cuota" label="Cuota" />
-        <NavItem iconName="account" route="/perfil" label="Perfil" />
+        {navItems.map((item) => (
+          <NavItem
+            key={item.route}
+            iconName={item.icon as any}
+            label={item.label}
+            route={item.route}
+          />
+        ))}
       </View>
     </SafeAreaView>
   );

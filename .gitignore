@@ -1,5 +1,8 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
+# env
+.env
+
 # dependencies
 node_modules/
 
@@ -34,3 +37,15 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# cursor
+.cursorrules
+.cursorignore
+.cursor*
+GEMINI.md
+
+#idea
+.idea*
+
+#vscode
+.vscode*

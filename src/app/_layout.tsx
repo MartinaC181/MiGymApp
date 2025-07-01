@@ -1,7 +1,7 @@
 // app/_layout.tsx
 import React, { useEffect, useState } from "react";
 import { Slot } from "expo-router";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
@@ -11,18 +11,17 @@ import {
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
 
-import theme from "../constants/theme"; // ruta a tu archivo theme.ts
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
+import { UserProvider } from "../context/UserContext";
 
-// Evita que el splash se oculte automáticamente hasta que carguen las fuentes
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-
-
+function AppContent() {
+  const { theme, isDarkMode } = useTheme();
   const [fontsLoaded] = useFonts({
-    [theme.typography.fontFamily.regular]: Roboto_400Regular,
-    [theme.typography.fontFamily.medium]: Roboto_500Medium,
-    [theme.typography.fontFamily.bold]: Roboto_700Bold,
+    'Roboto-Regular': Roboto_400Regular,
+    'Roboto-Medium': Roboto_500Medium,
+    'Roboto-Bold': Roboto_700Bold,
   });
 
   useEffect(() => {
@@ -31,22 +30,42 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  // Mientras no carguen las fuentes, no renderizamos nada
   if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider>
-        <View style={styles.container}>
-          <Slot />
-        </View>
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor={isDarkMode ? '#0066CC' : theme.colors.primary} 
+        translucent={true}
+      />
+      <View style={[
+        styles.container, 
+        { 
+          backgroundColor: theme.colors.background,
+          paddingTop: isDarkMode ? 0 : 0,
+          paddingBottom: isDarkMode ? 0 : 0
+        }
+      ]}>
+        <Slot />
+      </View>
     </SafeAreaProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </ThemeProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
 });
 
