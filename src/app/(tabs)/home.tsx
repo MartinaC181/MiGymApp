@@ -13,6 +13,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import styles, { CARD_WIDTH, CARD_SPACING } from "../../styles/home";
 import globalStyles from "../../styles/global";
 import Racha from "../../components/Racha";
+import MisClases from "../../components/MisClases";
 import theme from "../../constants/theme";
 import { getCurrentUser, getAvailableClasses } from "../../utils/storage";
 import { ClientUser } from "../../data/Usuario";
@@ -151,6 +152,9 @@ export default function Home() {
             <View style={styles.rachaContainer}>
                 <Racha />
             </View>
+
+            {/* Mis Clases */}
+            <MisClases />
 
             {/* Contenedor relativo para posicionar las sugerencias */}
             <View style={styles.searchWrapper}>
