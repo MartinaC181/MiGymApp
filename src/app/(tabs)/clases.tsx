@@ -172,7 +172,13 @@ export default function ClaseDetalle() {
         <ScrollView style={[globalStyles.safeArea, { backgroundColor: theme.colors.background }]}>
             <View style={styles.headerImage}>
                 <Image
-                    source={{ uri: claseInfo?.imagen }}
+                    source={
+                        claseInfo?.imagen && 
+                        typeof claseInfo.imagen === 'string' && 
+                        claseInfo.imagen.length > 0
+                            ? { uri: claseInfo.imagen }
+                            : require('../../../assets/icon.png')
+                    }
                     style={styles.headerImage}
                     resizeMode="cover"
                 />

@@ -399,16 +399,15 @@ export default function ClassFormModal({
                                 </TouchableOpacity>
                                 {imagen && (
                                     <Image
-                                        source={{ uri: imagen }}
+                                        source={
+                                            imagen && 
+                                            typeof imagen === 'string' && 
+                                            imagen.length > 0
+                                                ? { uri: imagen }
+                                                : require('../../assets/icon.png')
+                                        }
                                         style={{ width: 120, height: 80, borderRadius: 8, alignSelf: 'center' }}
                                         resizeMode="cover"
-                                    />
-                                )}
-                                {!imagen && (
-                                    <Image
-                                        source={require('../../assets/icon.png')}
-                                        style={{ width: 60, height: 60, borderRadius: 12, alignSelf: 'center', opacity: 0.5 }}
-                                        resizeMode="contain"
                                     />
                                 )}
                             </View>

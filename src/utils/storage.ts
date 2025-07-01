@@ -1,6 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ClientUser, GymUser, UsuarioAtleta, UsuarioGimnasio } from "../data/Usuario";
 
+// Helper function para validar URIs
+const validateUri = (uri: any): string | undefined => {
+  if (!uri || typeof uri !== 'string' || uri.trim().length === 0) {
+    return undefined;
+  }
+  return uri.trim();
+};
+
 // Keys para AsyncStorage
 const STORAGE_KEYS = {
   // Usuarios y sesión
@@ -170,6 +178,11 @@ export const updateUserProfile = async (userId: string, updates: Partial<ClientU
     const user = Object.values(usersDB).find(u => u.id === userId);
     
     if (user) {
+      // Validar avatarUri si está en las actualizaciones
+      if ('avatarUri' in updates) {
+        updates.avatarUri = validateUri(updates.avatarUri);
+      }
+      
       const updatedUser = { ...user, ...updates } as ClientUser | GymUser;
       
       // Guardar usando el email como clave (como hace saveUser)
@@ -385,7 +398,7 @@ const convertGymClassToHomeFormat = (gymClass: any) => {
   return {
     id: gymClass.id,
     nombre: gymClass.nombre,
-    imagen: gymClass.imagen || getDefaultImage(gymClass.nombre),
+    imagen: validateUri(gymClass.imagen) || getDefaultImage(gymClass.nombre),
     descripcion: gymClass.descripcion,
     horarios: horarios,
     cupoMaximo: gymClass.cupoMaximo,

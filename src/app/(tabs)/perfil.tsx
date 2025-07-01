@@ -108,7 +108,14 @@ const Profile = () => {
                     {/* Avatar con fondo y botón de edición*/}
                     <View style={styles.avatarWrapper}>
                         <Image
-                            source={userData && (userData as any).avatarUri ? { uri: (userData as any).avatarUri } : perfilMirtho}
+                            source={
+                                userData && 
+                                (userData as any).avatarUri && 
+                                typeof (userData as any).avatarUri === 'string' && 
+                                (userData as any).avatarUri.length > 0
+                                    ? { uri: (userData as any).avatarUri } 
+                                    : perfilMirtho
+                            }
                             style={styles.avatar}
                         />
                         <TouchableOpacity 

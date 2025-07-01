@@ -261,7 +261,13 @@ export default function Home() {
                         }]}> 
                             <View style={styles.card}>
                                 <Image
-                                    source={{ uri: clase.imagen }}
+                                    source={
+                                        clase.imagen && 
+                                        typeof clase.imagen === 'string' && 
+                                        clase.imagen.length > 0
+                                            ? { uri: clase.imagen }
+                                            : require('../../../assets/icon.png')
+                                    }
                                     style={styles.cardImage}
                                 />
                                 <View style={[styles.cardOverlay, { 

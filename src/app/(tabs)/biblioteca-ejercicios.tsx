@@ -277,7 +277,7 @@ export default function BibliotecaEjercicios() {
         activeOpacity={0.9}
       >
         <View style={[styles.cardImageContainer, isGrid && styles.gridImageContainer]}>
-          {ejercicio.gifUrl ? (
+          {ejercicio.gifUrl && typeof ejercicio.gifUrl === 'string' && ejercicio.gifUrl.length > 0 ? (
             <Image source={{ uri: ejercicio.gifUrl }} style={styles.exerciseImage} />
           ) : (
             <LinearGradient

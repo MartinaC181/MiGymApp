@@ -68,11 +68,16 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
             )}
           </View>
           <ScrollView style={styles(theme).exerciseDetails} showsVerticalScrollIndicator={false}>
-            {exercise.gifUrl && (
-              <View style={styles(theme).exerciseImageModal}>
+            <View style={styles(theme).exerciseImageModal}>
+              {exercise.gifUrl && typeof exercise.gifUrl === 'string' && exercise.gifUrl.length > 0 ? (
                 <Image source={{ uri: exercise.gifUrl }} style={styles(theme).exerciseDetailImage} />
-              </View>
-            )}
+              ) : (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.surface }}>
+                  <MaterialIcons name="fitness-center" size={64} color={theme.colors.textSecondary} />
+                  <Text style={{ color: theme.colors.textSecondary, marginTop: 8 }}>Imagen no disponible</Text>
+                </View>
+              )}
+            </View>
             <View style={styles(theme).exerciseInfo}>
               <Text style={styles(theme).exerciseModalTitle}>{exercise.name}</Text>
               <View style={styles(theme).exerciseMetrics}>
