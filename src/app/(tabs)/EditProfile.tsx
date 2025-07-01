@@ -5,12 +5,14 @@ import { useTheme } from '../../context/ThemeContext';
 import {router} from "expo-router";
 import styles from '@/src/styles/home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { updateUserProfile, getCurrentUser } from '../../utils/storage';
+import { updateUserProfile } from '../../utils/storage';
 // eslint-disable-next-line import/no-unresolved
 import * as ImagePicker from 'expo-image-picker';
+import { useUser } from '../../context/UserContext';
 
 const EditProfile = ({navigation}: any) => {
     const { theme, isDarkMode } = useTheme();
+    const { user, setUser, refreshUser } = useUser();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [weight, setWeight] = useState('');
@@ -20,27 +22,18 @@ const EditProfile = ({navigation}: any) => {
     const [avatarUri, setAvatarUri] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Cargar datos del usuario actual
+    // Cargar datos del usuario actual desde el contexto
     useEffect(() => {
-        loadUserData();
-    }, []);
-
-    const loadUserData = async () => {
-        try {
-            const user = await getCurrentUser();
-            if (user) {
-                setName(user.name || '');
-                setEmail(user.email || '');
-                setWeight((user as any).weight?.toString() || '');
-                setIdealWeight((user as any).idealWeight?.toString() || '');
-                setHeight((user as any).height?.toString() || '');
-                setDni((user as any).dni?.toString() || '');
-                setAvatarUri(user.avatarUri || null);
-            }
-        } catch (error) {
-            console.error('Error cargando datos del usuario:', error);
+        if (user) {
+            setName(user.name || '');
+            setEmail(user.email || '');
+            setWeight((user as any).weight?.toString() || '');
+            setIdealWeight((user as any).idealWeight?.toString() || '');
+            setHeight((user as any).height?.toString() || '');
+            setDni((user as any).dni?.toString() || '');
+            setAvatarUri((user as any).avatarUri || null);
         }
-    };
+    }, [user]);
 
     const validateEmail = (email: string) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -87,11 +80,9 @@ const EditProfile = ({navigation}: any) => {
         if (hasError) return;
         setIsLoading(true);
         try {
-            const currentUser = await getCurrentUser();
-            if (!currentUser) {
+            if (!user) {
                 throw new Error('No se pudo obtener el usuario actual');
             }
-
             const updates = {
                 name,
                 email,
@@ -101,11 +92,10 @@ const EditProfile = ({navigation}: any) => {
                 dni,
                 avatarUri,
             };
-
             // Usar updateUserProfile para guardar en la base de datos y actualizar la sesión
-            const updatedUser = await updateUserProfile(currentUser.id, updates);
-            
+            const updatedUser = await updateUserProfile(user.id, updates);
             if (updatedUser) {
+                setUser(updatedUser); // Actualizar el contexto global
                 router.push('/perfil');
             } else {
                 throw new Error('No se pudo actualizar el perfil');
